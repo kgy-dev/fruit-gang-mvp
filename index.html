@@ -254,7 +254,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">MVP Production Tracker · B8</div>
+    <div class="splash-tag">MVP Production Tracker · B9</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -417,16 +417,31 @@ const FIREBASE_CONFIG = {
 };
 const DB_PATH = "fg-mvp/done";
 
-/* ===== viewport lock: trust measured pixels, not iOS viewport units ===== */
-const BUILD=8;
+/* ===== viewport lock =====
+   iOS standalone launches reporting Safari's shorter viewport and never fires
+   resize. In standalone the webview is fullscreen by definition, so we take the
+   physical screen dimension there and re-measure aggressively for 1.5s. */
+const BUILD=9;
 function fitViewport(){
-  const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  const vv=window.visualViewport;
+  let h=Math.max(window.innerHeight||0, vv?vv.height:0,
+                 document.documentElement.clientHeight||0);
+  if(navigator.standalone){
+    const scr=matchMedia("(orientation: portrait)").matches?screen.height:screen.width;
+    if(scr) h=Math.max(h,scr);
+  }
   document.documentElement.style.setProperty("--appH",h+"px");
+  window.__h=Math.round(h);
 }
 fitViewport();
 addEventListener("resize",fitViewport);
-addEventListener("orientationchange",()=>setTimeout(fitViewport,120));
+addEventListener("pageshow",fitViewport);
+addEventListener("focus",fitViewport);
+document.addEventListener("visibilitychange",fitViewport);
+addEventListener("orientationchange",()=>setTimeout(fitViewport,150));
 if(window.visualViewport) visualViewport.addEventListener("resize",fitViewport);
+const __t0=performance.now();
+(function burst(t){ fitViewport(); if(t-__t0<1500) requestAnimationFrame(burst); })(__t0);
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
@@ -701,7 +716,7 @@ document.addEventListener("visibilitychange",async()=>{
   $("wToggle").checked=weighted;
   $("panes").hidden=false;
   buildTicks(); chips(); teamSeg(); all_();
-  $("buildTag").textContent=`build ${BUILD} · ${backend}`;
+  $("buildTag").textContent=`build ${BUILD} · ${backend} · ${window.__h}px${navigator.standalone?" · standalone":""}`;
 
   // hold the splash long enough to read, never longer than needed
   const held=Math.max(0,900-(Date.now()-t0));
