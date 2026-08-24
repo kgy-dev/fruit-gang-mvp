@@ -34,7 +34,7 @@
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;padding:0;overflow:hidden}
+html,body{height:100%;margin:0;padding:0;overflow:hidden;overscroll-behavior:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 :focus-visible{outline:2px solid var(--t2);outline-offset:2px;border-radius:4px}
@@ -45,7 +45,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 ::-webkit-scrollbar-thumb:hover{background:#3b3934}
 ::-webkit-scrollbar-corner{background:transparent}
 
-.app{position:relative;height:100%;max-width:1240px;margin:0 auto;display:flex;flex-direction:column}
+.app{position:relative;height:100vh;height:100dvh;max-width:1240px;margin:0 auto;display:flex;flex-direction:column}
 
 /* ---------- header ---------- */
 .topbar{
@@ -61,7 +61,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .sync{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--dim);white-space:nowrap}
 
 .panes{flex:1;min-height:0;overflow:hidden}
-.pane{display:none;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 18px 32px}
+.pane{display:none;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 18px 56px}
 .pane.is-active{display:block}
 
 /* ---------- hero ring ---------- */
@@ -92,7 +92,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 /* ---------- panels ---------- */
 .card{background:var(--panel);border:1px solid var(--line-soft);border-radius:14px;padding:15px 15px 16px;margin-bottom:14px}
-.sec{margin:26px 0 11px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.sec{margin:22px 0 10px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .sec h2{margin:0;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .sec .note{font-family:var(--mono);font-size:10px;color:var(--dim)}
 
@@ -132,6 +132,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .filters{display:grid;gap:10px;margin-bottom:16px}
 .search{width:100%;padding:12px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font-family:var(--dsp);font-size:15px}
 .search::placeholder{color:var(--dim)}
+.search:focus{border-color:#3a3a37;background:var(--panel-2);outline:none}
 .scroller{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .scroller::-webkit-scrollbar{display:none}
 .chip{
@@ -153,24 +154,33 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .g-right{display:flex;align-items:center;gap:10px}
 .g-mini{width:34px;height:3px;background:#232220;border-radius:2px;overflow:hidden}
 .g-mini>i{display:block;height:100%;background:linear-gradient(90deg,var(--t3),var(--t2));transition:width .5s ease}
-.g-ct{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.group-body{display:none;border-top:1px solid var(--line-soft);padding:4px 0}
+.g-ct{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;transition:color .25s}
+.group.is-complete .g-ct{color:var(--t1)}
+.group.is-complete .g-name{color:var(--muted)}
+.group-body{display:none;border-top:1px solid var(--line-soft);padding:5px 6px 7px}
 .group.is-open .group-body{display:block}
 
-.task{display:grid;grid-template-columns:auto minmax(0,1fr) 62px 30px;align-items:center;gap:10px;padding:8px 14px;min-height:46px;cursor:pointer}
+.task{display:grid;grid-template-columns:auto minmax(0,1fr) 62px 30px;align-items:center;gap:10px;
+  padding:8px 10px;min-height:46px;cursor:pointer;border-radius:11px;
+  transition:background-color .25s ease}
 .task:active{background:var(--panel-2)}
+.task.is-done{background:rgba(78,201,106,.075)}
 .task input{
   appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:5px;flex:none;
   border:1.6px solid var(--line);background:var(--panel-2);cursor:pointer;position:relative;
   transition:background-color .18s,border-color .18s,transform .12s;
 }
 .task input:active{transform:scale(.92)}
-.task input:checked{border-color:transparent}
-.task input:checked::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;border:solid #12120f;border-width:0 2.2px 2.2px 0;transform:rotate(42deg)}
+.task input:checked{background:var(--t1);border-color:var(--t1);animation:pop .32s cubic-bezier(.3,1.5,.5,1)}
+.task input:checked::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
+  border:solid #0d1a10;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.14)}100%{transform:scale(1)}}
 .t-name{font-size:14px;font-weight:400;transition:color .2s;overflow-wrap:anywhere;min-width:0}
-.task.is-done .t-name{color:var(--dim);text-decoration:line-through;text-decoration-thickness:1px}
+.task.is-done .t-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(78,201,106,.45)}
 .t-tier{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 0;border-radius:4px;border:1px solid;white-space:nowrap;width:100%;text-align:center}
-.t-disc{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;text-align:right;opacity:.9}
+.t-disc{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;text-align:right;opacity:.9;transition:opacity .25s}
+.task.is-done .t-disc{opacity:.4}
+.task.is-done .t-tier{opacity:.45}
 
 @media (max-width:399px){ .sync{display:none} }
 
@@ -186,11 +196,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .toggle input:checked::after{transform:translateX(16px);background:var(--t3)}
 .foot{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:14px;line-height:1.7}
 
-.tabs{flex:none;display:flex;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-.tab{flex:1;padding:12px 6px 13px;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);transition:color .16s;min-height:52px}
-.tab[aria-selected="true"]{color:var(--ink)}
-.tab i{width:18px;height:2px;border-radius:2px;background:transparent;transition:background-color .16s}
-.tab[aria-selected="true"] i{background:var(--t3)}
+.tabs{flex:none;display:flex;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.tab{flex:1;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  border-radius:11px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);transition:color .16s,background-color .16s;min-height:50px}
+.tab[aria-selected="true"]{color:var(--ink);background:var(--panel)}
+.tab i{width:20px;height:2.5px;border-radius:2px;background:#2e2e2c;transition:background-color .16s,width .22s}
+.tab[aria-selected="true"] i{background:var(--t3);width:26px}
 
 .splash{
   position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;
@@ -275,7 +287,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <div class="card">
         <div class="est-top">
           <div>
-            <div class="est-lab">Target date</div>
+            <div class="est-lab">Estimated</div>
             <div class="est-date" id="etaDate">—</div>
           </div>
           <div class="est-side">
@@ -373,7 +385,7 @@ const SECTIONS=[
  ["Camera & Traps",[["Camera System","system",1],["Trap System","system",2]]],
  ["Playable Characters",[...quad("Tomato",[1,2,1,1]),...quad("Lemon",[1,2,1,1]),...quad("Banana",[1,2,1,1]),
   ...quad("Onion",[1,2,1,1]),...quad("Pickle",[1,2,1,1])]],
- ["Melee & Dual Weapons",[...quad("Katana",[1,2,1,1]),...quad("DualUzi",[1,2,1,1])]],
+ ["Pickleman Arsenal",[...quad("Katana",[1,2,1,1]),...quad("DualUzi",[1,2,1,1])]],
  ["Marketing",[["Steam Page & Socials","marketing",2]]]
 ];
 
@@ -582,7 +594,7 @@ function groups(){
     const all=TASKS.filter(t=>t.si===si),n=all.filter(t=>isDone(t.id)).length;
     const p=all.length?Math.round(n/all.length*100):0;
     const isOpen=forceOpen||open.has(si);
-    const g=document.createElement("section"); g.className="group"+(isOpen?" is-open":"");
+    const g=document.createElement("section"); g.className="group"+(isOpen?" is-open":"")+(n===all.length?" is-complete":"");
     const h=document.createElement("button"); h.className="group-head"; h.type="button";
     h.setAttribute("aria-expanded",isOpen);
     h.innerHTML=`<span class="caret"></span><span class="g-name">${name}</span>
