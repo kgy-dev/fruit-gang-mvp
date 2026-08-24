@@ -1,9 +1,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fruit Gang">
-<meta name="theme-color" content="#0F0F0E">
+<meta name="theme-color" content="#0e0e0e">
 <title>Fruit Gang — MVP</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -14,6 +15,7 @@
 
 <style>
 :root{
+  color-scheme:dark;
   --bg:#0e0e0e; --panel:#161615; --panel-2:#1d1d1c;
   --line:#2a2a28; --line-soft:#212120;
   --ink:#f4f1e4; --muted:#8a8a85; --dim:#575753;
@@ -26,7 +28,7 @@
   --c-fx:#7f8388; --c-concept:#c47b8f; --c-ui:#9b8fc4; --c-marketing:#8fa86b;
 
   --hot:#e2543f; --hot-2:#ee8a2e;
-  --fig-empty:#4a4845;
+  --fig-empty:#605d58;
 
   --stencil:"Saira Stencil One","Saira Condensed",Impact,sans-serif;
   --dsp:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
@@ -45,7 +47,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 ::-webkit-scrollbar-thumb:hover{background:#3b3934}
 ::-webkit-scrollbar-corner{background:transparent}
 
-.app{position:fixed;inset:0;max-width:1240px;margin:0 auto;display:flex;flex-direction:column}
+.app{position:fixed;top:0;left:0;right:0;height:var(--appH,100dvh);max-width:1240px;margin:0 auto;display:flex;flex-direction:column}
 
 /* ---------- header ---------- */
 .topbar{
@@ -200,10 +202,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .toggle input:checked::after{transform:translateX(16px);background:var(--t3)}
 .foot{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:14px;line-height:1.7}
 
-.tabs{flex:none;display:flex;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
-.tab{flex:1;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;
-  border-radius:11px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--dim);transition:color .16s,background-color .16s;min-height:50px}
+.tabs{flex:none;display:flex;gap:4px;padding:4px 10px calc(4px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.tab{flex:1;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  border-radius:10px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);transition:color .16s,background-color .16s;min-height:42px}
 .tab[aria-selected="true"]{color:var(--ink);background:var(--panel)}
 .tab i{width:20px;height:2.5px;border-radius:2px;background:#2e2e2c;transition:background-color .16s,width .22s}
 .tab[aria-selected="true"] i{background:var(--t3);width:26px}
@@ -252,7 +254,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">MVP Production Tracker</div>
+    <div class="splash-tag">MVP Production Tracker · B8</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -318,7 +320,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <button class="btn" id="resetBtn">Reset</button>
       </div>
       <p class="foot">Progress is shared — everyone on the link sees the same numbers.<br>
-      Tier-weighted counts each task by its day ceiling instead of as one unit.</p>
+      Tier-weighted counts each task by its day ceiling instead of as one unit.<br>
+      <span id="buildTag"></span></p>
     </section>
 
     <section class="pane pane--tasks" id="pane-tasks" role="tabpanel">
@@ -413,6 +416,17 @@ const FIREBASE_CONFIG = {
   appId: "1:460844228518:web:6f269bfafab2c9b7843967"
 };
 const DB_PATH = "fg-mvp/done";
+
+/* ===== viewport lock: trust measured pixels, not iOS viewport units ===== */
+const BUILD=8;
+function fitViewport(){
+  const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  document.documentElement.style.setProperty("--appH",h+"px");
+}
+fitViewport();
+addEventListener("resize",fitViewport);
+addEventListener("orientationchange",()=>setTimeout(fitViewport,120));
+if(window.visualViewport) visualViewport.addEventListener("resize",fitViewport);
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
@@ -687,6 +701,7 @@ document.addEventListener("visibilitychange",async()=>{
   $("wToggle").checked=weighted;
   $("panes").hidden=false;
   buildTicks(); chips(); teamSeg(); all_();
+  $("buildTag").textContent=`build ${BUILD} · ${backend}`;
 
   // hold the splash long enough to read, never longer than needed
   const held=Math.max(0,900-(Date.now()-t0));
