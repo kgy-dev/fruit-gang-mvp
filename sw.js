@@ -5,7 +5,7 @@
    - Static assets (icons, manifest): cache-first, they rarely change.
    - Firebase and Google Fonts are never cached here; they handle their own. */
 
-const CACHE = "fg-mvp-v1";
+const CACHE = "fg-mvp-v2";
 const SHELL = [
   "./",
   "./index.html",
