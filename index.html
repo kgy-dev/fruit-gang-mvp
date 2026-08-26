@@ -22,6 +22,7 @@
 
   /* tier owns the saturated trio — green / orange / red */
   --t1:#4ec96a; --t2:#ee8a2e; --t3:#e2543f;
+  --doing:#3f8ee0;
 
   /* disciplines stay deliberately muted so tier reads first */
   --c-system:#6b8fc4; --c-asset:#c4a06b; --c-animset:#6bb8b5;
@@ -135,15 +136,37 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .search{width:100%;padding:12px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font-family:var(--dsp);font-size:15px}
 .search::placeholder{color:var(--dim)}
 .search:focus{border-color:#3a3a37;background:var(--panel-2);outline:none}
+.deck-card{
+  display:grid;grid-template-columns:auto minmax(0,1fr) 62px 30px;align-items:center;gap:10px;
+  padding:11px 12px;margin-bottom:7px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line-soft);
+  border-left:2.5px solid var(--doing);cursor:pointer;
+  transition:background-color .2s,border-color .2s}
+.deck-card:active{background:var(--panel-2)}
+.deck-card .d-sec{
+  grid-column:2/-1;font-family:var(--mono);font-size:9px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--dim);margin-top:2px}
+.deck-card .t-name{font-size:14.5px}
+.deck-empty{text-align:center;padding:46px 20px 30px;color:var(--muted)}
+.deck-empty .de-mark{
+  width:34px;height:34px;margin:0 auto 16px;border-radius:9px;
+  border:1.6px dashed #3a3a37}
+.deck-empty p{margin:0 0 7px;font-family:var(--dsp);font-weight:700;font-size:16px;
+  text-transform:uppercase;letter-spacing:.02em;color:var(--ink)}
+.deck-empty span{font-size:13px;line-height:1.5;color:var(--dim)}
+.deck-empty b{color:var(--muted);font-weight:600}
 .tseg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line-soft);border-radius:12px}
 .tseg button{display:flex;align-items:baseline;justify-content:center;gap:6px;padding:9px 4px;border-radius:9px;
   font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted);
   transition:background-color .16s,color .16s}
-.tseg button i{font-style:normal;font-size:9.5px;font-weight:500;color:var(--dim)}
+.tseg button i{font-style:normal;font-size:9.5px;font-weight:500;opacity:.85}
+.tseg button[data-t="1"] i{color:var(--t1)}
+.tseg button[data-t="2"] i{color:var(--t2)}
+.tseg button[data-t="3"] i{color:var(--t3)}
 .tseg button[aria-pressed="true"][data-t="1"]{color:var(--t1);background:rgba(78,201,106,.10)}
 .tseg button[aria-pressed="true"][data-t="2"]{color:var(--t2);background:rgba(238,138,46,.10)}
 .tseg button[aria-pressed="true"][data-t="3"]{color:var(--t3);background:rgba(226,84,63,.10)}
-.tseg button[aria-pressed="true"] i{color:inherit;opacity:.7}
+.tseg button[aria-pressed="true"] i{opacity:1}
 .dwrap{display:flex;flex-wrap:wrap;gap:6px}
 .chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;
   border:1px solid var(--line-soft);background:var(--panel);
@@ -172,14 +195,21 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   transition:background-color .25s ease}
 .task:active{background:var(--panel-2)}
 .task.is-done{background:rgba(78,201,106,.075)}
-.task input{
+.task.is-doing{background:rgba(63,142,224,.085)}
+.task.is-doing .t-name{color:var(--ink)}
+.sbox{
   appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:5px;flex:none;
   border:1.6px solid var(--line);background:var(--panel-2);cursor:pointer;position:relative;
   transition:background-color .18s,border-color .18s,transform .12s;
 }
-.task input:active{transform:scale(.92)}
-.task input:checked{background:var(--t1);border-color:var(--t1)}
-.task input:checked::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
+.sbox:active{transform:scale(.92)}
+/* on the deck — a live dot, deliberately not a tick */
+.task.is-doing .sbox{background:var(--doing);border-color:var(--doing)}
+.task.is-doing .sbox::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;
+  margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#08131f}
+/* done — the tick */
+.task.is-done .sbox{background:var(--t1);border-color:var(--t1)}
+.task.is-done .sbox::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
   border:solid #0d1a10;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
 .t-name{font-size:14px;font-weight:400;transition:color .2s;overflow-wrap:anywhere;min-width:0}
 .task.is-done .t-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(78,201,106,.45)}
@@ -204,18 +234,26 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .navseg{
   position:sticky;top:var(--barH,52px);z-index:29;
-  display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  margin:0;padding:8px 18px 10px;background:var(--bg);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
+  margin:0;padding:9px 14px 11px;background:var(--bg);
   border-bottom:1px solid var(--line-soft);
 }
 .tab{
-  padding:9px 6px;border-radius:10px;background:var(--panel);
-  border:1px solid var(--line-soft);
-  font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;
+  position:relative;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 4px;border-radius:11px;background:var(--panel);
+  border:1px solid transparent;
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.13em;
   text-transform:uppercase;color:var(--dim);
-  transition:color .16s,background-color .16s,border-color .16s;
+  transition:color .18s,background-color .18s,border-color .18s;
 }
-.tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2);border-color:#3c3c39}
+.tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2);border-color:#3d3d3a}
+.tab .badge{
+  min-width:17px;height:17px;padding:0 4px;border-radius:9px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#2b2b28;color:var(--muted);font-size:9.5px;letter-spacing:0;
+  transition:background-color .18s,color .18s}
+.tab.has-live .badge{background:rgba(63,142,224,.18);color:var(--doing)}
+.tab[aria-selected="true"].has-live .badge{background:var(--doing);color:#08131f}
 
 .splash{
   position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
@@ -246,6 +284,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 @media (min-width:960px){
   .panes{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);align-items:start}
   .pane{display:block !important;padding:22px 24px 40px}
+  #pane-deck{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
+  #pane-tasks{grid-column:2;grid-row:1/3}
   .pane--tasks{border-left:1px solid var(--line-soft)}
   .navseg{display:none}
 }
@@ -260,13 +300,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </header>
 
   <nav class="navseg" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" aria-controls="pane-overview">Overview</button>
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="pane-overview">Overview</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
   </nav>
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">MVP Production Tracker · B10</div>
+    <div class="splash-tag">MVP Production Tracker · B11</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -336,6 +377,16 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <span id="buildTag"></span></p>
     </section>
 
+    <section class="pane" id="pane-deck" role="tabpanel">
+      <div class="sec"><h2>On the deck</h2><span class="sec-note" id="deckNote"></span></div>
+      <div id="deckList"></div>
+      <div class="deck-empty" id="deckEmpty" hidden>
+        <div class="de-mark"></div>
+        <p>Nothing on the deck.</p>
+        <span>Tap a task once in <b>Tasks</b> to start it. Tap again to complete it.</span>
+      </div>
+    </section>
+
     <section class="pane pane--tasks" id="pane-tasks" role="tabpanel">
       <div class="filters">
         <input class="search" id="search" type="search" placeholder="Search tasks — Lemon, Animset, Locomotion…" aria-label="Search tasks">
@@ -365,7 +416,7 @@ const foe=(b,a)=>[[`${b} Logic`,"system",1],[`${b} Concept`,"concept",1],[`${b} 
 
 const SECTIONS=[
  ["Hub & Mission Flow",[
-  ["Hub/Menu","system",2],["Loadout System","system",2],["Environment Concept","concept",1],
+  ["Hub/Menu","system",2],["Loadout System","system",3],["Environment Concept","concept",1],
   ["Environment Pipeline","asset",1],["Environment Blockout","asset",1],["Environment V1","asset",3],
   ["Destruction System","system",2],["Missions","system",2],["Mission Manager","system",2],
   ["Pickleman Curse Part 1","system",1],["Pickleman Curse Part 2","system",1],
@@ -395,7 +446,7 @@ const SECTIONS=[
   ["Mantle Animset","animset",1],["Fall/Land Animset","animset",1],["Slide/Roll/Dash Animset","animset",1],
   ["Walk/Run FX","fx",1],["Mantle FX","fx",1],["Fall/Land FX","fx",1],["Slide/Roll/Dash FX","fx",1]]],
  ["Ability & Inventory",[
-  ["Ability System Part 1","system",2],["Inventory System","system",3],["Inventory Update","system",1]]],
+  ["Ability System Part 1","system",2],["Inventory System","system",3],["Inventory Update","system",2]]],
  ["UI",[["Thumbnail Part 1","ui",1],["HUD","ui",1]]],
  ["Camera & Traps",[["Camera System","system",1],["Trap System","system",2]]],
  ["Playable Characters",[...quad("Tomato",[1,2,1,1]),...quad("Lemon",[1,2,1,1]),...quad("Banana",[1,2,1,1]),
@@ -423,11 +474,13 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "460844228518",
   appId: "1:460844228518:web:6f269bfafab2c9b7843967"
 };
-const DB_PATH = "fg-mvp/done";
+const DB_ROOT = "fg-mvp";
+const DB_PATH = "fg-mvp/done";   // completed  (unchanged, existing data preserved)
+const DB_DOING = "fg-mvp/doing"; // on the deck
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=10;
+const BUILD=11;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -437,10 +490,15 @@ addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
+let doneMap={}, doingMap={}, weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
 const open=new Set();
 const $=id=>document.getElementById(id);
-const isDone=id=>Object.prototype.hasOwnProperty.call(doneMap,id);
+const has=(m,id)=>Object.prototype.hasOwnProperty.call(m,id);
+const isDone=id=>has(doneMap,id);
+const isDoing=id=>!isDone(id)&&has(doingMap,id);
+/* 0 = todo, 1 = on the deck, 2 = done. Tapping a row cycles through them. */
+const stateOf=id=>isDone(id)?2:(isDoing(id)?1:0);
+const doingList=()=>TASKS.filter(t=>isDoing(t.id));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== storage adapter: firebase | claude | device ===== */
@@ -457,7 +515,7 @@ async function initStore(){
       const a=app.initializeApp(FIREBASE_CONFIG);
       await authm.signInAnonymously(authm.getAuth(a));
       const db=dbm.getDatabase(a);
-      FB={db,...dbm,root:dbm.ref(db,DB_PATH)};
+      FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -468,43 +526,51 @@ async function initStore(){
 async function pull(){
   try{
     if(backend==="firebase"){
-      const s=await FB.get(FB.root); doneMap=s.exists()?(s.val()||{}):{}; return;
+      const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
+      doneMap=v.done||{}; doingMap=v.doing||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
-      if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d.done==="object") doneMap=d.done; }
+      if(r&&r.value){ const d=JSON.parse(r.value);
+        if(d&&typeof d.done==="object") doneMap=d.done;
+        if(d&&typeof d.doing==="object") doingMap=d.doing; }
       return;
     }
-    doneMap=JSON.parse(localStorage.getItem(SKEY)||"{}");
+    const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
+    doneMap=raw.done||raw; doingMap=raw.doing||{};
   }catch(e){}
 }
 
-async function push(id,add){
+async function push(id,state){
+  const ts=Date.now();
   try{
     if(backend==="firebase"){
-      // per-key write: two people ticking at once never overwrite each other
-      await FB.set(FB.ref(FB.db,DB_PATH+"/"+id), add?Date.now():null);
+      // per-key writes: two people moving cards at once never overwrite each other
+      await Promise.all([
+        FB.set(FB.ref(FB.db,DB_PATH+"/"+id),  state===2?ts:null),
+        FB.set(FB.ref(FB.db,DB_DOING+"/"+id), state===1?ts:null)
+      ]);
       stamp("synced"); return;
     }
     if(backend==="claude"){
-      let cur={};
-      try{ const r=await window.storage.get(SKEY,true);
-        if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d.done==="object") cur=d.done; } }catch(e){}
-      if(add) cur[id]=Date.now(); else delete cur[id];
-      doneMap=cur;
-      await window.storage.set(SKEY,JSON.stringify({v:3,done:cur,at:Date.now()}),true);
+      await window.storage.set(SKEY,JSON.stringify({v:4,done:doneMap,doing:doingMap,at:ts}),true);
       stamp("saved"); return;
     }
-    if(add) doneMap[id]=Date.now(); else delete doneMap[id];
-    localStorage.setItem(SKEY,JSON.stringify(doneMap));
+    localStorage.setItem(SKEY,JSON.stringify({done:doneMap,doing:doingMap}));
     stamp("saved on this device");
   }catch(e){ stamp("save failed"); }
 }
+function setState(id,state){
+  delete doneMap[id]; delete doingMap[id];
+  if(state===1) doingMap[id]=Date.now();
+  if(state===2) doneMap[id]=Date.now();
+}
 
 async function clearAll(){
+  doneMap={}; doingMap={};
   if(backend==="firebase"){ await FB.set(FB.root,null); return; }
-  if(backend==="claude"){ await window.storage.set(SKEY,JSON.stringify({v:3,done:{},at:Date.now()}),true); return; }
-  localStorage.setItem(SKEY,"{}");
+  if(backend==="claude"){ await window.storage.set(SKEY,JSON.stringify({v:4,done:{},doing:{},at:Date.now()}),true); return; }
+  localStorage.setItem(SKEY,JSON.stringify({done:{},doing:{}}));
 }
 
 async function loadPrefs(){
@@ -555,9 +621,9 @@ function buildTicks(){
 }
 function paintTicks(){
   document.querySelectorAll("#ticks .tk").forEach(el=>{
-    const t=TASKS[+el.dataset.i], d=isDone(t.id);
-    el.style.stroke=d?TIER[t.tier].c:"";
-    el.style.strokeWidth=d?"4.4":"";
+    const t=TASKS[+el.dataset.i], s=stateOf(t.id);
+    el.style.stroke=s===2?TIER[t.tier].c:(s===1?"var(--doing)":"");
+    el.style.strokeWidth=s?"4.4":"";
   });
 }
 function estimate(){
@@ -630,20 +696,13 @@ function groups(){
     g.appendChild(h);
     const body=document.createElement("div"); body.className="group-body";
     list.forEach(t=>{
-      const d=isDone(t.id);
-      const row=document.createElement("label"); row.className="task"+(d?" is-done":"");
-      row.innerHTML=`<input type="checkbox" ${d?"checked":""}>
+      const row=document.createElement("div"); row.className="task"; row.dataset.id=t.id;
+      row.innerHTML=`<button class="sbox" type="button" aria-label="cycle state"></button>
         <span class="t-name">${t.name}</span>
         <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
         <span class="t-tier tp${t.tier}">T${t.tier}</span>`;
-      row.querySelector("input").onchange=async e=>{
-        const add=e.target.checked;
-        if(add) doneMap[t.id]=Date.now(); else delete doneMap[t.id];
-        row.classList.toggle("is-done",add);
-        refreshHead(t.si);
-        summary();
-        await push(t.id,add);
-      };
+      paintRow(row,t.id);
+      row.onclick=()=>advance(t);
       body.appendChild(row);
     });
     g.appendChild(body); box.appendChild(g);
@@ -661,7 +720,41 @@ function teamSeg(){
     s.appendChild(b);
   });
 }
-const sig=m=>Object.keys(m).sort().join("|");
+function paintRow(row,id){
+  const s=stateOf(id);
+  row.classList.toggle("is-doing",s===1);
+  row.classList.toggle("is-done", s===2);
+}
+/* todo -> deck -> done -> todo */
+async function advance(t){
+  const next=(stateOf(t.id)+1)%3;
+  setState(t.id,next);
+  document.querySelectorAll(`.task[data-id="${t.id}"]`).forEach(r=>paintRow(r,t.id));
+  refreshHead(t.si); summary(); deck();
+  await push(t.id,next);
+}
+
+function deck(){
+  const list=doingList(), box=$("deckList");
+  $("deckCount").textContent=list.length;
+  $("deckTab").classList.toggle("has-live",list.length>0);
+  $("deckEmpty").hidden=list.length>0;
+  $("deckNote").textContent=list.length?`${list.length} in progress`:"";
+  box.innerHTML="";
+  list.forEach(t=>{
+    const c=document.createElement("div"); c.className="deck-card"; c.dataset.id=t.id;
+    c.innerHTML=`<button class="sbox" type="button" aria-label="complete"></button>
+      <span class="t-name">${t.name}</span>
+      <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
+      <span class="t-tier tp${t.tier}">T${t.tier}</span>
+      <span class="d-sec">${SECTIONS[t.si][0]}</span>`;
+    c.classList.add("is-doing");
+    c.onclick=()=>advance(t);
+    box.appendChild(c);
+  });
+}
+
+const sig=()=>Object.keys(doneMap).sort().join("|")+"#"+Object.keys(doingMap).sort().join("|");
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si), k=all.filter(t=>isDone(t.id)).length;
@@ -670,7 +763,7 @@ function refreshHead(si){
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
 }
 function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); }
-function all_(){ summary(); groups(); }
+function all_(){ summary(); deck(); groups(); }
 
 /* ===== events ===== */
 $("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();groups();});
@@ -695,8 +788,8 @@ document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>
 }));
 document.addEventListener("visibilitychange",async()=>{
   if(!document.hidden&&backend!=="firebase"){
-    const before=sig(doneMap); await pull();
-    if(sig(doneMap)!==before) all_();
+    const before=sig(); await pull();
+    if(sig()!==before) all_();
   }
 });
 
@@ -725,18 +818,18 @@ document.addEventListener("visibilitychange",async()=>{
   if(backend==="firebase"){
     // live: a teammate's tick lands here within a second, no refresh needed
     FB.onValue(FB.root,s=>{
-      const m=s.exists()?(s.val()||{}):{};
-      const changed=sig(m)!==sig(doneMap);
-      doneMap=m;
-      if(changed) all_();
+      const v=s.exists()?(s.val()||{}):{};
+      const before=sig();
+      doneMap=v.done||{}; doingMap=v.doing||{};
+      if(sig()!==before) all_();
       stamp("live");
     });
     $("refreshBtn").style.display="none";
   }else if(backend==="claude"){
     stamp("up to date");
     setInterval(async()=>{ if(!document.hidden){
-      const before=sig(doneMap); await pull();
-      if(sig(doneMap)!==before) all_();
+      const before=sig(); await pull();
+      if(sig()!==before) all_();
     } },20000);
   }else{
     stamp("this device only");
