@@ -21,7 +21,8 @@
   --ink:#f4f1e4; --muted:#8a8a85; --dim:#575753;
 
   /* tier owns the saturated trio — green / orange / red */
-  --t1:#4ec96a; --t2:#ee8a2e; --t3:#e2543f;
+  /* ripening ramp: unripe deep green -> green -> yellow -> red */
+  --t0:#2f8a4e; --t1:#4ec96a; --t2:#e9bf35; --t3:#e2543f;
   --doing:#3f8ee0;
 
   /* disciplines stay deliberately muted so tier reads first */
@@ -38,6 +39,21 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;overflow-x:hidden}
+/* MVP mode runs hot — vivid red over black. Tier colours are nudged brighter
+   so the T3 badge still separates from the red panels. */
+body.mvp{
+  --bg:#0b0403; --panel:#1c0b09; --panel-2:#27100d;
+  --line:#3d1a15; --line-soft:#2b110e;
+  --ink:#fdf0ec; --muted:#b08880; --dim:#7a544c;
+  --fig-empty:#6d4941;
+  --hot:#ff4433; --hot-2:#ff8a5c;
+  --t0:#35a05c; --t1:#5ade78; --t2:#f5cf46; --t3:#ff6b57;
+}
+body.mvp .topbar{background:linear-gradient(180deg,#1a0806 0%,var(--bg) 100%)}
+body.mvp .navseg{background:var(--bg)}
+body.mvp .modebtn{border-color:#4a201a}
+body.mvp .hero::before{background:radial-gradient(circle,rgba(255,68,51,.20) 0%,rgba(255,68,51,0) 66%)}
+body.mvp .splash{background:var(--bg)}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 :focus-visible{outline:2px solid var(--t2);outline-offset:2px;border-radius:4px}
@@ -62,6 +78,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .mark-txt em{font-style:normal;color:var(--t3)}
 .mark-sub{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 5px}
 .sync{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--dim);white-space:nowrap}
+.modebtn{
+  display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none;
+  padding:5px 9px;border-radius:9px;background:var(--panel);
+  border:1px solid var(--line);cursor:pointer;
+  transition:background-color .18s,border-color .18s}
+.modebtn:active{background:var(--panel-2)}
+.mb-lab{font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.16em;color:var(--dim)}
+.mb-pct{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);line-height:1.05;font-variant-numeric:tabular-nums}
 
 .panes{}
 .pane{display:none;padding:16px 18px 8px}
@@ -120,9 +144,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.07em;
   padding:3px 7px;border-radius:5px;border:1px solid;white-space:nowrap;
 }
-.tp1{color:var(--t1);border-color:rgba(91,217,122,.32);background:rgba(91,217,122,.09)}
-.tp2{color:var(--t2);border-color:rgba(242,194,48,.32);background:rgba(242,194,48,.09)}
-.tp3{color:var(--t3);border-color:rgba(242,85,75,.32);background:rgba(242,85,75,.09)}
+.tp0{color:var(--t0);border-color:rgba(47,138,78,.38);background:rgba(47,138,78,.10)}
+.tp1{color:var(--t1);border-color:rgba(78,201,106,.32);background:rgba(78,201,106,.09)}
+.tp2{color:var(--t2);border-color:rgba(233,191,53,.32);background:rgba(233,191,53,.09)}
+.tp3{color:var(--t3);border-color:rgba(226,84,63,.32);background:rgba(226,84,63,.09)}
 .row-mid{display:flex;align-items:center;gap:10px;min-width:0}
 .row-name{font-size:13px;font-weight:500;white-space:nowrap}
 .row-when{font-family:var(--mono);font-size:10.5px;color:var(--dim);white-space:nowrap}
@@ -155,14 +180,16 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   text-transform:uppercase;letter-spacing:.02em;color:var(--ink)}
 .deck-empty span{font-size:13px;line-height:1.5;color:var(--dim)}
 .deck-empty b{color:var(--muted);font-weight:600}
-.tseg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line-soft);border-radius:12px}
+.tseg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line-soft);border-radius:12px}
 .tseg button{display:flex;align-items:baseline;justify-content:center;gap:6px;padding:9px 4px;border-radius:9px;
   font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted);
   transition:background-color .16s,color .16s}
 .tseg button i{font-style:normal;font-size:9.5px;font-weight:500;opacity:.85}
+.tseg button[data-t="0"] i{color:var(--t0)}
 .tseg button[data-t="1"] i{color:var(--t1)}
 .tseg button[data-t="2"] i{color:var(--t2)}
 .tseg button[data-t="3"] i{color:var(--t3)}
+.tseg button[aria-pressed="true"][data-t="0"]{color:var(--t0);background:rgba(47,138,78,.12)}
 .tseg button[aria-pressed="true"][data-t="1"]{color:var(--t1);background:rgba(78,201,106,.10)}
 .tseg button[aria-pressed="true"][data-t="2"]{color:var(--t2);background:rgba(238,138,46,.10)}
 .tseg button[aria-pressed="true"][data-t="3"]{color:var(--t3);background:rgba(226,84,63,.10)}
@@ -218,7 +245,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .task.is-done .t-disc{opacity:.4}
 .task.is-done .t-tier{opacity:.45}
 
-@media (max-width:399px){ .sync{display:none} }
+@media (max-width:429px){ .sync{display:none} }
 
 .empty{padding:34px 4px;color:var(--muted);font-size:14px}
 
@@ -295,8 +322,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <div class="app">
   <header class="topbar">
     <span class="mark"><span class="mark-dot"></span><span class="mark-txt">FRUIT <em>GANG</em></span></span>
-    <span class="mark-sub">MVP</span>
+    <span class="mark-sub" id="modeName">MVP</span>
     <span class="sync" id="sync"></span>
+    <button class="modebtn" id="modeBtn" type="button">
+      <span class="mb-lab" id="modeOtherName">ALPHA</span>
+      <span class="mb-pct" id="modeOtherPct">0%</span>
+    </button>
   </header>
 
   <nav class="navseg" role="tablist">
@@ -305,15 +336,21 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
   </nav>
 
+  <script>
+    try{
+      var p=JSON.parse(localStorage.getItem("fg-mvp-v3-prefs")||"{}");
+      if(p.mode!=="alpha") document.body.classList.add("mvp");
+    }catch(e){ document.body.classList.add("mvp"); }
+  </script>
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">MVP Production Tracker · B11</div>
+    <div class="splash-tag">Production Tracker · B13</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
               stroke-width="3" stroke-linecap="round" stroke-dasharray="70 206"/>
       <defs><linearGradient id="sg" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stop-color="#e2543f"/><stop offset="100%" stop-color="#ee8a2e"/>
+        <stop offset="0%" stop-color="var(--hot)"/><stop offset="100%" stop-color="var(--hot-2)"/>
       </linearGradient></defs>
     </svg>
     <div class="splash-status" id="bootMsg">Connecting…</div>
@@ -326,7 +363,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
           <svg viewBox="0 0 300 300" aria-hidden="true">
             <defs>
               <linearGradient id="hg" x1="0" y1="1" x2="0.55" y2="0">
-                <stop offset="0%" stop-color="#e2543f"/><stop offset="100%" stop-color="#ee8a2e"/>
+                <stop offset="0%" stop-color="var(--hot)"/><stop offset="100%" stop-color="var(--hot-2)"/>
               </linearGradient>
             </defs>
             <circle class="arc-track" cx="150" cy="150" r="137" stroke-width="4"/>
@@ -409,55 +446,50 @@ const DISC={
   concept:{name:"Concept",c:"var(--c-concept)"}, ui:{name:"UI",c:"var(--c-ui)"},
   marketing:{name:"Marketing",c:"var(--c-marketing)"}
 };
-const TIER={1:{d:3,when:"≤ 3 days",c:"var(--t1)"},2:{d:7,when:"≤ 1 week",c:"var(--t2)"},3:{d:14,when:"≤ 2 weeks",c:"var(--t3)"}};
-
-const quad=(b,[c,a,an,f])=>[[`${b} Concept`,"concept",c],[`${b} Asset`,"asset",a],[`${b} Animset`,"animset",an],[`${b} FX`,"fx",f]];
-const foe=(b,a)=>[[`${b} Logic`,"system",1],[`${b} Concept`,"concept",1],[`${b} Asset`,"asset",a],[`${b} Animset`,"animset",1],[`${b} FX`,"fx",1]];
+const TIER={
+  0:{d:1, when:"≤ 1 day",   short:"≤1d", c:"var(--t0)"},
+  1:{d:3, when:"≤ 3 days",  short:"≤3d", c:"var(--t1)"},
+  2:{d:7, when:"≤ 1 week",  short:"≤1w", c:"var(--t2)"},
+  3:{d:14,when:"≤ 2 weeks", short:"≤2w", c:"var(--t3)"}};
+const TIERS=[0,1,2,3];
 
 const SECTIONS=[
- ["Hub & Mission Flow",[
-  ["Hub/Menu","system",2],["Loadout System","system",3],["Environment Concept","concept",1],
-  ["Environment Pipeline","asset",1],["Environment Blockout","asset",1],["Environment V1","asset",3],
-  ["Destruction System","system",2],["Missions","system",2],["Mission Manager","system",2],
-  ["Pickleman Curse Part 1","system",1],["Pickleman Curse Part 2","system",1],
-  ["Extraction Logic Part 1","system",1],["Sound System","system",1]]],
- ["Health & Survival",[
-  ["Health Component","system",3],["Health Component – Update","system",1],["JuiceBox","asset",1],
-  ["Revive System","system",2],["Revive Animation","animset",1],["Hit Reaction System","system",2]]],
- ["Combat Core",[
-  ["Combat Component Melee","system",3],["Combat Component Melee – Update","system",1],
-  ["Combat Component Ranged","system",3],["Combat Component Ranged – Update","system",1]]],
- ["Weapons",[...quad("Rifle",[1,2,1,1]),...quad("Rocketique",[1,2,1,1]),...quad("Minigun",[1,2,1,1]),
-  ...quad("Pistol",[1,2,1,1]),...quad("Racquet",[1,1,1,1])]],
- ["Throwables & Gadgets",[
-  ["Throwable Component","system",2],["Throwable Animset","animset",1],
-  ["Grenade Concept","concept",1],["Grenade Asset","asset",1],["Grenade FX","fx",1],
-  ["WaterBalloon Concept","concept",1],["WaterBalloon Asset","asset",1],["WaterBalloon FX","fx",1],
-  ["Gadget/JumpPad Concept","concept",1],["Gadget/JumpPad Asset","asset",1],
-  ["Gadget/JumpPad Animation","animset",1],["Gadget/JumpPad FX","fx",1]]],
- ["World Systems",[
-  ["Spawn/Pool Manager","system",2],["Map/Minimap","system",1],["Interaction Component","system",3],
-  ["Ragdoll Component","system",3],["Ragdoll Component Update","system",1],["NPC System Part 1","system",2]]],
- ["Enemies",[...foe("Ant",2),...foe("Mosquito",2),...foe("Boss",2)]],
- ["Locomotion & Animation",[
-  ["Locomotion System Core","system",2],["Locomotion System V2","system",1],["Locomotion System V3","system",1],
-  ["Locomotion Combat Mode","system",1],["Emote System","system",1],["Emote Animation","animset",1],
-  ["Idle Animset","animset",1],["Walk Animset","animset",1],["Run Animset","animset",1],
-  ["Mantle Animset","animset",1],["Fall/Land Animset","animset",1],["Slide/Roll/Dash Animset","animset",1],
-  ["Walk/Run FX","fx",1],["Mantle FX","fx",1],["Fall/Land FX","fx",1],["Slide/Roll/Dash FX","fx",1]]],
- ["Ability & Inventory",[
-  ["Ability System Part 1","system",2],["Inventory System","system",3],["Inventory Update","system",2]]],
- ["UI",[["Thumbnail Part 1","ui",1],["HUD","ui",1]]],
- ["Camera & Traps",[["Camera System","system",1],["Trap System","system",2]]],
- ["Playable Characters",[...quad("Tomato",[1,2,1,1]),...quad("Lemon",[1,2,1,1]),...quad("Banana",[1,2,1,1]),
-  ...quad("Onion",[1,2,1,1]),...quad("Pickle",[1,2,1,1])]],
- ["Pickleman Arsenal",[...quad("Katana",[1,2,1,1]),...quad("DualUzi",[1,2,1,1])]],
- ["Marketing",[["Steam Page & Socials","marketing",2]]]
+["Hub & Mission Flow",[["Hub/Menu Part 1","system",2],["Hub/Menu Part 2","system",3],["Loadout System","system",2],["Environment Concept","concept",1],["Environment Pipeline","asset",1],["Environment Blockout","asset",1],["Environment V1","asset",3],["Destruction System","system",2],["Pickleman Curse Part 1","system",1],["Pickleman Curse Part 2","system",1],["Missions","system",2],["Mission Manager","system",2],["Extraction Logic","system",1]]],
+["Health & Survival",[["Health Component","system",3],["Health Component Update","system",1],["JuiceBox","asset",1],["Revive System","system",2],["Revive Animation","animset",1],["Hit Reaction","system",2],["Sound System","system",1]]],
+["Weapons",[["Rifle Placeholders","asset",0],["Rifle Logic","system",1],["Rifle Concept","concept",1],["Rifle Asset","asset",2],["Rifle Animset","animset",1],["Rifle FX","fx",1],["Rocketique Placeholders","asset",0],["Rocketique Logic","system",1],["Rocketique Concept","concept",1],["Rocketique Asset","asset",2],["Rocketique Animset","animset",1],["Rocketique FX","fx",1],["Minigun Placeholders","asset",0],["Minigun Logic","system",1],["Minigun Concept","concept",1],["Minigun Asset","asset",2],["Minigun Animset","animset",1],["Minigun FX","fx",1],["Pistol Placeholders","asset",0],["Pistol Logic","system",1],["Pistol Concept","concept",1],["Pistol Asset","asset",2],["Pistol Animset","animset",1],["Pistol FX","fx",1],["Racquet Placeholders","asset",0],["Racquet Concept","concept",1],["Racquet Asset","asset",1],["Racquet Animset","animset",1],["Racquet FX","fx",1]]],
+["Combat Core",[["Combat Component Melee","system",3],["Combat Component Melee Update","system",1],["Combat Component Ranged","system",3],["Combat Component Ranged Update","system",1]]],
+["Throwables & Gadgets",[["Throwable Component","system",2],["Throwable Animset","animset",1],["Grenade Placeholders","asset",0],["Grenade Concept","concept",1],["Grenade Asset","asset",1],["Grenade FX","fx",1],["Water Balloon Placeholders","asset",0],["Water Balloon Concept","concept",1],["Water Balloon Asset","asset",1],["Water Balloon FX","fx",1],["Gadget/Jump Pad Placeholders","asset",0],["Gadget/Jump Pad Logic","system",0],["Gadget/Jump Pad Concept","concept",1],["Gadget/Jump Pad Asset","asset",1],["Gadget/Jump Pad Animation","animset",1],["Gadget/Jump Pad FX","fx",1]]],
+["World Systems",[["Spawn/Pool Manager","system",2],["Map/Minimap System","system",1],["Ragdoll Component","system",3],["Ragdoll Component Update","system",1],["Interaction Component","system",3],["NPC System Part 1","system",2]]],
+["Enemies",[["Ant Placeholders","asset",0],["Ant Logic","system",1],["Ant Concept","concept",1],["Ant Asset","asset",2],["Ant Animset","animset",1],["Ant FX","fx",1],["Mosquito Placeholders","asset",0],["Mosquito Logic","system",1],["Mosquito Concept","concept",1],["Mosquito Asset","asset",2],["Mosquito Animset","animset",1],["Mosquito FX","fx",1],["Boss Placeholders","asset",0],["Boss Logic","system",1],["Boss Concept","concept",1],["Boss Asset","asset",2],["Boss Animset","animset",1],["Boss FX","fx",1]]],
+["Locomotion & Animation",[["Locomotion System Core","system",2],["Locomotion System V2","system",1],["Locomotion System V3","system",1],["Locomotion Combat Mode","system",1],["Emote System","system",1],["Emote Animation","animset",1],["Walk Animset","animset",1],["Walk/Run FX","fx",1],["Run Animset","animset",1],["Mantle Animset","animset",1],["Mantle FX","fx",1],["Idle Animset","animset",1],["Fall/Land Animset","animset",1],["Fall/Land FX","fx",1],["Slide/Roll/Dash Animset","animset",1],["Slide/Roll/Dash FX","fx",1]]],
+["Ability & Inventory",[["Ability System Part 1","system",2],["Inventory System","system",3],["Inventory Update","system",1]]],
+["UI",[["Thumbnail Part 1","ui",1],["HUD","ui",1]]],
+["Camera & Traps",[["Camera System","system",1],["Trap System","system",2]]],
+["Playable Characters",[["Tomato Concept","concept",1],["Tomato Asset","asset",2],["Tomato Animset","animset",1],["Tomato FX","fx",1],["Lemon Concept","concept",1],["Lemon Asset","asset",2],["Lemon Animset","animset",1],["Lemon FX","fx",1],["Banana Concept","concept",1],["Banana Asset","asset",2],["Banana Animset","animset",1],["Banana FX","fx",1],["Onion Concept","concept",1],["Onion Asset","asset",2],["Onion Animset","animset",1],["Onion FX","fx",1],["Pickle Concept","concept",1],["Pickle Asset","asset",2],["Pickle Animset","animset",1],["Pickle FX","fx",1]]],
+["Pickleman Arsenal",[["DualUzi Placeholders","asset",0],["DualUzi Logic","system",1],["DualUzi Concept","concept",1],["DualUzi Asset","asset",2],["DualUzi Animset","animset",1],["DualUzi FX","fx",1],["Katana Placeholders","asset",0],["Katana Logic","system",1],["Katana Concept","concept",1],["Katana Asset","asset",2],["Katana Animset","animset",1],["Katana FX","fx",1]]],
+["Marketing",[["SteamPage & Socials Part 1","marketing",1],["SteamPage & Socials Part 2","marketing",2]]]
 ];
 
-const TASKS=[];
-SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier],ti)=>
-  TASKS.push({id:`s${si}t${ti}`,name,disc,tier,sec,si})));
+const MVP_IDS=new Set(["hub-menu-part-1", "environment-concept", "environment-pipeline", "environment-blockout", "environment-v1", "destruction-system", "pickleman-curse-part-1", "missions", "mission-manager", "extraction-logic", "health-component", "health-component-update", "juicebox", "revive-system", "revive-animation", "hit-reaction", "sound-system", "rifle-placeholders", "rifle-logic", "rocketique-placeholders", "rocketique-logic", "minigun-placeholders", "minigun-logic", "pistol-placeholders", "pistol-logic", "racquet-placeholders", "combat-component-melee", "combat-component-melee-update", "combat-component-ranged", "combat-component-ranged-update", "throwable-component", "throwable-animset", "grenade-placeholders", "water-balloon-placeholders", "gadget-jump-pad-placeholders", "gadget-jump-pad-logic", "spawn-pool-manager", "map-minimap-system", "ragdoll-component", "ragdoll-component-update", "interaction-component", "npc-system-part-1", "ant-placeholders", "ant-logic", "mosquito-placeholders", "mosquito-logic", "boss-placeholders", "boss-logic", "locomotion-system-core", "locomotion-system-v2", "locomotion-system-v3", "locomotion-combat-mode", "emote-system", "emote-animation", "walk-animset", "walk-run-fx", "run-animset", "mantle-animset", "mantle-fx", "idle-animset", "fall-land-animset", "fall-land-fx", "slide-roll-dash-animset", "slide-roll-dash-fx", "ability-system-part-1", "inventory-system", "inventory-update", "thumbnail-part-1", "hud", "camera-system", "trap-system", "tomato-concept", "tomato-asset", "tomato-animset", "tomato-fx", "lemon-concept", "lemon-asset", "lemon-animset", "lemon-fx", "dualuzi-placeholders", "dualuzi-logic", "steampage-socials-part-1"]);
+const ID_MIGRATION={"s0t0": "hub-menu-part-1", "s0t1": "loadout-system", "s0t2": "environment-concept", "s0t3": "environment-pipeline", "s0t4": "environment-blockout", "s0t5": "environment-v1", "s0t6": "destruction-system", "s0t7": "missions", "s0t8": "mission-manager", "s0t9": "pickleman-curse-part-1", "s0t10": "pickleman-curse-part-2", "s0t11": "extraction-logic", "s0t12": "sound-system", "s1t0": "health-component", "s1t1": "health-component-update", "s1t2": "juicebox", "s1t3": "revive-system", "s1t4": "revive-animation", "s1t5": "hit-reaction", "s2t0": "combat-component-melee", "s2t1": "combat-component-melee-update", "s2t2": "combat-component-ranged", "s2t3": "combat-component-ranged-update", "s3t0": "rifle-concept", "s3t1": "rifle-asset", "s3t2": "rifle-animset", "s3t3": "rifle-fx", "s3t4": "rocketique-concept", "s3t5": "rocketique-asset", "s3t6": "rocketique-animset", "s3t7": "rocketique-fx", "s3t8": "minigun-concept", "s3t9": "minigun-asset", "s3t10": "minigun-animset", "s3t11": "minigun-fx", "s3t12": "pistol-concept", "s3t13": "pistol-asset", "s3t14": "pistol-animset", "s3t15": "pistol-fx", "s3t16": "racquet-concept", "s3t17": "racquet-asset", "s3t18": "racquet-animset", "s3t19": "racquet-fx", "s4t0": "throwable-component", "s4t1": "throwable-animset", "s4t2": "grenade-concept", "s4t3": "grenade-asset", "s4t4": "grenade-fx", "s4t5": "water-balloon-concept", "s4t6": "water-balloon-asset", "s4t7": "water-balloon-fx", "s4t8": "gadget-jump-pad-concept", "s4t9": "gadget-jump-pad-asset", "s4t10": "gadget-jump-pad-animation", "s4t11": "gadget-jump-pad-fx", "s5t0": "spawn-pool-manager", "s5t1": "map-minimap-system", "s5t2": "interaction-component", "s5t3": "ragdoll-component", "s5t4": "ragdoll-component-update", "s5t5": "npc-system-part-1", "s6t0": "ant-logic", "s6t1": "ant-concept", "s6t2": "ant-asset", "s6t3": "ant-animset", "s6t4": "ant-fx", "s6t5": "mosquito-logic", "s6t6": "mosquito-concept", "s6t7": "mosquito-asset", "s6t8": "mosquito-animset", "s6t9": "mosquito-fx", "s6t10": "boss-logic", "s6t11": "boss-concept", "s6t12": "boss-asset", "s6t13": "boss-animset", "s6t14": "boss-fx", "s7t0": "locomotion-system-core", "s7t1": "locomotion-system-v2", "s7t2": "locomotion-system-v3", "s7t3": "locomotion-combat-mode", "s7t4": "emote-system", "s7t5": "emote-animation", "s7t6": "idle-animset", "s7t7": "walk-animset", "s7t8": "run-animset", "s7t9": "mantle-animset", "s7t10": "fall-land-animset", "s7t11": "slide-roll-dash-animset", "s7t12": "walk-run-fx", "s7t13": "mantle-fx", "s7t14": "fall-land-fx", "s7t15": "slide-roll-dash-fx", "s8t0": "ability-system-part-1", "s8t1": "inventory-system", "s8t2": "inventory-update", "s9t0": "thumbnail-part-1", "s9t1": "hud", "s10t0": "camera-system", "s10t1": "trap-system", "s11t0": "tomato-concept", "s11t1": "tomato-asset", "s11t2": "tomato-animset", "s11t3": "tomato-fx", "s11t4": "lemon-concept", "s11t5": "lemon-asset", "s11t6": "lemon-animset", "s11t7": "lemon-fx", "s11t8": "banana-concept", "s11t9": "banana-asset", "s11t10": "banana-animset", "s11t11": "banana-fx", "s11t12": "onion-concept", "s11t13": "onion-asset", "s11t14": "onion-animset", "s11t15": "onion-fx", "s11t16": "pickle-concept", "s11t17": "pickle-asset", "s11t18": "pickle-animset", "s11t19": "pickle-fx", "s12t0": "katana-concept", "s12t1": "katana-asset", "s12t2": "katana-animset", "s12t3": "katana-fx", "s12t4": "dualuzi-concept", "s12t5": "dualuzi-asset", "s12t6": "dualuzi-animset", "s12t7": "dualuzi-fx", "s13t0": "steampage-socials-part-1"};
+
+const ALL_TASKS=[];
+const slug=s=>s.normalize("NFKD").replace(/[^\w\s/&-]/g,"")
+  .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"");
+SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier])=>
+  ALL_TASKS.push({id:slug(name),name,disc,tier,sec,si})));
+
+/* MVP is a strict subset of Alpha over one shared dataset, so a task ticked in
+   either mode is ticked in both — no syncing between the two views. */
+let mode="mvp";
+const inView=t=>mode==="alpha"||MVP_IDS.has(t.id);
+let TASKS=[], VIEW_SECTIONS=[];
+function applyMode(){
+  TASKS=ALL_TASKS.filter(inView);
+  VIEW_SECTIONS=SECTIONS.map(([nm],si)=>[nm,si]).filter(([,si])=>TASKS.some(t=>t.si===si));
+  document.body.classList.toggle("mvp",mode==="mvp");
+  document.getElementById("modeName").textContent=mode==="mvp"?"MVP":"ALPHA";
+}
 
 /* ==========================================================================
    FIREBASE CONFIG — PASTE YOURS BETWEEN THE BRACES, NOTHING ELSE TO EDIT.
@@ -480,7 +512,7 @@ const DB_DOING = "fg-mvp/doing"; // on the deck
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=11;
+const BUILD=13;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -523,6 +555,23 @@ async function initStore(){
   backend="device";
 }
 
+function migrate(){
+  /* Old builds keyed tasks by position (s3t7). The re-scope reordered
+     everything, so translate once through the recorded map and write back. */
+  const conv=m=>{
+    let hit=false; const out={};
+    for(const k in m){
+      if(/^s\d+t\d+$/.test(k)){ hit=true; const nk=ID_MIGRATION[k]; if(nk) out[nk]=m[k]; }
+      else out[k]=m[k];
+    }
+    return hit?out:null;
+  };
+  const d=conv(doneMap), g=conv(doingMap);
+  if(d) doneMap=d;
+  if(g) doingMap=g;
+  return !!(d||g);
+}
+
 async function pull(){
   try{
     if(backend==="firebase"){
@@ -538,6 +587,18 @@ async function pull(){
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
+  }catch(e){}
+}
+
+async function pushAll(){
+  try{
+    if(backend==="firebase"){
+      await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap)]);
+    }else if(backend==="claude"){
+      await window.storage.set(SKEY,JSON.stringify({v:4,done:doneMap,doing:doingMap,at:Date.now()}),true);
+    }else{
+      localStorage.setItem(SKEY,JSON.stringify({done:doneMap,doing:doingMap}));
+    }
   }catch(e){}
 }
 
@@ -577,16 +638,17 @@ async function loadPrefs(){
   try{
     if(backend==="claude"){
       const r=await window.storage.get(PKEY);
-      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; }
+      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; }
       return;
     }
     const p=JSON.parse(localStorage.getItem(PKEY)||"{}");
     if("weighted" in p) weighted=!!p.weighted;
     if(p.devs) devs=p.devs;
+    if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode;
   }catch(e){}
 }
 function savePrefs(){
-  const v=JSON.stringify({weighted,devs});
+  const v=JSON.stringify({weighted,devs,mode});
   try{ backend==="claude" ? window.storage.set(PKEY,v) : localStorage.setItem(PKEY,v); }catch(e){}
 }
 const stamp=t=>$("sync").textContent=t?`${t} · ${new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`:"";
@@ -636,7 +698,7 @@ function estimate(){
   $("velLine").textContent=`${left} days ÷ ${cap} per week (${devs} dev × 5)`;
 }
 function tierRows(){
-  $("tierRows").innerHTML=[1,2,3].map(k=>{
+  $("tierRows").innerHTML=TIERS.map(k=>{
     const l=TASKS.filter(t=>t.tier===k),n=l.filter(t=>isDone(t.id)).length;
     const p=l.length?Math.round(n/l.length*100):0;
     return `<div class="row"><span class="tier-pill tp${k}">TIER ${k}</span>
@@ -655,14 +717,13 @@ function discRows(){
       <span class="row-ct">${n}/${l.length}</span></div>`;
   }).join("");
 }
-const TSHORT={1:"≤3d",2:"≤1w",3:"≤2w"};
 function chips(){
   const tc=$("tierChips"); tc.innerHTML="";
-  [1,2,3].forEach(k=>{
+  TIERS.forEach(k=>{
     const b=document.createElement("button");
     b.type="button"; b.dataset.t=k;
     b.setAttribute("aria-pressed",tierF.has(k));
-    b.innerHTML=`T${k} <i>${TSHORT[k]}</i>`;
+    b.innerHTML=`T${k} <i>${TIER[k].short}</i>`;
     b.onclick=()=>{tierF.has(k)?tierF.delete(k):tierF.add(k);chips();groups();};
     tc.appendChild(b);
   });
@@ -681,7 +742,7 @@ const match=t=>(!tierF.size||tierF.has(t.tier))&&(!discF.size||discF.has(t.disc)
 function groups(){
   const box=$("groups"); box.innerHTML=""; let shown=0;
   const forceOpen=!!q||!!tierF.size||!!discF.size;
-  SECTIONS.forEach(([name],si)=>{
+  VIEW_SECTIONS.forEach(([name,si])=>{
     const list=TASKS.filter(t=>t.si===si&&match(t)); if(!list.length) return;
     shown+=list.length;
     const all=TASKS.filter(t=>t.si===si),n=all.filter(t=>isDone(t.id)).length;
@@ -762,7 +823,24 @@ function refreshHead(si){
   const ct=g.querySelector(".g-ct"); if(ct) ct.textContent=`${k}/${all.length}`;
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
 }
-function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); }
+function otherPct(){
+  const other=mode==="mvp"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id));
+  let d=0,a=0;
+  other.forEach(t=>{const w=weighted?TIER[t.tier].d:1; a+=w; if(isDone(t.id))d+=w;});
+  return a?Math.round(d/a*100):0;
+}
+function modeBtn(){
+  $("modeOtherName").textContent=mode==="mvp"?"ALPHA":"MVP";
+  $("modeOtherPct").textContent=otherPct()+"%";
+}
+function setMode(m){
+  mode=m; savePrefs(); applyMode();
+  tierF.clear(); discF.clear(); q=""; $("search").value="";
+  open.clear();
+  buildTicks(); chips(); all_(); modeBtn();
+  scrollTo({top:0,behavior:"instant"});
+}
+function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn(); }
 function all_(){ summary(); deck(); groups(); }
 
 /* ===== events ===== */
@@ -800,9 +878,12 @@ document.addEventListener("visibilitychange",async()=>{
   await initStore();
   msg(backend==="firebase"?"Syncing…":"Loading…");
   await Promise.all([pull(),loadPrefs()]);
+  if(migrate()){ msg("Migrating…"); await pushAll(); }
+  applyMode();
   $("wToggle").checked=weighted;
   $("panes").hidden=false;
-  buildTicks(); chips(); teamSeg(); all_();
+  buildTicks(); chips(); teamSeg(); all_(); modeBtn();
+  $("modeBtn").onclick=()=>setMode(mode==="mvp"?"alpha":"mvp");
   fitBar();
   $("buildTag").textContent=`build ${BUILD} · ${backend}${navigator.standalone?" · standalone":""}`;
 
