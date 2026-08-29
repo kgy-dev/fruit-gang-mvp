@@ -42,18 +42,22 @@ html,body{margin:0;padding:0;overflow-x:hidden}
 /* MVP mode runs hot — vivid red over black. Tier colours are nudged brighter
    so the T3 badge still separates from the red panels. */
 body.mvp{
-  --bg:#0b0403; --panel:#1c0b09; --panel-2:#27100d;
-  --line:#3d1a15; --line-soft:#2b110e;
-  --ink:#fdf0ec; --muted:#b08880; --dim:#7a544c;
-  --fig-empty:#6d4941;
-  --hot:#ff4433; --hot-2:#ff8a5c;
-  --t0:#35a05c; --t1:#5ade78; --t2:#f5cf46; --t3:#ff6b57;
+  /* warm charcoal rather than maroon — the red lives in the accents, not the panels */
+  --bg:#0d0807; --panel:#1b1412; --panel-2:#261b18;
+  --line:#3d2b26; --line-soft:#2a1f1c;
+  --ink:#fff5f0; --muted:#bda49c; --dim:#836a63;
+  --fig-empty:#7d6058;
+  --hot:#ff4d3a; --hot-2:#ffb03a;
+  --t0:#3fb469; --t1:#5fe884; --t2:#ffd23f; --t3:#ff6f52;
 }
-body.mvp .topbar{background:linear-gradient(180deg,#1a0806 0%,var(--bg) 100%)}
+body.mvp .topbar{background:linear-gradient(180deg,#2a1310 0%,var(--bg) 92%);border-bottom-color:#3d2b26}
 body.mvp .navseg{background:var(--bg)}
-body.mvp .modebtn{border-color:#4a201a}
-body.mvp .hero::before{background:radial-gradient(circle,rgba(255,68,51,.20) 0%,rgba(255,68,51,0) 66%)}
+body.mvp .mark-sub{color:#ff7358;border-color:#5c2c23;background:rgba(255,77,58,.10)}
+body.mvp .mark-dot{background:var(--hot);box-shadow:0 0 14px rgba(255,77,58,.65)}
+body.mvp .modebtn{border-color:#4a2f28}
+body.mvp .hero::before{background:radial-gradient(circle,rgba(255,90,58,.24) 0%,rgba(255,176,58,.07) 46%,rgba(255,90,58,0) 70%)}
 body.mvp .splash{background:var(--bg)}
+body.mvp .splash-mark em{color:var(--hot)}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 :focus-visible{outline:2px solid var(--t2);outline-offset:2px;border-radius:4px}
@@ -68,19 +72,21 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 /* ---------- header ---------- */
 .topbar{
-  position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:9px;
-  padding:calc(11px + env(safe-area-inset-top)) 18px 9px;
+  position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;
+  padding:calc(11px + env(safe-area-inset-top)) 14px 9px;
   background:var(--bg);border-bottom:1px solid var(--line-soft);
 }
-.mark{display:flex;align-items:center;gap:8px;min-width:0}
+.mark{display:flex;align-items:center;gap:8px;min-width:0;flex:none}
 .mark-dot{width:9px;height:9px;border-radius:2px;background:var(--t3);flex:none;box-shadow:0 0 12px rgba(226,84,63,.55)}
 .mark-txt{font-family:var(--stencil);font-weight:400;font-size:17px;letter-spacing:.02em;white-space:nowrap}
 .mark-txt em{font-style:normal;color:var(--t3)}
-.mark-sub{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 5px}
-.sync{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--dim);white-space:nowrap}
+/* fixed width so switching MVP <-> ALPHA never nudges the rest of the bar */
+.mark-sub{flex:none;min-width:52px;text-align:center;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 4px}
+.sync{margin-left:auto;margin-right:0;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--dim);white-space:nowrap;text-align:right}
 .modebtn{
-  display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none;
-  padding:5px 9px;border-radius:9px;background:var(--panel);
+  margin-left:auto;   /* stays welded to the right edge whatever else changes */
+  display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;min-width:58px;
+  padding:5px 8px;border-radius:9px;background:var(--panel);
   border:1px solid var(--line);cursor:pointer;
   transition:background-color .18s,border-color .18s}
 .modebtn:active{background:var(--panel-2)}
@@ -245,7 +251,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .task.is-done .t-disc{opacity:.4}
 .task.is-done .t-tier{opacity:.45}
 
-@media (max-width:429px){ .sync{display:none} }
+@media (max-width:400px){ .mark-txt{font-size:15px} .mark-sub{min-width:46px;letter-spacing:.1em} }
+@media (max-width:339px){ .sync{display:none} }
 
 .empty{padding:34px 4px;color:var(--muted);font-size:14px}
 
@@ -344,7 +351,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </script>
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B13</div>
+    <div class="splash-tag">Production Tracker · B14</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -379,8 +386,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         </div>
       </div>
 
-      <div class="sec"><h2>Projected finish</h2><span class="note">from remaining tiers</span></div>
-      <div class="card">
+      <div class="card" style="margin-top:10px">
         <div class="est-top">
           <div>
             <div class="est-lab">Estimated</div>
@@ -512,7 +518,7 @@ const DB_DOING = "fg-mvp/doing"; // on the deck
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=13;
+const BUILD=14;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -651,7 +657,7 @@ function savePrefs(){
   const v=JSON.stringify({weighted,devs,mode});
   try{ backend==="claude" ? window.storage.set(PKEY,v) : localStorage.setItem(PKEY,v); }catch(e){}
 }
-const stamp=t=>$("sync").textContent=t?`${t} · ${new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`:"";
+const stamp=t=>$("sync").textContent=t?`${t} ${new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`:"";
 
 /* ===== math ===== */
 const wOf=t=>weighted?TIER[t.tier].d:1;
