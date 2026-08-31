@@ -30,7 +30,7 @@
   --c-system:#6b8fc4; --c-asset:#c4a06b; --c-animset:#6bb8b5;
   --c-fx:#7f8388; --c-concept:#c47b8f; --c-ui:#9b8fc4; --c-marketing:#8fa86b;
 
-  --hot:#e2543f; --hot-2:#ee8a2e;
+  --hot:#e0a52a; --hot-2:#ffd45e;   /* Alpha: amber. MVP overrides to red. */
   --fig-empty:#605d58;
 
   --stencil:"Saira Stencil One","Saira Condensed",Impact,sans-serif;
@@ -76,14 +76,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .topbar{
   position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;
   padding:calc(11px + env(safe-area-inset-top)) 14px 9px;
-  background:var(--bg);border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(180deg,#181510 0%,var(--bg) 72%);
+  border-bottom:1px solid var(--line-soft);
 }
 .mark{display:flex;align-items:center;gap:8px;min-width:0;flex:none}
-.mark-dot{width:9px;height:9px;border-radius:2px;background:var(--t3);flex:none;box-shadow:0 0 12px rgba(226,84,63,.55)}
+.mark-dot{width:9px;height:9px;border-radius:2px;background:var(--hot);flex:none;box-shadow:0 0 12px var(--hot)}
 .mark-txt{font-family:var(--stencil);font-weight:400;font-size:17px;letter-spacing:.02em;white-space:nowrap}
-.mark-txt em{font-style:normal;color:var(--t3)}
+.mark-txt em{font-style:normal;color:var(--hot)}
 /* fixed width so switching MVP <-> ALPHA never nudges the rest of the bar */
-.mark-sub{flex:none;min-width:52px;text-align:center;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 4px}
+.mark-sub{flex:none;color:var(--hot);border-color:color-mix(in srgb,var(--hot) 34%,transparent);background:color-mix(in srgb,var(--hot) 9%,transparent);min-width:52px;text-align:center;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 4px}
 .sync{margin-left:auto;margin-right:2px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--dim);white-space:nowrap;text-align:right}
 .modebtn{   /* stays welded to the right edge whatever else changes */
   display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;min-width:58px;
@@ -103,7 +104,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .hero::before{
   content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:74%;aspect-ratio:1;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(226,84,63,.13) 0%,rgba(226,84,63,0) 66%);
+  background:radial-gradient(circle,rgba(224,165,42,.15) 0%,rgba(255,212,94,.05) 44%,rgba(224,165,42,0) 68%);
 }
 .ring{--r:min(310px,70vw,34vh);position:relative;width:var(--r);aspect-ratio:1}
 .ring svg{position:absolute;inset:0;width:100%;height:100%}
@@ -277,8 +278,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .navseg{
   position:sticky;top:var(--barH,52px);z-index:29;
-  display:grid;grid-template-columns:repeat(4,1fr);gap:4px;
-  margin:0;padding:9px 10px 11px;background:var(--bg);
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;
+  margin:0;padding:9px 9px 11px;background:var(--bg);
   border-bottom:1px solid var(--line-soft);
 }
 .tab{
@@ -298,11 +299,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .tab.has-live .badge{background:rgba(63,142,224,.18);color:var(--doing)}
 .tab.has-warn .badge{background:rgba(238,138,46,.22);color:var(--t2)}
 .tab[aria-selected="true"].has-warn .badge{background:var(--t2);color:#1a1206}
-body.admin .navseg{grid-template-columns:repeat(5,1fr);gap:3px;padding-left:8px;padding-right:8px}
-body.admin .tab{font-size:8.5px;letter-spacing:.04em;padding:10px 1px}
-body.admin .tab .badge{min-width:14px;height:14px;font-size:8.5px}
-.tab.admin-only{display:none}
+body.crew .navseg{gap:3px;padding-left:7px;padding-right:7px}
+body.crew .tab{font-size:8.6px;letter-spacing:.03em;padding:10px 1px}
+body.crew .tab .badge{min-width:14px;height:14px;font-size:8.5px;padding:0 3px}
+body.admin .tab{font-size:8.2px;letter-spacing:.02em}
+.tab.crew-only,.tab.admin-only{display:none}
+body.crew .tab.crew-only{display:flex}
 body.admin .tab.admin-only{display:flex}
+.tab.has-done .badge{background:rgba(78,201,106,.20);color:var(--t1)}
+.tab[aria-selected="true"].has-done .badge{background:var(--t1);color:#0d1a10}
 .tab.has-req .badge{background:rgba(255,59,48,.22);color:var(--prio)}
 .tab[aria-selected="true"].has-req .badge{background:var(--prio);color:#fff}
 .tab[aria-selected="true"].has-live .badge{background:var(--doing);color:#08131f}
@@ -318,7 +323,7 @@ body.admin .tab.admin-only{display:flex}
   font-size:clamp(38px,13vw,60px);letter-spacing:.02em;line-height:1;color:var(--ink);
   animation:rise .6s cubic-bezier(.2,.8,.3,1) both;
 }
-.splash-mark em{font-style:normal;color:var(--t3)}
+.splash-mark em{font-style:normal;color:var(--hot)}
 .splash-tag{
   font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.26em;
   text-transform:uppercase;color:var(--dim);margin-top:10px;
@@ -336,7 +341,7 @@ body.admin .tab.admin-only{display:flex}
 @media (min-width:960px){
   .panes{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);align-items:start}
   .pane{display:block !important;padding:22px 24px 40px}
-  #pane-active,#pane-deck,#pane-admin{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
+  #pane-active,#pane-deck,#pane-done,#pane-admin{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
   #pane-tasks{grid-column:2;grid-row:1/5}
   .pane--tasks{border-left:1px solid var(--line-soft)}
   .navseg{display:none}
@@ -517,6 +522,7 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
     <button class="tab" role="tab" aria-selected="true"  aria-controls="pane-overview">Overview</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-active" id="activeTab">Active<span class="badge" id="activeCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
+    <button class="tab crew-only" role="tab" aria-selected="false" aria-controls="pane-done" id="doneTab">Done<span class="badge" id="doneCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
     <button class="tab admin-only" role="tab" aria-selected="false" aria-controls="pane-admin" id="adminTab">Admin<span class="badge" id="reqCount">0</span></button>
   </nav>
@@ -538,7 +544,7 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B22</div>
+    <div class="splash-tag">Production Tracker · B24</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -626,6 +632,16 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
         <p>Deck is empty.</p>
         <span>In <b>Tasks</b>, swipe a row <b>right&nbsp;to&nbsp;left</b> to flag it as priority.
               Hold and drag here to reorder.</span>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-done" role="tabpanel">
+      <div class="sec"><h2>Completed</h2><span class="note" id="doneNote">finished work</span></div>
+      <div id="doneList"></div>
+      <div class="deck-empty" id="doneEmpty" hidden>
+        <div class="de-mark"></div>
+        <p>Nothing finished yet.</p>
+        <span>Completed tasks land here, newest first.</span>
       </div>
     </section>
 
@@ -733,7 +749,7 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=22;
+const BUILD=24;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -778,7 +794,12 @@ const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
    so a task is never sitting in two queues at once. */
 const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&stateOf(t.id)===0)));
 /* Overview follows the lens: pick a person and the ring is theirs. */
-const scope=()=>mine(TASKS);
+/* Main sees the whole project. A person's ring is their working set —
+   what they finished, what they are on, and what is queued for them. */
+const scope=()=>lens==="main" ? TASKS
+  : TASKS.filter(t=>whoOf(t.id)===lens && (isDone(t.id)||stateOf(t.id)===1||isPrio(t.id)));
+const doneListQ=()=>mine(TASKS.filter(t=>isDone(t.id)))
+  .sort((a,b)=>(doneMap[b.id]||0)-(doneMap[a.id]||0));   // newest first
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== storage adapter: firebase | claude | device ===== */
@@ -1212,8 +1233,8 @@ async function advance(t,settleEl){
   repaint(t.id); refreshHead(t.si); summary();
 
   // let the green tick read for a beat before the card leaves its queue
-  if(settleEl) setTimeout(()=>{ deck(); active(); },460);
-  else { deck(); active(); }
+  if(settleEl) setTimeout(()=>{ deck(); active(); donePane(); },460);
+  else { deck(); active(); donePane(); }
 }
 function repaint(id){
   document.querySelectorAll(`.task[data-id="${id}"],.deck-card[data-id="${id}"]`)
@@ -1343,6 +1364,30 @@ function refreshHead(si){
 }
 function reqList(){ return ALL_TASKS.filter(t=>hasReq(t.id)); }
 
+function donePane(){
+  const list=doneListQ(), box=$("doneList");
+  $("doneCount").textContent=list.length;
+  $("doneTab").classList.toggle("has-done",list.length>0);
+  $("doneEmpty").hidden=list.length>0;
+  $("doneNote").textContent=list.length
+    ? (lens==="main"?`${list.length} finished`:`${list.length} by ${lens}`)
+    : "finished work";
+  box.innerHTML="";
+  list.forEach(t=>{
+    const w=whoOf(t.id), ts=doneMap[t.id];
+    const when=(typeof ts==="number"&&ts>0)
+      ? new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : "";
+    const c=document.createElement("div"); c.className="deck-card is-done";
+    c.innerHTML=`<span class="sbox"></span>
+      <span class="t-name">${t.name}</span>
+      <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
+      <span class="t-flags">${w?`<span class="t-who who-${w}">${w}</span>`:""}</span>
+      <span class="t-tier tp${t.tier}">T${t.tier}</span>
+      <span class="d-sec">${SECTIONS[t.si][0]}${when?" · "+when:""}</span>`;
+    box.appendChild(c);
+  });
+}
+
 function adminPane(){
   const list=reqList(), box=$("reqList");
   $("reqCount").textContent=list.length;
@@ -1365,7 +1410,7 @@ function adminPane(){
     const [ok,no]=el.querySelectorAll("button");
     ok.onclick=async()=>{
       await commit(t.id,r.to);
-      repaint(t.id); refreshHead(t.si); summary(); deck(); active(); adminPane();
+      repaint(t.id); refreshHead(t.si); summary(); deck(); active(); donePane(); adminPane();
     };
     no.onclick=async()=>{
       delete reqMap[t.id];
@@ -1467,8 +1512,10 @@ function setRole(r){
 }
 function applyRole(){
   document.body.classList.toggle("ro",!canEdit());
+  document.body.classList.toggle("crew",canEdit());
   document.body.classList.toggle("admin",isAdmin());
-  if(!isAdmin()&&$("adminTab").getAttribute("aria-selected")==="true") showPane("pane-overview");
+  const cur=document.querySelector('.tab[aria-selected="true"]');
+  if(cur&&getComputedStyle(cur).display==="none") showPane("pane-overview");
   const el=$("roleLine");
   if(el){
     el.innerHTML=`${role||"visitor"} · <button class="rolebtn" type="button">switch</button>`;
@@ -1515,7 +1562,7 @@ function summary(){
   if(scope().map(t=>t.id).join("|")!==TICK_SIG) buildTicks();  // scope changed under us
   hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn();
 }
-function all_(){ summary(); deck(); active(); adminPane(); groups(); }
+function all_(){ summary(); deck(); active(); donePane(); adminPane(); groups(); }
 
 /* ===== events ===== */
 $("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();groups();});
