@@ -24,7 +24,7 @@
   /* ripening ramp: unripe deep green -> green -> yellow -> red */
   --t0:#2f8a4e; --t1:#4ec96a; --t2:#e9bf35; --t3:#e2543f;
   --doing:#3f8ee0; --prio:#ff3b30;
-  --kgy:#e8b33c; --rfn:#b07fe8;
+  --kgy:#3fae3f; --rfn:#4a9df5;
 
   /* disciplines stay deliberately muted so tier reads first */
   --c-system:#6b8fc4; --c-asset:#c4a06b; --c-animset:#6bb8b5;
@@ -230,29 +230,34 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   padding:8px 10px;min-height:46px;cursor:pointer;border-radius:11px;background-color:var(--panel);
   touch-action:pan-y;transition:background-color .25s ease}
 .task:active{background:var(--panel-2)}
-.task.is-done{background-image:linear-gradient(rgba(78,201,106,.075),rgba(78,201,106,.075))}
-.task.is-doing{background-image:linear-gradient(rgba(63,142,224,.085),rgba(63,142,224,.085))}
-.task.is-doing .t-name{color:var(--ink)}
+.task.is-done,.deck-card.is-done{background-image:linear-gradient(rgba(78,201,106,.09),rgba(78,201,106,.09))}
+.task.is-doing,.deck-card.is-doing{background-image:linear-gradient(rgba(63,142,224,.085),rgba(63,142,224,.085))}
+.task.is-req,.deck-card.is-req{background-image:linear-gradient(rgba(255,176,58,.09),rgba(255,176,58,.09))}
+.is-doing .t-name{color:var(--ink)}
 .sbox{
   appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:5px;flex:none;
   border:1.6px solid var(--line);background:var(--panel-2);cursor:pointer;position:relative;
   transition:background-color .18s,border-color .18s,transform .12s;
 }
 .sbox:active{transform:scale(.92)}
-/* on the deck — a live dot, deliberately not a tick */
-.task.is-doing .sbox{background:var(--doing);border-color:var(--doing)}
-.task.is-doing .sbox::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;
+/* in progress — a live dot, deliberately not a tick */
+.is-doing>.sbox{background:var(--doing);border-color:var(--doing)}
+.is-doing>.sbox::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;
   margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#08131f}
 /* done — the tick */
-.task.is-done .sbox{background:var(--t1);border-color:var(--t1)}
-.task.is-done .sbox::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
+.is-done>.sbox{background:var(--t1);border-color:var(--t1)}
+.is-done>.sbox::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
   border:solid #0d1a10;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
+/* requested — an amber tick waiting for a sign-off (declared last, so it wins) */
+.is-req>.sbox{background:#ffb03a;border-color:#ffb03a}
+.is-req>.sbox::after{content:"";position:absolute;left:6.5px;top:2.5px;width:4px;height:9.5px;
+  border:solid #2a1a05;border-width:0 2.4px 2.4px 0;transform:rotate(42deg);opacity:.5}
 .t-name{font-size:14px;font-weight:400;transition:color .2s;overflow-wrap:anywhere;min-width:0}
-.task.is-done .t-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(78,201,106,.45)}
+.is-done .t-name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(78,201,106,.45)}
 .t-tier{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 0;border-radius:4px;border:1px solid;white-space:nowrap;width:100%;text-align:center}
 .t-disc{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;text-align:right;opacity:.9;transition:opacity .25s}
-.task.is-done .t-disc{opacity:.4}
-.task.is-done .t-tier{opacity:.45}
+.is-done .t-disc{opacity:.4}
+.is-done .t-tier{opacity:.45}
 
 @media (max-width:400px){ .mark-txt{font-size:15px} .mark-sub{min-width:46px;letter-spacing:.1em} }
 @media (max-width:339px){ .sync{display:none} }
@@ -342,10 +347,11 @@ body.admin .tab.admin-only{display:flex}
 .t-prio{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.05em;
   color:var(--prio);border:1px solid rgba(255,59,48,.45);background:rgba(255,59,48,.13);
   border-radius:4px;padding:2px 4px;white-space:nowrap}
+/* people read as solid chips; tiers and flags stay outlined, so the two never blur */
 .t-who{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.03em;
-  border-radius:4px;padding:2px 4px;border:1px solid;white-space:nowrap}
-.who-KGY{color:var(--kgy);border-color:rgba(232,179,60,.42);background:rgba(232,179,60,.12)}
-.who-RFN{color:var(--rfn);border-color:rgba(176,127,232,.42);background:rgba(176,127,232,.12)}
+  border-radius:4px;padding:2px 5px;border:none;color:#08140a;white-space:nowrap}
+.who-KGY{background:var(--kgy)}
+.who-RFN{background:var(--rfn);color:#04101d}
 .task.is-prio{box-shadow:inset 3px 0 0 var(--prio)}
 
 .t-req{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.05em;
@@ -379,9 +385,9 @@ body.admin .tab.admin-only{display:flex}
 .swipe.armed .sw-right em{color:#fff}
 .who-btn{padding:7px 11px;border-radius:8px;border:1px solid;background:var(--panel-2);
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em}
-.who-btn.on{color:#0d0d0c}
-.who-btn[data-who="KGY"]{color:var(--kgy);border-color:rgba(232,179,60,.5)}
-.who-btn[data-who="RFN"]{color:var(--rfn);border-color:rgba(176,127,232,.5)}
+.who-btn.on{color:#08140a}
+.who-btn[data-who="KGY"]{color:var(--kgy);border-color:rgba(63,174,63,.55)}
+.who-btn[data-who="RFN"]{color:var(--rfn);border-color:rgba(74,157,245,.55)}
 .who-btn[data-who="KGY"].on{background:var(--kgy)}
 .who-btn[data-who="RFN"].on{background:var(--rfn)}
 .swipe .task{transition:transform .2s cubic-bezier(.2,.8,.3,1)}
@@ -426,6 +432,8 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
 .gate-q{font-family:var(--dsp);font-weight:700;font-size:16px;text-transform:uppercase;
   letter-spacing:.02em;color:var(--muted);margin:30px 0 14px}
 .gate-actions{display:flex;flex-direction:column;gap:9px}
+.gate-actions .gbtn{min-height:58px;justify-content:center}
+.gate-actions .gbtn-ghost{min-height:0}
 .gbtn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 12px;
   border-radius:13px;background:var(--panel);border:1px solid var(--line);
   font-family:var(--dsp);font-weight:700;font-size:15px;letter-spacing:.03em;
@@ -513,7 +521,7 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B16</div>
+    <div class="splash-tag">Production Tracker · B17</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -675,7 +683,7 @@ SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier])=>
    either mode is ticked in both — no syncing between the two views. */
 let mode="mvp";
 const inView=t=>mode==="alpha"||MVP_IDS.has(t.id);
-let TASKS=[], VIEW_SECTIONS=[];
+let TASKS=[], VIEW_SECTIONS=[], TICKS=[], TICK_SIG="";
 function applyMode(){
   TASKS=ALL_TASKS.filter(inView);
   VIEW_SECTIONS=SECTIONS.map(([nm],si)=>[nm,si]).filter(([,si])=>TASKS.some(t=>t.si===si));
@@ -708,7 +716,7 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=16;
+const BUILD=17;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -749,7 +757,11 @@ const ordered=l=>l.slice().sort((a,b)=>rankOf(a.id)-rankOf(b.id));
 /* Prime narrows both queues to whoever is holding the phone. */
 const mine=l=>(lens==="main")?l:l.filter(t=>whoOf(t.id)===lens);
 const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
-const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&!isDone(t.id))));
+/* Deck = flagged but not started. The moment it starts it belongs to Active,
+   so a task is never sitting in two queues at once. */
+const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&stateOf(t.id)===0)));
+/* Overview follows the lens: pick a person and the ring is theirs. */
+const scope=()=>mine(TASKS);
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== storage adapter: firebase | claude | device ===== */
@@ -908,8 +920,8 @@ const stamp=t=>$("sync").textContent=t?`${t} ${new Date().toLocaleTimeString("en
 /* ===== math ===== */
 const wOf=t=>weighted?TIER[t.tier].d:1;
 function pct(list){let d=0,a=0;list.forEach(t=>{const w=wOf(t);a+=w;if(isDone(t.id))d+=w;});return a?d/a*100:0;}
-const daysLeft=()=>TASKS.filter(t=>!isDone(t.id)).reduce((s,t)=>s+TIER[t.tier].d,0);
-const daysAll=()=>TASKS.reduce((s,t)=>s+TIER[t.tier].d,0);
+const daysLeft=()=>scope().filter(t=>!isDone(t.id)).reduce((s,t)=>s+TIER[t.tier].d,0);
+const daysAll=()=>scope().reduce((s,t)=>s+TIER[t.tier].d,0);
 const fmtDate=ms=>new Date(ms).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
 
 /* ===== render ===== */
@@ -921,27 +933,31 @@ function tween(to){
    if(k<1)requestAnimationFrame(s);else cur=to;})(performance.now());
 }
 function hero(){
-  const p=pct(TASKS), n=TASKS.filter(t=>isDone(t.id)).length;
+  const S=scope(), p=pct(S), n=S.filter(t=>isDone(t.id)).length;
   tween(p);
-  $("sub").textContent=`${n} / ${TASKS.length} tasks`;
+  $("sub").textContent=`${n} / ${S.length} tasks`;
   $("arc").style.strokeDashoffset=(2*Math.PI*137)*(1-p/100);
 }
 function buildTicks(){
-  const N=TASKS.length,cx=150,cy=150,r1=109,r2=122;
-  $("ticks").innerHTML=TASKS.map((t,i)=>{
+  TICKS=scope(); TICK_SIG=TICKS.map(t=>t.id).join("|");
+  const N=Math.max(1,TICKS.length),cx=150,cy=150,r1=109,r2=122;
+  $("ticks").innerHTML=TICKS.map((t,i)=>{
     const a=(i/N)*2*Math.PI-Math.PI/2;
     return `<line class="tk" data-i="${i}" x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}"/>`;
   }).join("");
 }
 function paintTicks(){
   document.querySelectorAll("#ticks .tk").forEach(el=>{
-    const t=TASKS[+el.dataset.i], s=stateOf(t.id);
-    el.style.stroke=s===2?TIER[t.tier].c:(s===1?"var(--doing)":"");
-    el.style.strokeWidth=s?"4.4":"";
+    const t=TICKS[+el.dataset.i]; if(!t) return;
+    const s=stateOf(t.id), r=hasReq(t.id);
+    el.style.stroke=r?"#ffb03a":(s===2?TIER[t.tier].c:(s===1?"var(--doing)":""));
+    el.style.strokeWidth=(s||r)?"4.4":"";
   });
 }
 function estimate(){
-  const left=daysLeft(), cap=devs*5;
+  const left=daysLeft(), cap=devs*5, total=daysAll();
+  if(!total){ $("etaDate").textContent="—"; $("etaWeeks").textContent="0w";
+    $("etaDays").textContent="nothing assigned yet"; $("velLine").textContent=""; return; }
   if(left<=0){ $("etaDate").textContent="Shipped"; $("etaWeeks").textContent="0w"; $("etaDays").textContent="0 days left"; $("velLine").textContent=""; return; }
   const weeks=left/cap;
   $("etaWeeks").textContent=`${weeks.toFixed(1)}w`;
@@ -950,8 +966,9 @@ function estimate(){
   $("velLine").textContent=`${left} days ÷ ${cap} per week (${devs} dev × 5)`;
 }
 function tierRows(){
+  const S=scope();
   $("tierRows").innerHTML=TIERS.map(k=>{
-    const l=TASKS.filter(t=>t.tier===k),n=l.filter(t=>isDone(t.id)).length;
+    const l=S.filter(t=>t.tier===k),n=l.filter(t=>isDone(t.id)).length;
     const p=l.length?Math.round(n/l.length*100):0;
     return `<div class="row"><span class="tier-pill tp${k}">TIER ${k}</span>
       <span class="row-mid"><span class="row-when">${TIER[k].when}</span>
@@ -960,8 +977,9 @@ function tierRows(){
   }).join("");
 }
 function discRows(){
+  const S=scope();
   $("discRows").innerHTML=Object.entries(DISC).map(([k,m])=>{
-    const l=TASKS.filter(t=>t.disc===k),n=l.filter(t=>isDone(t.id)).length;
+    const l=S.filter(t=>t.disc===k),n=l.filter(t=>isDone(t.id)).length;
     const p=l.length?Math.round(n/l.length*100):0;
     return `<div class="row"><span class="dot" style="background:${m.c}"></span>
       <span class="row-mid"><span class="row-name">${m.name}</span>
@@ -1085,7 +1103,7 @@ function bindSwipe(wrap,row,t){
       const w=b.dataset.who, cur=whoOf(t.id);
       if(cur===w) delete assignMap[t.id]; else assignMap[t.id]=w;
       wrap.querySelectorAll(".who-btn").forEach(o=>o.classList.toggle("on",whoOf(t.id)===o.dataset.who));
-      paintRow(row,t.id); closeOpen(); deck(); active();
+      paintRow(row,t.id); closeOpen(); summary(); deck(); active();
       await pushKey(DB_ASSIGN,t.id,assignMap[t.id]||null);
     });
   });
@@ -1255,9 +1273,11 @@ function bindDrag(card,t){
   card.addEventListener("click",()=>{ moved=false; });   // body taps do nothing; use the box
 }
 
-const sig=()=>[doneMap,doingMap,prioMap,assignMap,reqMap]
-  .map(m=>Object.keys(m).sort().join("|")).join("#")
-  +"#"+Object.entries(rankMap).sort().map(([k,v])=>k+":"+v).join("|");
+/* Values, not just keys: reassigning KGY -> RFN keeps the same key, and the old
+   key-only signature meant the other phone never noticed the change. */
+const kv=m=>Object.keys(m).sort().map(k=>k+":"+(typeof m[k]==="object"?JSON.stringify(m[k]):m[k])).join("|");
+const sig=()=>[doneMap,doingMap,prioMap].map(m=>Object.keys(m).sort().join("|")).join("#")
+  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap);
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si), k=all.filter(t=>isDone(t.id)).length;
@@ -1317,7 +1337,8 @@ function crossHint(){
   };
 }
 function otherPct(){
-  const other=mode==="mvp"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id));
+  let other=mode==="mvp"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id));
+  if(lens!=="main") other=other.filter(t=>whoOf(t.id)===lens);
   let d=0,a=0;
   other.forEach(t=>{const w=weighted?TIER[t.tier].d:1; a+=w; if(isDone(t.id))d+=w;});
   return a?Math.round(d/a*100):0;
@@ -1333,7 +1354,7 @@ function primeBtn(){
 }
 function applyLens(){
   document.body.classList.toggle("prime",lens!=="main");
-  primeBtn(); deck(); active();
+  primeBtn(); buildTicks(); all_();
 }
 
 /* ---------- gate: every screen is rebuilt from scratch, so no stale state ---------- */
@@ -1404,11 +1425,9 @@ function pickLens(){
   $("gateQ").textContent="Whose queue?";
   const body=$("gateBody"); body.innerHTML="";
   const wrap=document.createElement("div"); wrap.className="gate-actions";
-  const opts=[["main","Main","everything, both of you"],
-              ["KGY","KGY","only KGY's deck and active"],
-              ["RFN","RFN","only RFN's deck and active"]];
-  opts.forEach(([k,label,sub])=>{
-    const b=gbtn(label,sub,k===lens);
+  const opts=[["main","Main"],["KGY","KGY"],["RFN","RFN"]];
+  opts.forEach(([k,label])=>{
+    const b=gbtn(label,"",k===lens);
     b.onclick=()=>{ lens=k; try{localStorage.setItem(MKEY,k);}catch(e){}
       savePrefs(); applyLens(); closeGate(); };
     wrap.appendChild(b);
@@ -1431,7 +1450,10 @@ function setMode(m){
   buildTicks(); chips(); all_(); modeBtn(); primeBtn();
   scrollTo({top:0,behavior:"instant"});
 }
-function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn(); }
+function summary(){
+  if(scope().map(t=>t.id).join("|")!==TICK_SIG) buildTicks();  // scope changed under us
+  hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn();
+}
 function all_(){ summary(); deck(); active(); adminPane(); groups(); }
 
 /* ===== events ===== */
