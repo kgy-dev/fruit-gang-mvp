@@ -460,7 +460,8 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
 /* visitors read, they do not write */
 body.ro .task,body.ro .deck-card{cursor:default}
 body.ro .sbox{opacity:.55}
-body.ro #resetBtn{display:none}
+#resetBtn{display:none}
+body.admin #resetBtn{display:inline-block}
 .rolebtn{background:none;color:var(--hot);text-decoration:underline;font:inherit;padding:0}
 
 /* ===== prime: personal view runs blue (wins over mvp red) ============ */
@@ -537,7 +538,7 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B20</div>
+    <div class="splash-tag">Production Tracker · B22</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -732,7 +733,7 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=20;
+const BUILD=22;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -801,6 +802,14 @@ async function initStore(){
   }
   if(hasClaude()){ backend="claude"; return; }
   backend="device";
+}
+
+/* Older builds could leave a deck flag on a finished task; it stayed invisible
+   until a reopen or reset dropped it back into the Deck. Sweep them on load. */
+function normalize(){
+  let changed=false;
+  for(const id in prioMap) if(has(doneMap,id)){ delete prioMap[id]; changed=true; }
+  return changed;
 }
 
 function migrate(){
@@ -907,9 +916,22 @@ function setState(id,state){
   if(state===2) doneMap[id]=Date.now();
 }
 
+/* Finishing a task retires its deck flag. Left behind, a stale flag means the
+   task springs back into the Deck the moment it is reopened or reset. */
+async function commit(id,to){
+  const dropPrio=(to===2&&isPrio(id)), dropReq=hasReq(id);
+  setState(id,to);
+  if(dropPrio) delete prioMap[id];
+  if(dropReq)  delete reqMap[id];
+  const jobs=[push(id,to)];
+  if(dropPrio) jobs.push(pushKey(DB_PRIO,id,null));
+  if(dropReq)  jobs.push(pushKey(DB_REQ,id,null));
+  await Promise.all(jobs);
+}
+
 async function clearAll(){
-  doneMap={};
-  if(backend==="firebase"){ await FB.set(FB.done,null); return; }
+  doneMap={}; doingMap={}; prioMap={}; reqMap={}; rankMap={}; assignMap={};
+  if(backend==="firebase"){ await FB.set(FB.root,null); return; }   // wipe the whole node
   await pushAll();
 }
 
@@ -1143,7 +1165,7 @@ function bindSwipe(wrap,row,t){
     e.preventDefault();
     dx=Math.max(-108,Math.min(OPEN_L,base+ax));
     row.style.transform=`translateX(${dx}px)`;
-    wrap.classList.toggle("armed",dx<=-THRESH);
+    wrap.classList.toggle("armed",dx<=-THRESH&&!isDone(t.id));
   },{passive:false});
 
   const finish=async()=>{
@@ -1152,6 +1174,7 @@ function bindSwipe(wrap,row,t){
     if(lock!=="x"){ row.style.transform="translateX(0px)"; return; }
     if(dx<=-THRESH){                       // left swipe -> toggle priority
       row.style.transform="translateX(0px)";
+      if(isDone(t.id)) return;             // a finished task has no place on the deck
       if(isPrio(t.id)) delete prioMap[t.id]; else prioMap[t.id]=Date.now();
       paintRow(row,t.id); deck(); summary();
       await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
@@ -1185,10 +1208,8 @@ async function advance(t,settleEl){
     return;
   }
 
-  setState(t.id,to);
-  if(hasReq(t.id)){ delete reqMap[t.id]; pushKey(DB_REQ,t.id,null); }
+  await commit(t.id,to);
   repaint(t.id); refreshHead(t.si); summary();
-  await push(t.id,to);
 
   // let the green tick read for a beat before the card leaves its queue
   if(settleEl) setTimeout(()=>{ deck(); active(); },460);
@@ -1343,10 +1364,8 @@ function adminPane(){
       </div>`;
     const [ok,no]=el.querySelectorAll("button");
     ok.onclick=async()=>{
-      const to=r.to;
-      delete reqMap[t.id]; setState(t.id,to);
+      await commit(t.id,r.to);
       repaint(t.id); refreshHead(t.si); summary(); deck(); active(); adminPane();
-      await Promise.all([push(t.id,to),pushKey(DB_REQ,t.id,null)]);
     };
     no.onclick=async()=>{
       delete reqMap[t.id];
@@ -1507,11 +1526,17 @@ $("expandBtn").addEventListener("click",()=>{
   groups();
 });
 $("resetBtn").addEventListener("click",async()=>{
-  const n=Object.keys(doneMap).length; if(!n) return;
-  if(!confirm(`Clear ${n} completed tasks for everyone?`)) return;
-  doneMap={};
+  if(!isAdmin()) return;
+  const d=Object.keys(doneMap).length, g=Object.keys(doingMap).length,
+        p=Object.keys(prioMap).length, q=Object.keys(reqMap).length,
+        a=Object.keys(assignMap).length;
+  if(!(d+g+p+q+a)) return;
+  if(!confirm(`Reset everything for everyone?\n\n`+
+              `${d} completed · ${g} in progress · ${p} on the deck\n`+
+              `${a} assignments · ${q} pending requests · custom ordering\n\n`+
+              `This cannot be undone.`)) return;
   try{ await clearAll(); stamp("reset"); }catch(e){}
-  all_();
+  buildTicks(); all_();
 });
 document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{
   showPane(tab.getAttribute("aria-controls"));
@@ -1531,7 +1556,7 @@ document.addEventListener("visibilitychange",async()=>{
   await initStore();
   msg(backend==="firebase"?"Syncing…":"Loading…");
   await Promise.all([pull(),loadPrefs()]);
-  if(migrate()){ msg("Migrating…"); await pushAll(); }
+  if(migrate()|normalize()){ msg("Tidying…"); await pushAll(); }
   applyMode();
   $("wToggle").checked=weighted;
   $("panes").hidden=false;
