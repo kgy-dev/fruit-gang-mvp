@@ -292,6 +292,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .tab.has-live .badge{background:rgba(63,142,224,.18);color:var(--doing)}
 .tab.has-warn .badge{background:rgba(238,138,46,.22);color:var(--t2)}
 .tab[aria-selected="true"].has-warn .badge{background:var(--t2);color:#1a1206}
+body.admin .navseg{grid-template-columns:repeat(5,1fr);gap:3px;padding-left:8px;padding-right:8px}
+body.admin .tab{font-size:8.5px;letter-spacing:.04em;padding:10px 1px}
+body.admin .tab .badge{min-width:14px;height:14px;font-size:8.5px}
+.tab.admin-only{display:none}
+body.admin .tab.admin-only{display:flex}
+.tab.has-req .badge{background:rgba(255,59,48,.22);color:var(--prio)}
+.tab[aria-selected="true"].has-req .badge{background:var(--prio);color:#fff}
 .tab[aria-selected="true"].has-live .badge{background:var(--doing);color:#08131f}
 
 .splash{
@@ -323,8 +330,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 @media (min-width:960px){
   .panes{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);align-items:start}
   .pane{display:block !important;padding:22px 24px 40px}
-  #pane-deck{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
-  #pane-tasks{grid-column:2;grid-row:1/3}
+  #pane-active,#pane-deck,#pane-admin{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
+  #pane-tasks{grid-column:2;grid-row:1/5}
   .pane--tasks{border-left:1px solid var(--line-soft)}
   .navseg{display:none}
 }
@@ -340,6 +347,25 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .who-KGY{color:var(--kgy);border-color:rgba(232,179,60,.42);background:rgba(232,179,60,.12)}
 .who-RFN{color:var(--rfn);border-color:rgba(176,127,232,.42);background:rgba(176,127,232,.12)}
 .task.is-prio{box-shadow:inset 3px 0 0 var(--prio)}
+
+.t-req{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.05em;
+  color:#ffb03a;border:1px solid rgba(255,176,58,.45);background:rgba(255,176,58,.13);
+  border-radius:4px;padding:2px 4px;white-space:nowrap}
+.task.is-req,.deck-card.is-req{box-shadow:inset 3px 0 0 #ffb03a}
+
+/* ===== admin: pending approvals ===================================== */
+.req-card{padding:13px;margin-bottom:8px;border-radius:12px;background:var(--panel);
+  border:1px solid var(--line-soft);border-left:2.5px solid #ffb03a}
+.req-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.req-name{font-size:14.5px;font-weight:500;overflow-wrap:anywhere}
+.req-what{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#ffb03a;white-space:nowrap}
+.req-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--dim);margin-top:5px}
+.req-acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+.req-acts button{padding:9px;border-radius:9px;font-family:var(--mono);font-size:10px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid}
+.req-ok{color:var(--t1);border-color:rgba(78,201,106,.45);background:rgba(78,201,106,.10)}
+.req-no{color:var(--muted);border-color:var(--line);background:var(--panel-2)}
 
 /* ===== swipe actions ================================================= */
 .swipe{position:relative;overflow:hidden;border-radius:11px;transition:background-color .2s}
@@ -366,7 +392,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .deck-card.dragging{opacity:.96;box-shadow:0 12px 30px rgba(0,0,0,.55);
   border-color:var(--hot);position:relative;z-index:6;transition:none}
 body.dragging-on{user-select:none;-webkit-user-select:none}
-.grip{position:absolute;right:9px;top:9px;width:13px;height:9px;opacity:.28;
+.grip{position:absolute;right:11px;bottom:12px;width:14px;height:8px;opacity:.22;pointer-events:none;
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
 /* ===== WIP warning =================================================== */
@@ -389,7 +415,8 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
 
 /* ===== role gate ===================================================== */
 .gate{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
-  padding:26px;background:var(--bg)}
+  padding:26px;background:var(--bg);overflow-y:auto}
+[hidden]{display:none !important}   /* author display must not beat the attribute */
 .gate.done{opacity:0;pointer-events:none;transition:opacity .35s}
 .gate-card{width:100%;max-width:340px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
 .gate-mark{font-family:var(--stencil);font-size:clamp(30px,10vw,40px);line-height:1;color:var(--ink)}
@@ -405,6 +432,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
   text-transform:uppercase;color:var(--ink);transition:background-color .16s,border-color .16s}
 .gbtn span{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.1em;
   text-transform:none;color:var(--dim)}
+.gbtn:empty{display:none}
 .gbtn:active{background:var(--panel-2)}
 .gbtn-primary{border-color:var(--hot);background:linear-gradient(180deg,rgba(226,84,63,.16),rgba(226,84,63,.05))}
 .gbtn-primary span{color:var(--muted)}
@@ -462,9 +490,10 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
 
   <nav class="navseg" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="pane-overview">Overview</button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-active" id="activeTab">Active<span class="badge" id="activeCount">0</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
+    <button class="tab admin-only" role="tab" aria-selected="false" aria-controls="pane-admin" id="adminTab">Admin<span class="badge" id="reqCount">0</span></button>
   </nav>
 
   <script>
@@ -477,26 +506,14 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
     <div class="gate-card">
       <div class="gate-mark">FRUIT <em>GANG</em></div>
       <div class="gate-sub">Production Tracker</div>
-      <div class="gate-q" id="gateQ">How are you joining?</div>
-      <div class="gate-actions" id="gatePick">
-        <button class="gbtn gbtn-primary" id="gateAdmin" type="button">Admin<span>edit, assign, prioritise</span></button>
-        <button class="gbtn" id="gateVisitor" type="button">Visitor<span>view only</span></button>
-      </div>
-      <div class="gate-pw" id="gatePw" hidden>
-        <input id="pwInput" type="password" inputmode="text" autocomplete="off"
-               placeholder="••••" aria-label="Admin password">
-        <div class="gate-err" id="pwErr" hidden>Wrong password</div>
-        <div class="gate-row">
-          <button class="gbtn gbtn-primary" id="pwGo" type="button">Unlock</button>
-          <button class="gbtn gbtn-ghost" id="pwSkip" type="button">Continue as visitor</button>
-        </div>
-      </div>
+      <div class="gate-q" id="gateQ"></div>
+      <div id="gateBody"></div>
     </div>
   </div>
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B15</div>
+    <div class="splash-tag">Production Tracker · B16</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -565,6 +582,17 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
       <span id="roleLine"></span> · <span id="buildTag"></span></p>
     </section>
 
+    <section class="pane" id="pane-active" role="tabpanel">
+      <div class="sec"><h2>Active</h2><span class="note" id="activeNote">in progress</span></div>
+      <div id="wipWarn" hidden></div>
+      <div id="activeList"></div>
+      <div class="deck-empty" id="activeEmpty" hidden>
+        <div class="de-mark"></div>
+        <p>Nothing in progress.</p>
+        <span>Tap the box on a task to start it. Hold and drag here to reorder.</span>
+      </div>
+    </section>
+
     <section class="pane" id="pane-deck" role="tabpanel">
       <div class="sec"><h2>Deck</h2><span class="note" id="deckNote">what comes next</span></div>
       <div id="deckList"></div>
@@ -576,15 +604,14 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
       </div>
     </section>
 
-    <section class="pane" id="pane-active" role="tabpanel">
-      <div class="sec"><h2>Active</h2><span class="note" id="activeNote">in progress</span></div>
-      <div id="wipWarn" hidden></div>
-      <div id="activeList"></div>
-      <div class="deck-empty" id="activeEmpty" hidden>
+    <section class="pane" id="pane-admin" role="tabpanel">
+      <div class="sec"><h2>Approvals</h2><span class="note" id="reqNote">team requests</span></div>
+      <div id="reqList"></div>
+      <div class="deck-empty" id="reqEmpty" hidden>
         <div class="de-mark"></div>
-        <p>Nothing in progress.</p>
-        <span>Tap a task once to start it, again to complete it.
-              Hold and drag here to reorder.</span>
+        <p>Nothing waiting.</p>
+        <span>When a team member marks a task complete or reopens one,
+              it lands here for your approval.</span>
       </div>
     </section>
 
@@ -677,10 +704,11 @@ const DB_DOING = "fg-mvp/doing"; // in progress
 const DB_PRIO  = "fg-mvp/prio";  // on the deck (priority queue)
 const DB_ASSIGN= "fg-mvp/assign";// who owns it
 const DB_RANK  = "fg-mvp/rank";  // manual ordering for deck + active
+const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=15;
+const BUILD=16;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -690,14 +718,23 @@ addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={};
+let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={};
 let weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
 
 /* device-local, never shared: who is looking and what they may do */
-const RKEY="fg-mvp-role", MKEY="fg-mvp-me";
-const PEOPLE={KGY:{c:"var(--kgy)"},RFN:{c:"var(--rfn)"}};
-let role=null, me=null, prime=false;
-const canEdit=()=>role==="admin";
+const RKEY="fg-mvp-role", MKEY="fg-mvp-lens";
+const PEOPLE=["KGY","RFN"];
+const ROLES={
+  admin:  {pw:"eff",   label:"Admin"},
+  team:   {pw:"plums", label:"Team"},
+  visitor:{pw:null,    label:"Visitor"}
+};
+let role=null, lens="main";
+const canEdit =()=>role==="admin"||role==="team";
+const isAdmin =()=>role==="admin";
+/* Team may move work along, but finishing or reopening needs a sign-off. */
+const needsReq=(from,to)=>role==="team"&&(to===2||from===2);
+const hasReq  =id=>has(reqMap,id);
 const open=new Set();
 const $=id=>document.getElementById(id);
 const has=(m,id)=>Object.prototype.hasOwnProperty.call(m,id);
@@ -710,7 +747,7 @@ const whoOf=id=>assignMap[id]||null;
 const rankOf=id=>(id in rankMap)?rankMap[id]:1e6;
 const ordered=l=>l.slice().sort((a,b)=>rankOf(a.id)-rankOf(b.id));
 /* Prime narrows both queues to whoever is holding the phone. */
-const mine=l=>(prime&&me)?l.filter(t=>whoOf(t.id)===me):l;
+const mine=l=>(lens==="main")?l:l.filter(t=>whoOf(t.id)===lens);
 const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
 const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&!isDone(t.id))));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -730,7 +767,7 @@ async function initStore(){
       await authm.signInAnonymously(authm.getAuth(a));
       const db=dbm.getDatabase(a);
       FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING),
-          prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK)};
+          prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK),req:dbm.ref(db,DB_REQ)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -749,13 +786,14 @@ function migrate(){
     }
     return hit?out:null;
   };
-  const d=conv(doneMap), g=conv(doingMap), p=conv(prioMap), a=conv(assignMap), r=conv(rankMap);
+  const d=conv(doneMap), g=conv(doingMap), p=conv(prioMap), a=conv(assignMap), r=conv(rankMap), rq=conv(reqMap);
   if(d) doneMap=d;
   if(g) doingMap=g;
   if(p) prioMap=p;
   if(a) assignMap=a;
   if(r) rankMap=r;
-  return !!(d||g||p||a||r);
+  if(rq) reqMap=rq;
+  return !!(d||g||p||a||r||rq);
 }
 
 async function pull(){
@@ -763,7 +801,7 @@ async function pull(){
     if(backend==="firebase"){
       const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
       doneMap=v.done||{}; doingMap=v.doing||{};
-      prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; return;
+      prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
@@ -772,22 +810,23 @@ async function pull(){
         if(d&&typeof d.doing==="object") doingMap=d.doing;
         if(d&&typeof d.prio==="object") prioMap=d.prio;
         if(d&&typeof d.assign==="object") assignMap=d.assign;
-        if(d&&typeof d.rank==="object") rankMap=d.rank; }
+        if(d&&typeof d.rank==="object") rankMap=d.rank;
+        if(d&&typeof d.req==="object") reqMap=d.req; }
       return;
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
-    prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{};
+    prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{}; reqMap=raw.req||{};
   }catch(e){}
 }
 
-const bundle=()=>({v:5,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,at:Date.now()});
+const bundle=()=>({v:6,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,req:reqMap,at:Date.now()});
 
 async function pushAll(){
   try{
     if(backend==="firebase"){
-      await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),
-                         FB.set(FB.prio,prioMap),FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap)]);
+      await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),FB.set(FB.prio,prioMap),
+                         FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap),FB.set(FB.req,reqMap)]);
     }else if(backend==="claude"){
       await window.storage.set(SKEY,JSON.stringify(bundle()),true);
     }else{
@@ -850,18 +889,18 @@ async function loadPrefs(){
   try{
     if(backend==="claude"){
       const r=await window.storage.get(PKEY);
-      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; prime=!!p.prime; }
+      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; if(p.lens) lens=p.lens; }
       return;
     }
     const p=JSON.parse(localStorage.getItem(PKEY)||"{}");
     if("weighted" in p) weighted=!!p.weighted;
     if(p.devs) devs=p.devs;
     if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode;
-    prime=!!p.prime;
+    if(p.lens) lens=p.lens;
   }catch(e){}
 }
 function savePrefs(){
-  const v=JSON.stringify({weighted,devs,mode,prime});
+  const v=JSON.stringify({weighted,devs,mode,lens});
   try{ backend==="claude" ? window.storage.set(PKEY,v) : localStorage.setItem(PKEY,v); }catch(e){}
 }
 const stamp=t=>$("sync").textContent=t?`${t} ${new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`:"";
@@ -989,6 +1028,7 @@ function teamSeg(){
 function flagsHTML(id){
   const w=whoOf(id);
   return `<span class="t-flags">
+    ${hasReq(id)?'<span class="t-req">REQ</span>':""}
     ${isPrio(id)?'<span class="t-prio">PRIO</span>':""}
     ${w?`<span class="t-who who-${w}">${w}</span>`:""}
   </span>`;
@@ -998,6 +1038,7 @@ function paintRow(row,id){
   row.classList.toggle("is-doing",s===1);
   row.classList.toggle("is-done", s===2);
   row.classList.toggle("is-prio", isPrio(id));
+  row.classList.toggle("is-req",  hasReq(id));
   const f=row.querySelector(".t-flags");
   if(f) f.outerHTML=flagsHTML(id);
 }
@@ -1097,13 +1138,31 @@ function bindSwipe(wrap,row,t){
     advance(t);
   });
 }
-/* todo -> deck -> done -> todo */
-async function advance(t){
-  const next=(stateOf(t.id)+1)%3;
-  setState(t.id,next);
-  document.querySelectorAll(`.task[data-id="${t.id}"]`).forEach(r=>paintRow(r,t.id));
-  refreshHead(t.si); summary(); deck(); active();
-  await push(t.id,next);
+/* todo -> in progress -> done -> todo */
+async function advance(t,settleEl){
+  if(!canEdit()) return;
+  const from=stateOf(t.id), to=(from+1)%3;
+
+  if(needsReq(from,to)){                    // team: ask instead of doing
+    if(hasReq(t.id)){ delete reqMap[t.id]; }
+    else { reqMap[t.id]={to,from,at:Date.now()}; }
+    repaint(t.id); adminPane(); summary();
+    await pushKey(DB_REQ,t.id,reqMap[t.id]||null);
+    return;
+  }
+
+  setState(t.id,to);
+  if(hasReq(t.id)){ delete reqMap[t.id]; pushKey(DB_REQ,t.id,null); }
+  repaint(t.id); refreshHead(t.si); summary();
+  await push(t.id,to);
+
+  // let the green tick read for a beat before the card leaves its queue
+  if(settleEl) setTimeout(()=>{ deck(); active(); },460);
+  else { deck(); active(); }
+}
+function repaint(id){
+  document.querySelectorAll(`.task[data-id="${id}"],.deck-card[data-id="${id}"]`)
+    .forEach(r=>paintRow(r,id));
 }
 
 function card(t,kind){
@@ -1116,8 +1175,11 @@ function card(t,kind){
     <span class="d-sec">${SECTIONS[t.si][0]}</span>
     <span class="grip"></span>`;
   paintRow(c,t.id);
-  if(kind==="active") c.classList.add("is-doing");
   bindDrag(c,t);
+  c.querySelector(".sbox").addEventListener("click",e=>{
+    e.stopPropagation();
+    advance(t,c);
+  });
   return c;
 }
 
@@ -1163,7 +1225,7 @@ function bindDrag(card,t){
     await pushRanks(ids);
   };
   card.addEventListener("pointerdown",e=>{
-    if(!canEdit()) return;
+    if(!canEdit()||e.target.closest(".sbox")) return;
     y0=e.clientY; moved=false;
     timer=setTimeout(()=>{
       dragging=true; moved=true;
@@ -1190,10 +1252,10 @@ function bindDrag(card,t){
   },{passive:false});
   card.addEventListener("pointerup",stop);
   card.addEventListener("pointercancel",stop);
-  card.addEventListener("click",()=>{ if(moved){moved=false;return;} if(canEdit()) advance(t); });
+  card.addEventListener("click",()=>{ moved=false; });   // body taps do nothing; use the box
 }
 
-const sig=()=>[doneMap,doingMap,prioMap,assignMap]
+const sig=()=>[doneMap,doingMap,prioMap,assignMap,reqMap]
   .map(m=>Object.keys(m).sort().join("|")).join("#")
   +"#"+Object.entries(rankMap).sort().map(([k,v])=>k+":"+v).join("|");
 function refreshHead(si){
@@ -1203,6 +1265,43 @@ function refreshHead(si){
   const ct=g.querySelector(".g-ct"); if(ct) ct.textContent=`${k}/${all.length}`;
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
 }
+function reqList(){ return ALL_TASKS.filter(t=>hasReq(t.id)); }
+
+function adminPane(){
+  const list=reqList(), box=$("reqList");
+  $("reqCount").textContent=list.length;
+  $("adminTab").classList.toggle("has-req",list.length>0);
+  $("reqEmpty").hidden=list.length>0;
+  $("reqNote").textContent=list.length?`${list.length} waiting`:"team requests";
+  box.innerHTML="";
+  list.forEach(t=>{
+    const r=reqMap[t.id]||{}, w=whoOf(t.id);
+    const what=r.to===2?"Mark complete":(r.to===0?"Reopen task":"Change state");
+    const when=r.at?new Date(r.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+    const el=document.createElement("div"); el.className="req-card";
+    el.innerHTML=`<div class="req-top"><span class="req-name">${t.name}</span>
+        <span class="req-what">${what}</span></div>
+      <div class="req-meta">${SECTIONS[t.si][0]}${w?" · "+w:""}${when?" · "+when:""}</div>
+      <div class="req-acts">
+        <button class="req-ok" type="button">Approve</button>
+        <button class="req-no" type="button">Reject</button>
+      </div>`;
+    const [ok,no]=el.querySelectorAll("button");
+    ok.onclick=async()=>{
+      const to=r.to;
+      delete reqMap[t.id]; setState(t.id,to);
+      repaint(t.id); refreshHead(t.si); summary(); deck(); active(); adminPane();
+      await Promise.all([push(t.id,to),pushKey(DB_REQ,t.id,null)]);
+    };
+    no.onclick=async()=>{
+      delete reqMap[t.id];
+      repaint(t.id); summary(); deck(); active(); adminPane();
+      await pushKey(DB_REQ,t.id,null);
+    };
+    box.appendChild(el);
+  });
+}
+
 function crossHint(){
   const box=$("xhint"); box.innerHTML="";
   if(!q||mode!=="mvp") return;
@@ -1229,71 +1328,100 @@ function modeBtn(){
 }
 function primeBtn(){
   const b=$("primeBtn");
-  b.textContent=prime&&me?me:"PRIME";
-  b.setAttribute("aria-pressed",prime);
+  b.textContent=lens==="main"?"MAIN":lens;
+  b.setAttribute("aria-pressed",lens!=="main");
 }
-function applyPrime(){
-  document.body.classList.toggle("prime",prime);
+function applyLens(){
+  document.body.classList.toggle("prime",lens!=="main");
   primeBtn(); deck(); active();
 }
-function togglePrime(){
-  if(!prime&&!me){ pickMe(); return; }
-  prime=!prime; savePrefs(); applyPrime();
-}
-/* Prime needs to know whose queue to show; ask once, remember on the device. */
-function pickMe(){
-  const g=$("gate"), q=$("gateQ"), pick=$("gatePick");
-  $("gatePw").hidden=true;
-  q.textContent="Whose queue is this?";
-  pick.innerHTML="";
-  Object.keys(PEOPLE).forEach(k=>{
-    const b=document.createElement("button");
-    b.className="gbtn"+(k==="KGY"?" gbtn-primary":""); b.type="button";
-    b.innerHTML=`${k}<span>show only ${k}'s deck and active</span>`;
-    b.onclick=()=>{ me=k; try{localStorage.setItem(MKEY,k);}catch(e){}
-      closeGate(); prime=true; savePrefs(); applyPrime(); };
-    pick.appendChild(b);
-  });
-  const c=document.createElement("button");
-  c.className="gbtn gbtn-ghost"; c.type="button"; c.textContent="Cancel";
-  c.onclick=closeGate; pick.appendChild(c);
-  openGate();
-}
 
+/* ---------- gate: every screen is rebuilt from scratch, so no stale state ---------- */
 function openGate(){ const g=$("gate"); g.hidden=false; g.classList.remove("done"); document.body.style.overflow="hidden"; }
 function closeGate(){
   const g=$("gate"); g.classList.add("done"); document.body.style.overflow="";
-  setTimeout(()=>{ g.hidden=true; },360);
+  setTimeout(()=>{ g.hidden=true; g.classList.remove("done"); },360);
 }
-function applyRole(){
-  document.body.classList.toggle("ro",role!=="admin");
-  const el=$("roleLine");
-  if(el) el.innerHTML=`${role==="admin"?"admin":"visitor"} · <button class="rolebtn" type="button" id="roleSwitch">switch</button>`;
-  const sw=$("roleSwitch");
-  if(sw) sw.onclick=()=>askRole();
-}
+const gbtn=(label,sub,primary)=>{
+  const b=document.createElement("button");
+  b.type="button"; b.className="gbtn"+(primary?" gbtn-primary":"");
+  b.innerHTML=label+(sub?`<span>${sub}</span>`:"");
+  return b;
+};
+
 function askRole(){
-  const q=$("gateQ"), pick=$("gatePick"), pw=$("gatePw");
-  q.textContent="How are you joining?";
-  pw.hidden=true; pw.classList.remove("bad");
-  $("pwErr").hidden=true; $("pwInput").value="";
-  pick.innerHTML=`
-    <button class="gbtn gbtn-primary" id="gateAdmin" type="button">Admin<span>edit, assign, prioritise</span></button>
-    <button class="gbtn" id="gateVisitor" type="button">Visitor<span>view only</span></button>`;
-  $("gateAdmin").onclick=()=>{ pick.style.display="none"; pw.hidden=false; $("pwInput").focus(); };
-  $("gateVisitor").onclick=()=>setRole("visitor");
-  pick.style.display="";
+  $("gateQ").textContent="How are you joining?";
+  const body=$("gateBody"); body.innerHTML="";
+  const wrap=document.createElement("div"); wrap.className="gate-actions";
+
+  const a=gbtn("Admin","",true);         a.onclick=()=>askPw("admin");
+  const t=gbtn("Team","",false);         t.onclick=()=>askPw("team");
+  const v=gbtn("Visitor","view only");   v.onclick=()=>setRole("visitor");
+  wrap.append(a,t,v); body.appendChild(wrap);
   openGate();
 }
+
+function askPw(target){
+  $("gateQ").textContent=ROLES[target].label+" password";
+  const body=$("gateBody"); body.innerHTML="";
+  const box=document.createElement("div"); box.className="gate-pw";
+  box.innerHTML=`<input type="password" inputmode="text" autocomplete="off"
+      placeholder="•••••" aria-label="password">
+    <div class="gate-err" hidden>Wrong password</div>
+    <div class="gate-row"></div>`;
+  const input=box.querySelector("input"), err=box.querySelector(".gate-err"), row=box.querySelector(".gate-row");
+
+  const go=gbtn("Unlock","",true);
+  go.onclick=()=>{
+    if(input.value.trim().toLowerCase()===ROLES[target].pw){ setRole(target); return; }
+    box.classList.remove("bad"); void box.offsetWidth; box.classList.add("bad");
+    err.hidden=false; input.select();
+  };
+  const back=gbtn("Back","",false); back.className="gbtn gbtn-ghost"; back.onclick=askRole;
+  row.append(go,back);
+  body.appendChild(box);
+  input.addEventListener("keydown",e=>{ if(e.key==="Enter") go.click(); });
+  openGate(); setTimeout(()=>input.focus(),60);
+}
+
 function setRole(r){
   role=r; try{localStorage.setItem(RKEY,r);}catch(e){}
-  applyRole(); closeGate();
+  applyRole(); all_(); closeGate();
 }
-function tryPw(){
-  const pw=$("gatePw"), v=$("pwInput").value.trim().toLowerCase();
-  if(v==="eff"){ setRole("admin"); return; }
-  pw.classList.remove("bad"); void pw.offsetWidth; pw.classList.add("bad");
-  $("pwErr").hidden=false; $("pwInput").select();
+function applyRole(){
+  document.body.classList.toggle("ro",!canEdit());
+  document.body.classList.toggle("admin",isAdmin());
+  if(!isAdmin()&&$("adminTab").getAttribute("aria-selected")==="true") showPane("pane-overview");
+  const el=$("roleLine");
+  if(el){
+    el.innerHTML=`${role||"visitor"} · <button class="rolebtn" type="button">switch</button>`;
+    el.querySelector("button").onclick=askRole;
+  }
+}
+
+/* ---------- lens picker: Main / KGY / RFN, always re-openable ---------- */
+function pickLens(){
+  $("gateQ").textContent="Whose queue?";
+  const body=$("gateBody"); body.innerHTML="";
+  const wrap=document.createElement("div"); wrap.className="gate-actions";
+  const opts=[["main","Main","everything, both of you"],
+              ["KGY","KGY","only KGY's deck and active"],
+              ["RFN","RFN","only RFN's deck and active"]];
+  opts.forEach(([k,label,sub])=>{
+    const b=gbtn(label,sub,k===lens);
+    b.onclick=()=>{ lens=k; try{localStorage.setItem(MKEY,k);}catch(e){}
+      savePrefs(); applyLens(); closeGate(); };
+    wrap.appendChild(b);
+  });
+  const c=gbtn("Cancel","",false); c.className="gbtn gbtn-ghost"; c.onclick=closeGate;
+  wrap.appendChild(c);
+  body.appendChild(wrap);
+  openGate();
+}
+
+function showPane(id){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.getAttribute("aria-controls")===id));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-active",p.id===id));
 }
 
 function setMode(m){
@@ -1304,7 +1432,7 @@ function setMode(m){
   scrollTo({top:0,behavior:"instant"});
 }
 function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn(); }
-function all_(){ summary(); deck(); active(); groups(); }
+function all_(){ summary(); deck(); active(); adminPane(); groups(); }
 
 /* ===== events ===== */
 $("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();groups();});
@@ -1322,9 +1450,7 @@ $("resetBtn").addEventListener("click",async()=>{
   all_();
 });
 document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{
-  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t===tab));
-  const id=tab.getAttribute("aria-controls");
-  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-active",p.id===id));
+  showPane(tab.getAttribute("aria-controls"));
   scrollTo({top:0,behavior:"instant"});
 }));
 document.addEventListener("visibilitychange",async()=>{
@@ -1347,15 +1473,14 @@ document.addEventListener("visibilitychange",async()=>{
   $("panes").hidden=false;
   buildTicks(); chips(); teamSeg(); all_(); modeBtn();
   $("modeBtn").onclick=()=>setMode(mode==="mvp"?"alpha":"mvp");
-  $("primeBtn").onclick=togglePrime;
-  $("pwGo").onclick=tryPw;
-  $("pwSkip").onclick=()=>setRole("visitor");
-  $("pwInput").addEventListener("keydown",e=>{ if(e.key==="Enter") tryPw(); });
+  $("primeBtn").onclick=pickLens;
   document.addEventListener("click",e=>{ if(openWrap&&!e.target.closest(".swipe")) closeOpen(); });
 
-  try{ role=localStorage.getItem(RKEY); me=localStorage.getItem(MKEY); }catch(e){}
-  if(prime&&!me) prime=false;
-  applyRole(); applyPrime();
+  try{
+    const r=localStorage.getItem(RKEY); if(ROLES[r]) role=r;
+    const l=localStorage.getItem(MKEY); if(l==="main"||PEOPLE.includes(l)) lens=l;
+  }catch(e){}
+  applyRole(); applyLens();
   fitBar();
   $("buildTag").textContent=`build ${BUILD} · ${backend}${navigator.standalone?" · standalone":""}`;
 
@@ -1366,8 +1491,8 @@ document.addEventListener("visibilitychange",async()=>{
     b.classList.add("done");
     setTimeout(()=>{
       b.remove();
-      if(role==="admin"||role==="visitor"){ document.body.style.overflow=""; }
-      else askRole();          // first run: choose admin or visitor
+      if(role) document.body.style.overflow="";
+      else askRole();          // first run: pick a role
     },480);
   },held);
 
