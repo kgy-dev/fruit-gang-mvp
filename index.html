@@ -23,7 +23,8 @@
   /* tier owns the saturated trio — green / orange / red */
   /* ripening ramp: unripe deep green -> green -> yellow -> red */
   --t0:#2f8a4e; --t1:#4ec96a; --t2:#e9bf35; --t3:#e2543f;
-  --doing:#3f8ee0;
+  --doing:#3f8ee0; --prio:#ff3b30;
+  --kgy:#e8b33c; --rfn:#b07fe8;
 
   /* disciplines stay deliberately muted so tier reads first */
   --c-system:#6b8fc4; --c-asset:#c4a06b; --c-animset:#6bb8b5;
@@ -82,9 +83,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .mark-txt em{font-style:normal;color:var(--t3)}
 /* fixed width so switching MVP <-> ALPHA never nudges the rest of the bar */
 .mark-sub{flex:none;min-width:52px;text-align:center;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:2px 4px}
-.sync{margin-left:auto;margin-right:0;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--dim);white-space:nowrap;text-align:right}
-.modebtn{
-  margin-left:auto;   /* stays welded to the right edge whatever else changes */
+.sync{margin-left:auto;margin-right:2px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--dim);white-space:nowrap;text-align:right}
+.modebtn{   /* stays welded to the right edge whatever else changes */
   display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;min-width:58px;
   padding:5px 8px;border-radius:9px;background:var(--panel);
   border:1px solid var(--line);cursor:pointer;
@@ -168,11 +168,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .search::placeholder{color:var(--dim)}
 .search:focus{border-color:#3a3a37;background:var(--panel-2);outline:none}
 .deck-card{
-  display:grid;grid-template-columns:auto minmax(0,1fr) 62px 30px;align-items:center;gap:10px;
-  padding:11px 12px;margin-bottom:7px;border-radius:12px;
+  position:relative;
+  display:grid;grid-template-columns:auto minmax(0,1fr) 62px auto 30px;align-items:center;gap:10px;
+  padding:11px 12px 11px 12px;margin-bottom:7px;border-radius:12px;
   background:var(--panel);border:1px solid var(--line-soft);
-  border-left:2.5px solid var(--doing);cursor:pointer;
+  border-left:2.5px solid var(--line);cursor:pointer;
   transition:background-color .2s,border-color .2s}
+.deck-card.is-prio{border-left-color:var(--prio);box-shadow:none}
+.deck-card.is-doing{border-left-color:var(--doing)}
 .deck-card:active{background:var(--panel-2)}
 .deck-card .d-sec{
   grid-column:2/-1;font-family:var(--mono);font-size:9px;letter-spacing:.09em;
@@ -223,12 +226,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .group-body{display:none;border-top:1px solid var(--line-soft);padding:5px 6px 7px}
 .group.is-open .group-body{display:block}
 
-.task{display:grid;grid-template-columns:auto minmax(0,1fr) 62px 30px;align-items:center;gap:10px;
-  padding:8px 10px;min-height:46px;cursor:pointer;border-radius:11px;
-  transition:background-color .25s ease}
+.task{position:relative;z-index:1;display:grid;grid-template-columns:auto minmax(0,1fr) 62px auto 30px;align-items:center;gap:9px;
+  padding:8px 10px;min-height:46px;cursor:pointer;border-radius:11px;background-color:var(--panel);
+  touch-action:pan-y;transition:background-color .25s ease}
 .task:active{background:var(--panel-2)}
-.task.is-done{background:rgba(78,201,106,.075)}
-.task.is-doing{background:rgba(63,142,224,.085)}
+.task.is-done{background-image:linear-gradient(rgba(78,201,106,.075),rgba(78,201,106,.075))}
+.task.is-doing{background-image:linear-gradient(rgba(63,142,224,.085),rgba(63,142,224,.085))}
 .task.is-doing .t-name{color:var(--ink)}
 .sbox{
   appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:5px;flex:none;
@@ -268,25 +271,27 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .navseg{
   position:sticky;top:var(--barH,52px);z-index:29;
-  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
-  margin:0;padding:9px 14px 11px;background:var(--bg);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:4px;
+  margin:0;padding:9px 10px 11px;background:var(--bg);
   border-bottom:1px solid var(--line-soft);
 }
 .tab{
   position:relative;display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 4px;border-radius:11px;background:var(--panel);
+  padding:10px 2px;border-radius:11px;background:var(--panel);
   border:1px solid transparent;
-  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.13em;
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.07em;
   text-transform:uppercase;color:var(--dim);
   transition:color .18s,background-color .18s,border-color .18s;
 }
 .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2);border-color:#3d3d3a}
 .tab .badge{
-  min-width:17px;height:17px;padding:0 4px;border-radius:9px;
+  min-width:15px;height:15px;padding:0 3px;border-radius:8px;
   display:inline-flex;align-items:center;justify-content:center;
-  background:#2b2b28;color:var(--muted);font-size:9.5px;letter-spacing:0;
+  background:#2b2b28;color:var(--muted);font-size:9px;letter-spacing:0;
   transition:background-color .18s,color .18s}
 .tab.has-live .badge{background:rgba(63,142,224,.18);color:var(--doing)}
+.tab.has-warn .badge{background:rgba(238,138,46,.22);color:var(--t2)}
+.tab[aria-selected="true"].has-warn .badge{background:var(--t2);color:#1a1206}
 .tab[aria-selected="true"].has-live .badge{background:var(--doing);color:#08131f}
 
 .splash{
@@ -324,6 +329,123 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .navseg{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important}}
+
+/* ===== priority + assignee flags ===================================== */
+.t-flags{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.t-prio{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.05em;
+  color:var(--prio);border:1px solid rgba(255,59,48,.45);background:rgba(255,59,48,.13);
+  border-radius:4px;padding:2px 4px;white-space:nowrap}
+.t-who{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.03em;
+  border-radius:4px;padding:2px 4px;border:1px solid;white-space:nowrap}
+.who-KGY{color:var(--kgy);border-color:rgba(232,179,60,.42);background:rgba(232,179,60,.12)}
+.who-RFN{color:var(--rfn);border-color:rgba(176,127,232,.42);background:rgba(176,127,232,.12)}
+.task.is-prio{box-shadow:inset 3px 0 0 var(--prio)}
+
+/* ===== swipe actions ================================================= */
+.swipe{position:relative;overflow:hidden;border-radius:11px;transition:background-color .2s}
+.sw-bg{position:absolute;inset:0;display:flex;align-items:center;pointer-events:none}
+.sw-left{justify-content:flex-start;padding-left:11px;gap:6px}
+.swipe.open-l .sw-left{pointer-events:auto}
+.sw-right{justify-content:flex-end;padding-right:16px}
+.sw-right em{font-style:normal;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.14em;color:var(--prio);transition:color .18s}
+.swipe.armed{background:rgba(255,59,48,.15)}
+.swipe.armed .sw-right em{color:#fff}
+.who-btn{padding:7px 11px;border-radius:8px;border:1px solid;background:var(--panel-2);
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em}
+.who-btn.on{color:#0d0d0c}
+.who-btn[data-who="KGY"]{color:var(--kgy);border-color:rgba(232,179,60,.5)}
+.who-btn[data-who="RFN"]{color:var(--rfn);border-color:rgba(176,127,232,.5)}
+.who-btn[data-who="KGY"].on{background:var(--kgy)}
+.who-btn[data-who="RFN"].on{background:var(--rfn)}
+.swipe .task{transition:transform .2s cubic-bezier(.2,.8,.3,1)}
+.swipe.drag .task{transition:none}
+
+/* ===== drag to reorder =============================================== */
+.deck-card{touch-action:pan-y}
+.deck-card.dragging{opacity:.96;box-shadow:0 12px 30px rgba(0,0,0,.55);
+  border-color:var(--hot);position:relative;z-index:6;transition:none}
+body.dragging-on{user-select:none;-webkit-user-select:none}
+.grip{position:absolute;right:9px;top:9px;width:13px;height:9px;opacity:.28;
+  background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
+
+/* ===== WIP warning =================================================== */
+.wip{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;margin-bottom:11px;
+  border-radius:12px;background:rgba(238,138,46,.10);border:1px solid rgba(238,138,46,.34)}
+.wip i{width:23px;height:23px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:rgba(238,138,46,.22);color:var(--t2);font-family:var(--dsp);font-weight:800;font-size:14px;font-style:normal}
+.wip b{display:block;font-family:var(--dsp);font-weight:700;font-size:13.5px;
+  text-transform:uppercase;letter-spacing:.02em;color:var(--t2);margin-bottom:2px}
+.wip span{font-size:12.5px;color:var(--muted);line-height:1.45}
+
+/* ===== cross-mode search hint ======================================== */
+.xhint{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:10px;padding:10px 12px;border-radius:10px;
+  background:var(--panel);border:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+.xhint b{color:var(--ink);font-weight:600}
+.xhint button{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--hot);padding:6px 10px;border-radius:7px;
+  background:var(--panel-2);border:1px solid var(--line)}
+
+/* ===== role gate ===================================================== */
+.gate{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+  padding:26px;background:var(--bg)}
+.gate.done{opacity:0;pointer-events:none;transition:opacity .35s}
+.gate-card{width:100%;max-width:340px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
+.gate-mark{font-family:var(--stencil);font-size:clamp(30px,10vw,40px);line-height:1;color:var(--ink)}
+.gate-mark em{font-style:normal;color:var(--hot)}
+.gate-sub{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim);margin-top:9px}
+.gate-q{font-family:var(--dsp);font-weight:700;font-size:16px;text-transform:uppercase;
+  letter-spacing:.02em;color:var(--muted);margin:30px 0 14px}
+.gate-actions{display:flex;flex-direction:column;gap:9px}
+.gbtn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 12px;
+  border-radius:13px;background:var(--panel);border:1px solid var(--line);
+  font-family:var(--dsp);font-weight:700;font-size:15px;letter-spacing:.03em;
+  text-transform:uppercase;color:var(--ink);transition:background-color .16s,border-color .16s}
+.gbtn span{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.1em;
+  text-transform:none;color:var(--dim)}
+.gbtn:active{background:var(--panel-2)}
+.gbtn-primary{border-color:var(--hot);background:linear-gradient(180deg,rgba(226,84,63,.16),rgba(226,84,63,.05))}
+.gbtn-primary span{color:var(--muted)}
+.gbtn-ghost{background:transparent;border-color:transparent;padding:10px;font-size:12px}
+.gate-pw{margin-top:16px;animation:rise .35s cubic-bezier(.2,.8,.3,1) both}
+.gate-pw input{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  font-family:var(--mono);font-size:16px;letter-spacing:.3em;text-align:center;outline:none}
+.gate-pw input:focus{border-color:var(--hot)}
+.gate-pw.bad input{border-color:var(--prio);animation:shake .32s}
+.gate-err{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--prio)}
+.gate-row{display:flex;flex-direction:column;gap:7px;margin-top:11px}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* visitors read, they do not write */
+body.ro .task,body.ro .deck-card{cursor:default}
+body.ro .sbox{opacity:.55}
+body.ro #resetBtn{display:none}
+.rolebtn{background:none;color:var(--hot);text-decoration:underline;font:inherit;padding:0}
+
+/* ===== prime: personal view runs blue (wins over mvp red) ============ */
+body.prime{
+  --bg:#060a10; --panel:#111c28; --panel-2:#182633;
+  --line:#283a4d; --line-soft:#1c2937;
+  --ink:#eef6ff; --muted:#95acc1; --dim:#61798e;
+  --fig-empty:#51687c;
+  --hot:#309ae8; --hot-2:#4ad6e8;
+}
+body.prime .topbar{background:linear-gradient(180deg,#0f2436 0%,var(--bg) 92%);border-bottom-color:#283a4d}
+body.prime .navseg{background:var(--bg)}
+body.prime .mark-sub{color:#4fb2f0;border-color:#28516e;background:rgba(48,154,232,.10)}
+body.prime .mark-dot{background:var(--hot);box-shadow:0 0 14px rgba(48,154,232,.6)}
+body.prime .hero::before{background:radial-gradient(circle,rgba(48,154,232,.22) 0%,rgba(74,214,232,.06) 46%,rgba(48,154,232,0) 70%)}
+body.prime .splash,body.prime .gate{background:var(--bg)}
+body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
+
+.primebtn{margin-left:auto;flex:none;padding:6px 9px;border-radius:9px;background:var(--panel);
+  border:1px solid var(--line);font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.12em;color:var(--dim);transition:color .18s,border-color .18s,background-color .18s}
+.primebtn:active{background:var(--panel-2)}
 </style>
 
 <div class="app">
@@ -331,6 +453,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <span class="mark"><span class="mark-dot"></span><span class="mark-txt">FRUIT <em>GANG</em></span></span>
     <span class="mark-sub" id="modeName">MVP</span>
     <span class="sync" id="sync"></span>
+    <button class="primebtn" id="primeBtn" type="button">PRIME</button>
     <button class="modebtn" id="modeBtn" type="button">
       <span class="mb-lab" id="modeOtherName">ALPHA</span>
       <span class="mb-pct" id="modeOtherPct">0%</span>
@@ -340,6 +463,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <nav class="navseg" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="pane-overview">Overview</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-active" id="activeTab">Active<span class="badge" id="activeCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
   </nav>
 
@@ -349,9 +473,30 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       if(p.mode!=="alpha") document.body.classList.add("mvp");
     }catch(e){ document.body.classList.add("mvp"); }
   </script>
+  <div id="gate" class="gate" hidden>
+    <div class="gate-card">
+      <div class="gate-mark">FRUIT <em>GANG</em></div>
+      <div class="gate-sub">Production Tracker</div>
+      <div class="gate-q" id="gateQ">How are you joining?</div>
+      <div class="gate-actions" id="gatePick">
+        <button class="gbtn gbtn-primary" id="gateAdmin" type="button">Admin<span>edit, assign, prioritise</span></button>
+        <button class="gbtn" id="gateVisitor" type="button">Visitor<span>view only</span></button>
+      </div>
+      <div class="gate-pw" id="gatePw" hidden>
+        <input id="pwInput" type="password" inputmode="text" autocomplete="off"
+               placeholder="••••" aria-label="Admin password">
+        <div class="gate-err" id="pwErr" hidden>Wrong password</div>
+        <div class="gate-row">
+          <button class="gbtn gbtn-primary" id="pwGo" type="button">Unlock</button>
+          <button class="gbtn gbtn-ghost" id="pwSkip" type="button">Continue as visitor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B14</div>
+    <div class="splash-tag">Production Tracker · B15</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -417,16 +562,29 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       </div>
       <p class="foot">Progress is shared — everyone on the link sees the same numbers.<br>
       Tier-weighted counts each task by its day ceiling instead of as one unit.<br>
-      <span id="buildTag"></span></p>
+      <span id="roleLine"></span> · <span id="buildTag"></span></p>
     </section>
 
     <section class="pane" id="pane-deck" role="tabpanel">
-      <div class="sec"><h2>On the deck</h2><span class="sec-note" id="deckNote"></span></div>
+      <div class="sec"><h2>Deck</h2><span class="note" id="deckNote">what comes next</span></div>
       <div id="deckList"></div>
       <div class="deck-empty" id="deckEmpty" hidden>
         <div class="de-mark"></div>
-        <p>Nothing on the deck.</p>
-        <span>Tap a task once in <b>Tasks</b> to start it. Tap again to complete it.</span>
+        <p>Deck is empty.</p>
+        <span>In <b>Tasks</b>, swipe a row <b>right&nbsp;to&nbsp;left</b> to flag it as priority.
+              Hold and drag here to reorder.</span>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-active" role="tabpanel">
+      <div class="sec"><h2>Active</h2><span class="note" id="activeNote">in progress</span></div>
+      <div id="wipWarn" hidden></div>
+      <div id="activeList"></div>
+      <div class="deck-empty" id="activeEmpty" hidden>
+        <div class="de-mark"></div>
+        <p>Nothing in progress.</p>
+        <span>Tap a task once to start it, again to complete it.
+              Hold and drag here to reorder.</span>
       </div>
     </section>
 
@@ -437,6 +595,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <div class="dwrap" id="discChips"></div>
       </div>
       <div id="groups"></div>
+      <div id="xhint"></div>
       <p class="empty" id="empty" hidden>Nothing matches. Try clearing a filter.</p>
       <div class="actions"><button class="btn" id="expandBtn">Expand all</button></div>
     </section>
@@ -514,11 +673,14 @@ const FIREBASE_CONFIG = {
 };
 const DB_ROOT = "fg-mvp";
 const DB_PATH = "fg-mvp/done";   // completed  (unchanged, existing data preserved)
-const DB_DOING = "fg-mvp/doing"; // on the deck
+const DB_DOING = "fg-mvp/doing"; // in progress
+const DB_PRIO  = "fg-mvp/prio";  // on the deck (priority queue)
+const DB_ASSIGN= "fg-mvp/assign";// who owns it
+const DB_RANK  = "fg-mvp/rank";  // manual ordering for deck + active
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=14;
+const BUILD=15;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -528,7 +690,14 @@ addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, doingMap={}, weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
+let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={};
+let weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
+
+/* device-local, never shared: who is looking and what they may do */
+const RKEY="fg-mvp-role", MKEY="fg-mvp-me";
+const PEOPLE={KGY:{c:"var(--kgy)"},RFN:{c:"var(--rfn)"}};
+let role=null, me=null, prime=false;
+const canEdit=()=>role==="admin";
 const open=new Set();
 const $=id=>document.getElementById(id);
 const has=(m,id)=>Object.prototype.hasOwnProperty.call(m,id);
@@ -536,7 +705,14 @@ const isDone=id=>has(doneMap,id);
 const isDoing=id=>!isDone(id)&&has(doingMap,id);
 /* 0 = todo, 1 = on the deck, 2 = done. Tapping a row cycles through them. */
 const stateOf=id=>isDone(id)?2:(isDoing(id)?1:0);
-const doingList=()=>TASKS.filter(t=>isDoing(t.id));
+const isPrio=id=>has(prioMap,id);
+const whoOf=id=>assignMap[id]||null;
+const rankOf=id=>(id in rankMap)?rankMap[id]:1e6;
+const ordered=l=>l.slice().sort((a,b)=>rankOf(a.id)-rankOf(b.id));
+/* Prime narrows both queues to whoever is holding the phone. */
+const mine=l=>(prime&&me)?l.filter(t=>whoOf(t.id)===me):l;
+const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
+const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&!isDone(t.id))));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== storage adapter: firebase | claude | device ===== */
@@ -553,7 +729,8 @@ async function initStore(){
       const a=app.initializeApp(FIREBASE_CONFIG);
       await authm.signInAnonymously(authm.getAuth(a));
       const db=dbm.getDatabase(a);
-      FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING)};
+      FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING),
+          prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -572,40 +749,70 @@ function migrate(){
     }
     return hit?out:null;
   };
-  const d=conv(doneMap), g=conv(doingMap);
+  const d=conv(doneMap), g=conv(doingMap), p=conv(prioMap), a=conv(assignMap), r=conv(rankMap);
   if(d) doneMap=d;
   if(g) doingMap=g;
-  return !!(d||g);
+  if(p) prioMap=p;
+  if(a) assignMap=a;
+  if(r) rankMap=r;
+  return !!(d||g||p||a||r);
 }
 
 async function pull(){
   try{
     if(backend==="firebase"){
       const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
-      doneMap=v.done||{}; doingMap=v.doing||{}; return;
+      doneMap=v.done||{}; doingMap=v.doing||{};
+      prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
       if(r&&r.value){ const d=JSON.parse(r.value);
         if(d&&typeof d.done==="object") doneMap=d.done;
-        if(d&&typeof d.doing==="object") doingMap=d.doing; }
+        if(d&&typeof d.doing==="object") doingMap=d.doing;
+        if(d&&typeof d.prio==="object") prioMap=d.prio;
+        if(d&&typeof d.assign==="object") assignMap=d.assign;
+        if(d&&typeof d.rank==="object") rankMap=d.rank; }
       return;
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
+    prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{};
   }catch(e){}
 }
+
+const bundle=()=>({v:5,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,at:Date.now()});
 
 async function pushAll(){
   try{
     if(backend==="firebase"){
-      await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap)]);
+      await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),
+                         FB.set(FB.prio,prioMap),FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap)]);
     }else if(backend==="claude"){
-      await window.storage.set(SKEY,JSON.stringify({v:4,done:doneMap,doing:doingMap,at:Date.now()}),true);
+      await window.storage.set(SKEY,JSON.stringify(bundle()),true);
     }else{
-      localStorage.setItem(SKEY,JSON.stringify({done:doneMap,doing:doingMap}));
+      localStorage.setItem(SKEY,JSON.stringify(bundle()));
     }
   }catch(e){}
+}
+
+/* one key at a time, so two people editing at once never clobber each other */
+async function pushKey(node,id,val){
+  try{
+    if(backend==="firebase"){ await FB.set(FB.ref(FB.db,node+"/"+id),val); stamp("synced"); return; }
+    if(backend==="claude"){ await window.storage.set(SKEY,JSON.stringify(bundle()),true); stamp("saved"); return; }
+    localStorage.setItem(SKEY,JSON.stringify(bundle())); stamp("saved on this device");
+  }catch(e){ stamp("save failed"); }
+}
+async function pushRanks(ids){
+  try{
+    if(backend==="firebase"){
+      await Promise.all(ids.map((id,i)=>FB.set(FB.ref(FB.db,DB_RANK+"/"+id),i)));
+      stamp("synced"); return;
+    }
+    if(backend==="claude"){ await window.storage.set(SKEY,JSON.stringify(bundle()),true); stamp("saved"); return; }
+    localStorage.setItem(SKEY,JSON.stringify(bundle())); stamp("saved on this device");
+  }catch(e){ stamp("save failed"); }
 }
 
 async function push(id,state){
@@ -620,10 +827,10 @@ async function push(id,state){
       stamp("synced"); return;
     }
     if(backend==="claude"){
-      await window.storage.set(SKEY,JSON.stringify({v:4,done:doneMap,doing:doingMap,at:ts}),true);
+      await window.storage.set(SKEY,JSON.stringify(bundle()),true);
       stamp("saved"); return;
     }
-    localStorage.setItem(SKEY,JSON.stringify({done:doneMap,doing:doingMap}));
+    localStorage.setItem(SKEY,JSON.stringify(bundle()));
     stamp("saved on this device");
   }catch(e){ stamp("save failed"); }
 }
@@ -634,27 +841,27 @@ function setState(id,state){
 }
 
 async function clearAll(){
-  doneMap={}; doingMap={};
-  if(backend==="firebase"){ await FB.set(FB.root,null); return; }
-  if(backend==="claude"){ await window.storage.set(SKEY,JSON.stringify({v:4,done:{},doing:{},at:Date.now()}),true); return; }
-  localStorage.setItem(SKEY,JSON.stringify({done:{},doing:{}}));
+  doneMap={};
+  if(backend==="firebase"){ await FB.set(FB.done,null); return; }
+  await pushAll();
 }
 
 async function loadPrefs(){
   try{
     if(backend==="claude"){
       const r=await window.storage.get(PKEY);
-      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; }
+      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; prime=!!p.prime; }
       return;
     }
     const p=JSON.parse(localStorage.getItem(PKEY)||"{}");
     if("weighted" in p) weighted=!!p.weighted;
     if(p.devs) devs=p.devs;
     if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode;
+    prime=!!p.prime;
   }catch(e){}
 }
 function savePrefs(){
-  const v=JSON.stringify({weighted,devs,mode});
+  const v=JSON.stringify({weighted,devs,mode,prime});
   try{ backend==="claude" ? window.storage.set(PKEY,v) : localStorage.setItem(PKEY,v); }catch(e){}
 }
 const stamp=t=>$("sync").textContent=t?`${t} ${new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`:"";
@@ -762,19 +969,11 @@ function groups(){
     h.onclick=()=>{open.has(si)?open.delete(si):open.add(si);groups();};
     g.appendChild(h);
     const body=document.createElement("div"); body.className="group-body";
-    list.forEach(t=>{
-      const row=document.createElement("div"); row.className="task"; row.dataset.id=t.id;
-      row.innerHTML=`<button class="sbox" type="button" aria-label="cycle state"></button>
-        <span class="t-name">${t.name}</span>
-        <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
-        <span class="t-tier tp${t.tier}">T${t.tier}</span>`;
-      paintRow(row,t.id);
-      row.onclick=()=>advance(t);
-      body.appendChild(row);
-    });
+    list.forEach(t=>body.appendChild(taskRow(t)));
     g.appendChild(body); box.appendChild(g);
   });
   $("empty").hidden=shown>0;
+  crossHint();
   $("expandBtn").style.display=forceOpen?"none":"";
   $("expandBtn").textContent=open.size?"Collapse all":"Expand all";
 }
@@ -787,47 +986,236 @@ function teamSeg(){
     s.appendChild(b);
   });
 }
+function flagsHTML(id){
+  const w=whoOf(id);
+  return `<span class="t-flags">
+    ${isPrio(id)?'<span class="t-prio">PRIO</span>':""}
+    ${w?`<span class="t-who who-${w}">${w}</span>`:""}
+  </span>`;
+}
 function paintRow(row,id){
   const s=stateOf(id);
   row.classList.toggle("is-doing",s===1);
   row.classList.toggle("is-done", s===2);
+  row.classList.toggle("is-prio", isPrio(id));
+  const f=row.querySelector(".t-flags");
+  if(f) f.outerHTML=flagsHTML(id);
+}
+
+/* A row lives inside a swipe wrapper: drag right for assignment,
+   left to flag priority. Plain tap still cycles the state. */
+function taskRow(t){
+  const wrap=document.createElement("div"); wrap.className="swipe"; wrap.dataset.id=t.id;
+  wrap.innerHTML=`
+    <div class="sw-bg sw-left">
+      <button class="who-btn" type="button" data-who="KGY">KGY</button>
+      <button class="who-btn" type="button" data-who="RFN">RFN</button>
+    </div>
+    <div class="sw-bg sw-right"><em>PRIORITY</em></div>
+    <div class="task" data-id="${t.id}">
+      <button class="sbox" type="button" aria-label="cycle state"></button>
+      <span class="t-name">${t.name}</span>
+      <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
+      ${flagsHTML(t.id)}
+      <span class="t-tier tp${t.tier}">T${t.tier}</span>
+    </div>`;
+  const row=wrap.querySelector(".task");
+  paintRow(row,t.id);
+  bindSwipe(wrap,row,t);
+  return wrap;
+}
+
+/* ---------- swipe ---------- */
+const OPEN_L=126, THRESH=64;
+let openWrap=null;
+function closeOpen(){
+  if(!openWrap) return;
+  const r=openWrap.querySelector(".task");
+  if(r) r.style.transform="translateX(0px)";
+  openWrap.classList.remove("open-l");
+  openWrap=null;
+}
+function bindSwipe(wrap,row,t){
+  let x0=0,y0=0,lock=null,live=false,base=0,dx=0;
+  wrap.querySelectorAll(".who-btn").forEach(b=>{
+    b.classList.toggle("on",whoOf(t.id)===b.dataset.who);
+    b.addEventListener("click",async e=>{
+      e.stopPropagation();
+      const w=b.dataset.who, cur=whoOf(t.id);
+      if(cur===w) delete assignMap[t.id]; else assignMap[t.id]=w;
+      wrap.querySelectorAll(".who-btn").forEach(o=>o.classList.toggle("on",whoOf(t.id)===o.dataset.who));
+      paintRow(row,t.id); closeOpen(); deck(); active();
+      await pushKey(DB_ASSIGN,t.id,assignMap[t.id]||null);
+    });
+  });
+
+  row.addEventListener("pointerdown",e=>{
+    if(!canEdit()) return;
+    if(openWrap&&openWrap!==wrap) closeOpen();
+    live=true; lock=null; dx=0;
+    x0=e.clientX; y0=e.clientY;
+    base=openWrap===wrap?OPEN_L:0;
+    wrap.classList.add("drag");
+  });
+  row.addEventListener("pointermove",e=>{
+    if(!live) return;
+    const ax=e.clientX-x0, ay=e.clientY-y0;
+    if(lock===null){
+      if(Math.abs(ax)>9&&Math.abs(ax)>Math.abs(ay)+3) lock="x";
+      else if(Math.abs(ay)>9){ live=false; wrap.classList.remove("drag"); return; }
+      else return;
+    }
+    e.preventDefault();
+    dx=Math.max(-108,Math.min(OPEN_L,base+ax));
+    row.style.transform=`translateX(${dx}px)`;
+    wrap.classList.toggle("armed",dx<=-THRESH);
+  },{passive:false});
+
+  const finish=async()=>{
+    if(!live) return;
+    live=false; wrap.classList.remove("drag","armed");
+    if(lock!=="x"){ row.style.transform="translateX(0px)"; return; }
+    if(dx<=-THRESH){                       // left swipe -> toggle priority
+      row.style.transform="translateX(0px)";
+      if(isPrio(t.id)) delete prioMap[t.id]; else prioMap[t.id]=Date.now();
+      paintRow(row,t.id); deck(); summary();
+      await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
+    }else if(dx>=THRESH){                  // right swipe -> reveal assignment
+      row.style.transform=`translateX(${OPEN_L}px)`;
+      wrap.classList.add("open-l"); openWrap=wrap;
+    }else{
+      row.style.transform="translateX(0px)";
+      if(openWrap===wrap) closeOpen();
+    }
+  };
+  row.addEventListener("pointerup",finish);
+  row.addEventListener("pointercancel",finish);
+  row.addEventListener("click",e=>{
+    if(lock==="x"){ lock=null; return; }
+    if(openWrap===wrap){ closeOpen(); return; }
+    if(!canEdit()) return;
+    advance(t);
+  });
 }
 /* todo -> deck -> done -> todo */
 async function advance(t){
   const next=(stateOf(t.id)+1)%3;
   setState(t.id,next);
   document.querySelectorAll(`.task[data-id="${t.id}"]`).forEach(r=>paintRow(r,t.id));
-  refreshHead(t.si); summary(); deck();
+  refreshHead(t.si); summary(); deck(); active();
   await push(t.id,next);
 }
 
+function card(t,kind){
+  const c=document.createElement("div"); c.className="deck-card"; c.dataset.id=t.id;
+  c.innerHTML=`<button class="sbox" type="button" aria-label="advance"></button>
+    <span class="t-name">${t.name}</span>
+    <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
+    ${flagsHTML(t.id)}
+    <span class="t-tier tp${t.tier}">T${t.tier}</span>
+    <span class="d-sec">${SECTIONS[t.si][0]}</span>
+    <span class="grip"></span>`;
+  paintRow(c,t.id);
+  if(kind==="active") c.classList.add("is-doing");
+  bindDrag(c,t);
+  return c;
+}
+
+const WIP_LIMIT=4;
+
 function deck(){
-  const list=doingList(), box=$("deckList");
+  const list=deckList(), box=$("deckList");
   $("deckCount").textContent=list.length;
   $("deckTab").classList.toggle("has-live",list.length>0);
   $("deckEmpty").hidden=list.length>0;
-  $("deckNote").textContent=list.length?`${list.length} in progress`:"";
-  box.innerHTML="";
-  list.forEach(t=>{
-    const c=document.createElement("div"); c.className="deck-card"; c.dataset.id=t.id;
-    c.innerHTML=`<button class="sbox" type="button" aria-label="complete"></button>
-      <span class="t-name">${t.name}</span>
-      <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
-      <span class="t-tier tp${t.tier}">T${t.tier}</span>
-      <span class="d-sec">${SECTIONS[t.si][0]}</span>`;
-    c.classList.add("is-doing");
-    c.onclick=()=>advance(t);
-    box.appendChild(c);
-  });
+  $("deckNote").textContent=list.length?`${list.length} queued`:"what comes next";
+  box.innerHTML=""; list.forEach(t=>box.appendChild(card(t,"deck")));
 }
 
-const sig=()=>Object.keys(doneMap).sort().join("|")+"#"+Object.keys(doingMap).sort().join("|");
+function active(){
+  const list=doingList(), box=$("activeList"), over=list.length>WIP_LIMIT;
+  $("activeCount").textContent=list.length;
+  $("activeTab").classList.toggle("has-live",list.length>0&&!over);
+  $("activeTab").classList.toggle("has-warn",over);
+  $("activeEmpty").hidden=list.length>0;
+  $("activeNote").textContent=list.length?`${list.length} in progress`:"in progress";
+  const w=$("wipWarn");
+  w.hidden=!over;
+  w.innerHTML=over?`<div class="wip"><i>!</i><div>
+      <b>Too much in flight</b>
+      <span>${list.length} tasks are open at once. With a two-person team, more than
+      ${WIP_LIMIT} usually means nothing is finishing — close some before starting more.</span>
+    </div></div>`:"";
+  box.innerHTML=""; list.forEach(t=>box.appendChild(card(t,"active")));
+}
+
+/* ---------- hold and drag to reorder ---------- */
+function bindDrag(card,t){
+  let timer=null,dragging=false,y0=0,moved=false;
+  const stop=async()=>{
+    clearTimeout(timer);
+    if(!dragging) return;
+    dragging=false;
+    card.classList.remove("dragging"); card.style.transform="";
+    document.body.classList.remove("dragging-on");
+    const ids=[...card.parentNode.children].map(c=>c.dataset.id);
+    ids.forEach((id,i)=>rankMap[id]=i);
+    await pushRanks(ids);
+  };
+  card.addEventListener("pointerdown",e=>{
+    if(!canEdit()) return;
+    y0=e.clientY; moved=false;
+    timer=setTimeout(()=>{
+      dragging=true; moved=true;
+      card.classList.add("dragging");
+      document.body.classList.add("dragging-on");
+      try{ card.setPointerCapture(e.pointerId); }catch(_){}
+      if(navigator.vibrate) navigator.vibrate(12);
+    },340);
+  });
+  card.addEventListener("pointermove",e=>{
+    if(!dragging){ if(Math.abs(e.clientY-y0)>8){ clearTimeout(timer); } return; }
+    e.preventDefault();
+    card.style.transform=`translateY(${e.clientY-y0}px)`;
+    const mid=card.getBoundingClientRect().top+card.offsetHeight/2;
+    for(const s of [...card.parentNode.children]){
+      if(s===card) continue;
+      const r=s.getBoundingClientRect();
+      if(mid>r.top&&mid<r.bottom){
+        card.parentNode.insertBefore(card, mid>r.top+r.height/2 ? s.nextSibling : s);
+        y0=e.clientY; card.style.transform="";
+        break;
+      }
+    }
+  },{passive:false});
+  card.addEventListener("pointerup",stop);
+  card.addEventListener("pointercancel",stop);
+  card.addEventListener("click",()=>{ if(moved){moved=false;return;} if(canEdit()) advance(t); });
+}
+
+const sig=()=>[doneMap,doingMap,prioMap,assignMap]
+  .map(m=>Object.keys(m).sort().join("|")).join("#")
+  +"#"+Object.entries(rankMap).sort().map(([k,v])=>k+":"+v).join("|");
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si), k=all.filter(t=>isDone(t.id)).length;
   g.classList.toggle("is-complete",k===all.length);
   const ct=g.querySelector(".g-ct"); if(ct) ct.textContent=`${k}/${all.length}`;
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
+}
+function crossHint(){
+  const box=$("xhint"); box.innerHTML="";
+  if(!q||mode!=="mvp") return;
+  const extra=ALL_TASKS.filter(t=>!MVP_IDS.has(t.id)&&match(t)).length;
+  if(!extra) return;
+  box.innerHTML=`<div class="xhint"><span><b>${extra}</b> more
+    ${extra===1?"match":"matches"} in the full Alpha scope</span>
+    <button type="button" id="xgo">Switch</button></div>`;
+  $("xgo").onclick=()=>{
+    const keep=q;
+    setMode("alpha");
+    q=keep; $("search").value=keep; groups();
+  };
 }
 function otherPct(){
   const other=mode==="mvp"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id));
@@ -839,15 +1227,84 @@ function modeBtn(){
   $("modeOtherName").textContent=mode==="mvp"?"ALPHA":"MVP";
   $("modeOtherPct").textContent=otherPct()+"%";
 }
+function primeBtn(){
+  const b=$("primeBtn");
+  b.textContent=prime&&me?me:"PRIME";
+  b.setAttribute("aria-pressed",prime);
+}
+function applyPrime(){
+  document.body.classList.toggle("prime",prime);
+  primeBtn(); deck(); active();
+}
+function togglePrime(){
+  if(!prime&&!me){ pickMe(); return; }
+  prime=!prime; savePrefs(); applyPrime();
+}
+/* Prime needs to know whose queue to show; ask once, remember on the device. */
+function pickMe(){
+  const g=$("gate"), q=$("gateQ"), pick=$("gatePick");
+  $("gatePw").hidden=true;
+  q.textContent="Whose queue is this?";
+  pick.innerHTML="";
+  Object.keys(PEOPLE).forEach(k=>{
+    const b=document.createElement("button");
+    b.className="gbtn"+(k==="KGY"?" gbtn-primary":""); b.type="button";
+    b.innerHTML=`${k}<span>show only ${k}'s deck and active</span>`;
+    b.onclick=()=>{ me=k; try{localStorage.setItem(MKEY,k);}catch(e){}
+      closeGate(); prime=true; savePrefs(); applyPrime(); };
+    pick.appendChild(b);
+  });
+  const c=document.createElement("button");
+  c.className="gbtn gbtn-ghost"; c.type="button"; c.textContent="Cancel";
+  c.onclick=closeGate; pick.appendChild(c);
+  openGate();
+}
+
+function openGate(){ const g=$("gate"); g.hidden=false; g.classList.remove("done"); document.body.style.overflow="hidden"; }
+function closeGate(){
+  const g=$("gate"); g.classList.add("done"); document.body.style.overflow="";
+  setTimeout(()=>{ g.hidden=true; },360);
+}
+function applyRole(){
+  document.body.classList.toggle("ro",role!=="admin");
+  const el=$("roleLine");
+  if(el) el.innerHTML=`${role==="admin"?"admin":"visitor"} · <button class="rolebtn" type="button" id="roleSwitch">switch</button>`;
+  const sw=$("roleSwitch");
+  if(sw) sw.onclick=()=>askRole();
+}
+function askRole(){
+  const q=$("gateQ"), pick=$("gatePick"), pw=$("gatePw");
+  q.textContent="How are you joining?";
+  pw.hidden=true; pw.classList.remove("bad");
+  $("pwErr").hidden=true; $("pwInput").value="";
+  pick.innerHTML=`
+    <button class="gbtn gbtn-primary" id="gateAdmin" type="button">Admin<span>edit, assign, prioritise</span></button>
+    <button class="gbtn" id="gateVisitor" type="button">Visitor<span>view only</span></button>`;
+  $("gateAdmin").onclick=()=>{ pick.style.display="none"; pw.hidden=false; $("pwInput").focus(); };
+  $("gateVisitor").onclick=()=>setRole("visitor");
+  pick.style.display="";
+  openGate();
+}
+function setRole(r){
+  role=r; try{localStorage.setItem(RKEY,r);}catch(e){}
+  applyRole(); closeGate();
+}
+function tryPw(){
+  const pw=$("gatePw"), v=$("pwInput").value.trim().toLowerCase();
+  if(v==="eff"){ setRole("admin"); return; }
+  pw.classList.remove("bad"); void pw.offsetWidth; pw.classList.add("bad");
+  $("pwErr").hidden=false; $("pwInput").select();
+}
+
 function setMode(m){
   mode=m; savePrefs(); applyMode();
   tierF.clear(); discF.clear(); q=""; $("search").value="";
   open.clear();
-  buildTicks(); chips(); all_(); modeBtn();
+  buildTicks(); chips(); all_(); modeBtn(); primeBtn();
   scrollTo({top:0,behavior:"instant"});
 }
 function summary(){ hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn(); }
-function all_(){ summary(); deck(); groups(); }
+function all_(){ summary(); deck(); active(); groups(); }
 
 /* ===== events ===== */
 $("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();groups();});
@@ -890,6 +1347,15 @@ document.addEventListener("visibilitychange",async()=>{
   $("panes").hidden=false;
   buildTicks(); chips(); teamSeg(); all_(); modeBtn();
   $("modeBtn").onclick=()=>setMode(mode==="mvp"?"alpha":"mvp");
+  $("primeBtn").onclick=togglePrime;
+  $("pwGo").onclick=tryPw;
+  $("pwSkip").onclick=()=>setRole("visitor");
+  $("pwInput").addEventListener("keydown",e=>{ if(e.key==="Enter") tryPw(); });
+  document.addEventListener("click",e=>{ if(openWrap&&!e.target.closest(".swipe")) closeOpen(); });
+
+  try{ role=localStorage.getItem(RKEY); me=localStorage.getItem(MKEY); }catch(e){}
+  if(prime&&!me) prime=false;
+  applyRole(); applyPrime();
   fitBar();
   $("buildTag").textContent=`build ${BUILD} · ${backend}${navigator.standalone?" · standalone":""}`;
 
@@ -898,8 +1364,11 @@ document.addEventListener("visibilitychange",async()=>{
   setTimeout(()=>{
     const b=$("boot"); if(!b) return;
     b.classList.add("done");
-    document.body.style.overflow="";
-    setTimeout(()=>b.remove(),480);
+    setTimeout(()=>{
+      b.remove();
+      if(role==="admin"||role==="visitor"){ document.body.style.overflow=""; }
+      else askRole();          // first run: choose admin or visitor
+    },480);
   },held);
 
   if(backend==="firebase"){
