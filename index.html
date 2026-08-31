@@ -555,7 +555,7 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B25</div>
+    <div class="splash-tag">Production Tracker · B26</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -760,7 +760,7 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=25;
+const BUILD=26;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -796,19 +796,20 @@ const isDoing=id=>!isDone(id)&&has(doingMap,id);
 const stateOf=id=>isDone(id)?2:(isDoing(id)?1:0);
 const isPrio=id=>has(prioMap,id);
 const whoOf=id=>assignMap[id]||null;
+/* One rule drives every personal view: a task is in scope if it is assigned to
+   you. Tasks, Deck, Active, Done and the ring all read from the same set, so the
+   percentage always matches the list you are looking at. */
+const inScope=t=>lens==="main"||whoOf(t.id)===lens;
 const rankOf=id=>(id in rankMap)?rankMap[id]:1e6;
 const ordered=l=>l.slice().sort((a,b)=>rankOf(a.id)-rankOf(b.id));
 /* Prime narrows both queues to whoever is holding the phone. */
-const mine=l=>(lens==="main")?l:l.filter(t=>whoOf(t.id)===lens);
+const mine=l=>l.filter(inScope);
 const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
 /* Deck = flagged but not started. The moment it starts it belongs to Active,
    so a task is never sitting in two queues at once. */
 const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&stateOf(t.id)===0)));
 /* Overview follows the lens: pick a person and the ring is theirs. */
-/* Main sees the whole project. A person's ring is their working set —
-   what they finished, what they are on, and what is queued for them. */
-const scope=()=>lens==="main" ? TASKS
-  : TASKS.filter(t=>whoOf(t.id)===lens && (isDone(t.id)||stateOf(t.id)===1||isPrio(t.id)));
+const scope=()=>TASKS.filter(inScope);
 const doneListQ=()=>mine(TASKS.filter(t=>isDone(t.id)))
   .sort((a,b)=>(doneMap[b.id]||0)-(doneMap[a.id]||0));   // newest first
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1082,10 +1083,11 @@ const match=t=>(!tierF.size||tierF.has(t.tier))&&(!discF.size||discF.has(t.disc)
 function groups(){
   const box=$("groups"); box.innerHTML=""; let shown=0;
   const forceOpen=!!q||!!tierF.size||!!discF.size;
+  const S=scope();
   VIEW_SECTIONS.forEach(([name,si])=>{
-    const list=TASKS.filter(t=>t.si===si&&match(t)); if(!list.length) return;
+    const list=S.filter(t=>t.si===si&&match(t)); if(!list.length) return;
     shown+=list.length;
-    const all=TASKS.filter(t=>t.si===si),n=all.filter(t=>isDone(t.id)).length;
+    const all=S.filter(t=>t.si===si),n=all.filter(t=>isDone(t.id)).length;
     const p=all.length?Math.round(n/all.length*100):0;
     const isOpen=forceOpen||open.has(si);
     const g=document.createElement("section"); g.className="group"+(isOpen?" is-open":"")+(n===all.length?" is-complete":""); g.dataset.si=si;
@@ -1100,6 +1102,9 @@ function groups(){
     g.appendChild(body); box.appendChild(g);
   });
   $("empty").hidden=shown>0;
+  $("empty").textContent = shown ? "" :
+    (lens!=="main" && !S.length) ? `Nothing is assigned to ${lens} yet.`
+                                 : "Nothing matches. Try clearing a filter.";
   crossHint();
   $("expandBtn").style.display=forceOpen?"none":"";
   $("expandBtn").textContent=open.size?"Collapse all":"Expand all";
@@ -1409,7 +1414,7 @@ const sig=()=>[doneMap,doingMap,prioMap].map(m=>Object.keys(m).sort().join("|"))
   +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap);
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
-  const all=TASKS.filter(t=>t.si===si), k=all.filter(t=>isDone(t.id)).length;
+  const all=TASKS.filter(t=>t.si===si&&inScope(t)), k=all.filter(t=>isDone(t.id)).length;
   g.classList.toggle("is-complete",k===all.length);
   const ct=g.querySelector(".g-ct"); if(ct) ct.textContent=`${k}/${all.length}`;
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
@@ -1476,7 +1481,7 @@ function adminPane(){
 function crossHint(){
   const box=$("xhint"); box.innerHTML="";
   if(!q||mode!=="mvp") return;
-  const extra=ALL_TASKS.filter(t=>!MVP_IDS.has(t.id)&&match(t)).length;
+  const extra=ALL_TASKS.filter(t=>!MVP_IDS.has(t.id)&&inScope(t)&&match(t)).length;
   if(!extra) return;
   box.innerHTML=`<div class="xhint"><span><b>${extra}</b> more
     ${extra===1?"match":"matches"} in the full Alpha scope</span>
