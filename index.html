@@ -42,21 +42,22 @@
 html,body{margin:0;padding:0;overflow-x:hidden}
 /* MVP mode runs hot — vivid red over black. Tier colours are nudged brighter
    so the T3 badge still separates from the red panels. */
+/* Neutral graphite surfaces with a clear step between them; red is reserved for
+   accents. Tinting every surface flattened the contrast and read as cheap. */
 body.mvp{
-  /* warm charcoal rather than maroon — the red lives in the accents, not the panels */
-  --bg:#0d0807; --panel:#1b1412; --panel-2:#261b18;
-  --line:#3d2b26; --line-soft:#2a1f1c;
-  --ink:#fff5f0; --muted:#bda49c; --dim:#836a63;
-  --fig-empty:#7d6058;
-  --hot:#ff4d3a; --hot-2:#ffb03a;
+  --bg:#0b0b0b; --panel:#191818; --panel-2:#242222;
+  --line:#343130; --line-soft:#252323;
+  --ink:#f7f4f2; --muted:#928d8a; --dim:#5f5b59;
+  --fig-empty:#5e5a58;
+  --hot:#ff4a33; --hot-2:#ff8f3d;
   --t0:#3fb469; --t1:#5fe884; --t2:#ffd23f; --t3:#ff6f52;
 }
-body.mvp .topbar{background:linear-gradient(180deg,#2a1310 0%,var(--bg) 92%);border-bottom-color:#3d2b26}
+body.mvp .topbar{background:linear-gradient(180deg,#171211 0%,var(--bg) 72%);border-bottom-color:#2b2827}
 body.mvp .navseg{background:var(--bg)}
-body.mvp .mark-sub{color:#ff7358;border-color:#5c2c23;background:rgba(255,77,58,.10)}
-body.mvp .mark-dot{background:var(--hot);box-shadow:0 0 14px rgba(255,77,58,.65)}
-body.mvp .modebtn{border-color:#4a2f28}
-body.mvp .hero::before{background:radial-gradient(circle,rgba(255,90,58,.24) 0%,rgba(255,176,58,.07) 46%,rgba(255,90,58,0) 70%)}
+body.mvp .mark-sub{color:#ff7358;border-color:#5a2a22;background:rgba(255,74,51,.09)}
+body.mvp .mark-dot{background:var(--hot);box-shadow:0 0 13px rgba(255,74,51,.6)}
+body.mvp .modebtn{border-color:#3a3534}
+body.mvp .hero::before{background:radial-gradient(circle,rgba(255,74,51,.15) 0%,rgba(255,143,61,.05) 44%,rgba(255,74,51,0) 68%)}
 body.mvp .splash{background:var(--bg)}
 body.mvp .splash-mark em{color:var(--hot)}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
@@ -463,20 +464,35 @@ body.ro #resetBtn{display:none}
 .rolebtn{background:none;color:var(--hot);text-decoration:underline;font:inherit;padding:0}
 
 /* ===== prime: personal view runs blue (wins over mvp red) ============ */
-body.prime{
-  --bg:#060a10; --panel:#111c28; --panel-2:#182633;
-  --line:#283a4d; --line-soft:#1c2937;
-  --ink:#eef6ff; --muted:#95acc1; --dim:#61798e;
-  --fig-empty:#51687c;
-  --hot:#309ae8; --hot-2:#4ad6e8;
-}
-body.prime .topbar{background:linear-gradient(180deg,#0f2436 0%,var(--bg) 92%);border-bottom-color:#283a4d}
+/* The app takes the colour of whoever's queue you are looking at:
+   KGY runs green, RFN runs blue. Shared structure, separate palettes. */
 body.prime .navseg{background:var(--bg)}
-body.prime .mark-sub{color:#4fb2f0;border-color:#28516e;background:rgba(48,154,232,.10)}
-body.prime .mark-dot{background:var(--hot);box-shadow:0 0 14px rgba(48,154,232,.6)}
-body.prime .hero::before{background:radial-gradient(circle,rgba(48,154,232,.22) 0%,rgba(74,214,232,.06) 46%,rgba(48,154,232,0) 70%)}
+body.prime .mark-dot{background:var(--hot);box-shadow:0 0 15px var(--hot)}
 body.prime .splash,body.prime .gate{background:var(--bg)}
-body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
+body.prime .primebtn{border-color:var(--hot);color:var(--hot);background:var(--panel-2)}
+body.prime .splash-mark em,body.prime .gate-mark em{color:var(--hot)}
+
+body.lens-KGY{
+  --bg:#090c0a; --panel:#161b17; --panel-2:#202722;
+  --line:#2f3a32; --line-soft:#212925;
+  --ink:#f2f7f3; --muted:#8e9c92; --dim:#5d6a61;
+  --fig-empty:#5b6a60;
+  --hot:#3fae3f; --hot-2:#8ee06a;
+}
+body.lens-KGY .topbar{background:linear-gradient(180deg,#121c15 0%,var(--bg) 72%);border-bottom-color:#28322b}
+body.lens-KGY .mark-sub{color:#63d06e;border-color:#2c6236;background:rgba(63,174,63,.13)}
+body.lens-KGY .hero::before{background:radial-gradient(circle,rgba(63,174,63,.16) 0%,rgba(142,224,106,.05) 44%,rgba(63,174,63,0) 68%)}
+
+body.lens-RFN{
+  --bg:#090b0e; --panel:#161a1f; --panel-2:#20262d;
+  --line:#2f3843; --line-soft:#212730;
+  --ink:#f1f5f9; --muted:#8d99a6; --dim:#5d6874;
+  --fig-empty:#5b6673;
+  --hot:#4a9df5; --hot-2:#4ad6e8;
+}
+body.lens-RFN .topbar{background:linear-gradient(180deg,#121a24 0%,var(--bg) 72%);border-bottom-color:#28303a}
+body.lens-RFN .mark-sub{color:#79bcff;border-color:#28516e;background:rgba(74,157,245,.12)}
+body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.16) 0%,rgba(74,214,232,.05) 44%,rgba(74,157,245,0) 68%)}
 
 .primebtn{margin-left:auto;flex:none;padding:6px 9px;border-radius:9px;background:var(--panel);
   border:1px solid var(--line);font-family:var(--mono);font-size:9px;font-weight:700;
@@ -521,7 +537,7 @@ body.prime .primebtn{border-color:var(--hot);color:var(--hot)}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B17</div>
+    <div class="splash-tag">Production Tracker · B20</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -716,7 +732,7 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=17;
+const BUILD=20;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1229,7 +1245,27 @@ function active(){
   box.innerHTML=""; list.forEach(t=>box.appendChild(card(t,"active")));
 }
 
-/* ---------- hold and drag to reorder ---------- */
+/* ---------- hold and drag to reorder ----------
+   Rank is one shared number line. Reordering inside a personal lens must only
+   shuffle that person's items within the slots they already occupy, or their
+   three cards would leapfrog everyone else's the moment you look at Main. */
+function fullQueue(kind){
+  const base=kind==="deck"
+    ? TASKS.filter(t=>isPrio(t.id)&&stateOf(t.id)===0)
+    : TASKS.filter(t=>stateOf(t.id)===1);
+  return ordered(base).map(t=>t.id);          // whole queue, no lens filter
+}
+async function saveOrder(kind,visible){
+  const full=fullQueue(kind), vis=new Set(visible);
+  const slots=[];
+  full.forEach((id,i)=>{ if(vis.has(id)) slots.push(i); });
+  const merged=full.slice();
+  slots.forEach((pos,i)=>{ merged[pos]=visible[i]; });
+  merged.forEach((id,i)=>rankMap[id]=i);
+  await pushRanks(merged);
+}
+
+
 function bindDrag(card,t){
   let timer=null,dragging=false,y0=0,moved=false;
   const stop=async()=>{
@@ -1238,9 +1274,8 @@ function bindDrag(card,t){
     dragging=false;
     card.classList.remove("dragging"); card.style.transform="";
     document.body.classList.remove("dragging-on");
-    const ids=[...card.parentNode.children].map(c=>c.dataset.id);
-    ids.forEach((id,i)=>rankMap[id]=i);
-    await pushRanks(ids);
+    const kind=card.parentNode.id==="deckList"?"deck":"active";
+    await saveOrder(kind,[...card.parentNode.children].map(c=>c.dataset.id));
   };
   card.addEventListener("pointerdown",e=>{
     if(!canEdit()||e.target.closest(".sbox")) return;
@@ -1353,7 +1388,9 @@ function primeBtn(){
   b.setAttribute("aria-pressed",lens!=="main");
 }
 function applyLens(){
-  document.body.classList.toggle("prime",lens!=="main");
+  const b=document.body;
+  b.classList.toggle("prime",lens!=="main");
+  PEOPLE.forEach(p=>b.classList.toggle("lens-"+p,lens===p));
   primeBtn(); buildTicks(); all_();
 }
 
@@ -1428,6 +1465,11 @@ function pickLens(){
   const opts=[["main","Main"],["KGY","KGY"],["RFN","RFN"]];
   opts.forEach(([k,label])=>{
     const b=gbtn(label,"",k===lens);
+    if(k!=="main"){
+      const c=k==="KGY"?"var(--kgy)":"var(--rfn)";
+      b.style.color=c;
+      if(k===lens){ b.style.borderColor=c; b.style.background="color-mix(in srgb,"+c+" 14%,transparent)"; }
+    }
     b.onclick=()=>{ lens=k; try{localStorage.setItem(MKEY,k);}catch(e){}
       savePrefs(); applyLens(); closeGate(); };
     wrap.appendChild(b);
