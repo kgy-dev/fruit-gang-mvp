@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -39,7 +39,7 @@
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;overflow-x:hidden}
+html,body{margin:0;padding:0;overflow-x:hidden;touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
 /* MVP mode runs hot — vivid red over black. Tier colours are nudged brighter
    so the T3 badge still separates from the red panels. */
 /* Neutral graphite surfaces with a clear step between them; red is reserved for
@@ -593,7 +593,6 @@ body.fridge .frost{opacity:1}
   color:rgba(190,240,250,.07);pointer-events:none;transform:rotate(-12deg);
 }
 .ice:active{border-color:rgba(150,220,235,.42)}
-.ice.open{box-shadow:inset 0 1px 0 rgba(220,250,255,.26),0 6px 22px rgba(0,0,0,.35)}
 @media (prefers-reduced-motion: reduce){ .ice::after{animation:none;opacity:0} }
 .ice-head{height:62px;display:flex;align-items:center;gap:11px}
 .ice-title{
@@ -602,19 +601,14 @@ body.fridge .frost{opacity:1}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .ice-when{flex:none;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dim)}
-.ice-lock{flex:none;font-size:11px;opacity:.85}
-.ice-body{
-  max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .25s;
-  opacity:0;font-size:14.5px;line-height:1.55;color:var(--muted);
-  overflow-wrap:anywhere;white-space:pre-wrap;
-}
-.ice.open .ice-body{max-height:520px;opacity:1;padding-bottom:15px}
-.ice-by{margin-top:11px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--dim)}
+.read-txt{margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--ink);
+  text-align:left;overflow-wrap:anywhere;white-space:pre-wrap;
+  max-height:46vh;overflow-y:auto}
+.read-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim);text-align:left;margin-bottom:4px}
 .ice.locked{border-color:rgba(150,220,235,.46);
   box-shadow:inset 0 1px 0 rgba(220,250,255,.26),inset 3px 0 0 var(--hot)}
 .ice.locked::after{animation-duration:5.5s}
-.ice-lock{flex:none;font-size:11px;color:var(--hot);opacity:.9}
 .ice-title{text-shadow:0 1px 0 rgba(0,0,0,.4),0 0 18px rgba(150,220,235,.18)}
 
 .temp{display:flex;align-items:center;gap:9px;margin:-4px 0 13px;
@@ -684,7 +678,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B31</div>
+    <div class="splash-tag">Production Tracker · B32</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -929,7 +923,12 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=31;
+/* iOS ignores user-scalable in Safari, so refuse the gesture events as well */
+["gesturestart","gesturechange","gestureend"].forEach(ev=>
+  document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
+
+const BUILD=32;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1597,7 +1596,7 @@ function refreshHead(si){
 }
 function reqList(){ return ALL_TASKS.filter(t=>hasReq(t.id)); }
 
-const ideaTitle=v=>(v.title&&v.title.trim())||(v.text||"").split("\n")[0].slice(0,60)||"Untitled";
+const ideaTitle=v=>(v.title&&v.title.trim())||"Just an idea";
 
 function ideas(){
   const list=Object.entries(ideaMap)
@@ -1617,6 +1616,31 @@ function ideas(){
     box.appendChild(el); });
 }
 
+/* A note opens as its own window rather than unfolding in place — the height
+   animation stuttered on long notes and the list jumped around. */
+function readIdea(id,v){
+  openSheet(ideaTitle(v),body=>{
+    const when=v.at?new Date(v.at).toLocaleString("en-GB",
+      {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+    const p=document.createElement("p"); p.className="read-txt"; p.textContent=v.text||"";
+    const meta=document.createElement("div"); meta.className="read-meta";
+    meta.textContent=[v.by||"anon",when,v.lock?"frozen":""].filter(Boolean).join(" · ");
+    body.append(p,meta);
+
+    const row=document.createElement("div"); row.className="gate-row";
+    if(isAdmin()){
+      const lockBtn=gbtn(v.lock?"Unfreeze":"Freeze","",false);
+      lockBtn.onclick=async()=>{
+        v.lock=!v.lock; ideaMap[id]=v; closeGate(); ideas();
+        await pushKey(DB_IDEAS,id,v);
+      };
+      row.appendChild(lockBtn);
+    }
+    const close=gbtn("Close","",true); close.onclick=closeGate;
+    row.appendChild(close); body.appendChild(row);
+  });
+}
+
 function iceCard(id,v){
   const when=v.at?new Date(v.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
   const wrap=document.createElement("div"); wrap.className="iceswipe"; wrap.dataset.id=id;
@@ -1624,15 +1648,11 @@ function iceCard(id,v){
     <div class="ice${v.lock?" locked":""}">
       <div class="ice-head">
         <span class="ice-title"></span>
-        ${v.lock?'<span class="ice-lock">\u2744</span>':""}
         <span class="ice-when">${when}</span>
       </div>
-      <div class="ice-body"><span class="ice-text"></span>
-        <div class="ice-by">${v.by||"anon"}</div></div>
     </div>`;
   const card=wrap.querySelector(".ice");
   card.querySelector(".ice-title").textContent=ideaTitle(v);   // plain text, never markup
-  card.querySelector(".ice-text").textContent=v.text||"";
   bindIce(wrap,card,id,v);
   return wrap;
 }
@@ -1674,7 +1694,7 @@ function bindIce(wrap,card,id,v){
   };
   card.addEventListener("pointerup",finish);
   card.addEventListener("pointercancel",finish);
-  card.addEventListener("click",()=>{ if(lock==="x"){ lock=null; return; } card.classList.toggle("open"); });
+  card.addEventListener("click",()=>{ if(lock==="x"){ lock=null; return; } readIdea(id,v); });
 }
 
 function composeTask(){
