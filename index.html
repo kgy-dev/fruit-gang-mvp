@@ -316,7 +316,8 @@ body.crew .navseg{gap:3px;padding-left:7px;padding-right:7px}
 body.crew .tab{font-size:8.6px;letter-spacing:.03em;padding:10px 1px}
 body.crew .tab .badge{min-width:14px;height:14px;font-size:8.5px;padding:0 3px}
 body.admin .tab{font-size:8.2px;letter-spacing:.02em}
-.tab.crew-only,.tab.admin-only{display:none}
+.tab.crew-only,.tab.admin-only,#addTask{display:none}
+body.admin #addTask{display:inline-block}
 body.crew .tab.crew-only{display:flex}
 body.admin .tab.admin-only{display:flex}
 .tab.has-done .badge{background:rgba(78,201,106,.20);color:var(--t1)}
@@ -476,7 +477,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
 /* visitors read, they do not write */
 body.ro .task,body.ro .deck-card{cursor:default}
 body.ro .sbox{opacity:.55}
-#resetBtn{display:none}
+#resetBtn,body.ro #addIdea{display:none}
 body.admin #resetBtn{display:inline-block}
 .rolebtn{background:none;color:var(--hot);text-decoration:underline;font:inherit;padding:0}
 
@@ -515,6 +516,79 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
   border:1px solid var(--line);font-family:var(--mono);font-size:9px;font-weight:700;
   letter-spacing:.12em;color:var(--dim);transition:color .18s,border-color .18s,background-color .18s}
 .primebtn:active{background:var(--panel-2)}
+
+/* ===== mode identity: solid badge + accent hairline, so Alpha and MVP
+   can never be mistaken for one another at a glance ==================== */
+.mark-sub{background:var(--hot) !important;border-color:var(--hot) !important;color:#0d0b08 !important}
+.topbar{box-shadow:inset 0 3px 0 var(--hot)}
+body.mvp{--panel:#1a1717; --panel-2:#262322; --line:#37322f}
+:root{--panel:#15161a; --panel-2:#1e2026; --line:#2e3038}
+
+/* ===== fridge: the app goes cold ==================================== */
+body.fridge{
+  --bg:#070d11; --panel:#101c23; --panel-2:#17262f;
+  --line:#263d49; --line-soft:#1a2b34;
+  --ink:#eaf9ff; --muted:#8fb3c2; --dim:#5c808f;
+  --hot:#5fd8e8; --hot-2:#a8ecf5;
+}
+body.fridge .topbar{background:linear-gradient(180deg,#0d1e26 0%,var(--bg) 72%);border-bottom-color:#263d49}
+body.fridge .navseg,body.fridge .primebtn{display:none}
+body.fridge .splash,body.fridge .gate{background:var(--bg)}
+body.fridge .mark-dot{background:var(--hot);box-shadow:0 0 16px var(--hot)}
+
+.frost{
+  position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s;
+  background:
+    radial-gradient(120px 200px at 8% -4%,rgba(168,236,245,.16),transparent 70%),
+    radial-gradient(160px 240px at 96% 4%,rgba(95,216,232,.13),transparent 70%),
+    radial-gradient(200px 160px at 50% 104%,rgba(168,236,245,.10),transparent 70%);
+}
+body.fridge .frost{opacity:1}
+
+.fridge-btn{
+  display:flex;align-items:center;gap:9px;width:100%;margin-top:10px;
+  padding:13px 14px;border-radius:13px;cursor:pointer;text-align:left;
+  background:linear-gradient(135deg,rgba(95,216,232,.16),rgba(95,216,232,.05));
+  border:1px solid rgba(95,216,232,.34);
+  transition:background-color .18s,border-color .18s}
+.fridge-btn:active{background:rgba(95,216,232,.22)}
+.fridge-btn i{width:26px;height:26px;flex:none;border-radius:8px;display:grid;place-items:center;
+  background:rgba(95,216,232,.22);font-style:normal;font-size:14px}
+.fridge-btn b{display:block;font-family:var(--dsp);font-weight:700;font-size:14.5px;
+  text-transform:uppercase;letter-spacing:.02em;color:#8fe6f2}
+.fridge-btn span{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--dim)}
+.fridge-btn em{margin-left:auto;font-style:normal;font-family:var(--mono);font-size:16px;
+  font-weight:600;color:#8fe6f2}
+
+.note-card{position:relative;padding:14px 15px;margin-bottom:9px;border-radius:13px;
+  background:var(--panel);border:1px solid var(--line-soft);border-left:2.5px solid var(--hot)}
+.note-txt{font-size:14.5px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.note-meta{margin-top:9px;font-family:var(--mono);font-size:9px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--dim)}
+.note-del{position:absolute;top:9px;right:9px;padding:4px 7px;border-radius:7px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dim);
+  background:var(--panel-2);border:1px solid var(--line)}
+
+.addbtn{padding:9px 13px;border-radius:9px;border:1px solid var(--hot);
+  background:color-mix(in srgb,var(--hot) 14%,transparent);
+  color:var(--hot);font-family:var(--mono);font-size:12px;font-weight:700}
+.sheet-field{margin-bottom:12px;text-align:left}
+.sheet-field label{display:block;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.sheet-field input,.sheet-field textarea,.sheet-field select{
+  width:100%;box-sizing:border-box;padding:12px 13px;border-radius:11px;
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  font-family:var(--body);font-size:15px;outline:none}
+.sheet-field textarea{min-height:112px;resize:vertical;line-height:1.5}
+.sheet-field input:focus,.sheet-field textarea:focus,.sheet-field select:focus{border-color:var(--hot)}
+.pickrow{display:flex;flex-wrap:wrap;gap:6px}
+.pickrow button{padding:9px 12px;border-radius:9px;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:600}
+.pickrow button[aria-pressed="true"]{color:var(--ink);border-color:var(--hot);
+  background:color-mix(in srgb,var(--hot) 14%,transparent)}
+.gate--sheet .gate-mark,.gate--sheet .gate-sub{display:none}
+.gate--sheet .gate-card{max-width:400px}
+.gate--sheet .gate-q{margin:0 0 18px}
 </style>
 
 <div class="app">
@@ -544,6 +618,8 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
       if(p.mode!=="alpha") document.body.classList.add("mvp");
     }catch(e){ document.body.classList.add("mvp"); }
   </script>
+  <div class="frost"></div>
+
   <div id="gate" class="gate" hidden>
     <div class="gate-card">
       <div class="gate-mark">FRUIT <em>GANG</em></div>
@@ -555,7 +631,7 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B26</div>
+    <div class="splash-tag">Production Tracker · B28</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -608,6 +684,12 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
         <div class="est-vel" id="velLine"></div>
       </div>
 
+      <button class="fridge-btn" id="fridgeBtn" type="button">
+        <i>❄</i>
+        <span><b>The Fridge</b><span>ideas on ice</span></span>
+        <em id="fridgeCount">0</em>
+      </button>
+
       <div class="sec"><h2>Tier</h2><span class="note">ceiling per task</span></div>
       <div class="card"><div class="rows" id="tierRows"></div></div>
 
@@ -656,6 +738,20 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
       </div>
     </section>
 
+    <section class="pane" id="pane-fridge" role="tabpanel">
+      <div class="sec"><h2>The Fridge</h2>
+        <span class="note" id="ideaNote">ideas on ice</span></div>
+      <div class="actions" style="margin-bottom:12px">
+        <button class="addbtn" id="addIdea" type="button">+ New note</button>
+      </div>
+      <div id="ideaList"></div>
+      <div class="deck-empty" id="ideaEmpty" hidden>
+        <div class="de-mark"></div>
+        <p>The fridge is empty.</p>
+        <span>Park an idea here before it melts. Nothing here is a commitment.</span>
+      </div>
+    </section>
+
     <section class="pane" id="pane-admin" role="tabpanel">
       <div class="sec"><h2>Approvals</h2><span class="note" id="reqNote">team requests</span></div>
       <div id="reqList"></div>
@@ -676,7 +772,8 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
       <div id="groups"></div>
       <div id="xhint"></div>
       <p class="empty" id="empty" hidden>Nothing matches. Try clearing a filter.</p>
-      <div class="actions"><button class="btn" id="expandBtn">Expand all</button></div>
+      <div class="actions"><button class="btn" id="expandBtn">Expand all</button>
+        <button class="addbtn admin-only" id="addTask" type="button">+ Task</button></div>
     </section>
   </div>
 
@@ -703,7 +800,7 @@ const SECTIONS=[
 ["Weapons",[["Rifle Placeholders","asset",0],["Rifle Logic","system",1],["Rifle Concept","concept",1],["Rifle Asset","asset",2],["Rifle Animset","animset",1],["Rifle FX","fx",1],["Rocketique Placeholders","asset",0],["Rocketique Logic","system",1],["Rocketique Concept","concept",1],["Rocketique Asset","asset",2],["Rocketique Animset","animset",1],["Rocketique FX","fx",1],["Minigun Placeholders","asset",0],["Minigun Logic","system",1],["Minigun Concept","concept",1],["Minigun Asset","asset",2],["Minigun Animset","animset",1],["Minigun FX","fx",1],["Pistol Placeholders","asset",0],["Pistol Logic","system",1],["Pistol Concept","concept",1],["Pistol Asset","asset",2],["Pistol Animset","animset",1],["Pistol FX","fx",1],["Racquet Placeholders","asset",0],["Racquet Concept","concept",1],["Racquet Asset","asset",1],["Racquet Animset","animset",1],["Racquet FX","fx",1]]],
 ["Combat Core",[["Combat Component Melee","system",3],["Combat Component Melee Update","system",1],["Combat Component Ranged","system",3],["Combat Component Ranged Update","system",1]]],
 ["Throwables & Gadgets",[["Throwable Component","system",2],["Throwable Animset","animset",1],["Grenade Placeholders","asset",0],["Grenade Concept","concept",1],["Grenade Asset","asset",1],["Grenade FX","fx",1],["Water Balloon Placeholders","asset",0],["Water Balloon Concept","concept",1],["Water Balloon Asset","asset",1],["Water Balloon FX","fx",1],["Gadget/Jump Pad Placeholders","asset",0],["Gadget/Jump Pad Logic","system",0],["Gadget/Jump Pad Concept","concept",1],["Gadget/Jump Pad Asset","asset",1],["Gadget/Jump Pad Animation","animset",1],["Gadget/Jump Pad FX","fx",1]]],
-["World Systems",[["Spawn/Pool Manager","system",2],["Map/Minimap System","system",1],["Ragdoll Component","system",3],["Ragdoll Component Update","system",1],["Interaction Component","system",3],["NPC System Part 1","system",2]]],
+["World Systems",[["Spawn/Pool Manager","system",2],["Map/Minimap System","system",1],["Ragdoll Component","system",3],["Ragdoll Component Update","system",1],["Interaction Component","system",3],["NPC System Part 1","system",2],["System Integration","system",1]]],
 ["Enemies",[["Ant Placeholders","asset",0],["Ant Logic","system",1],["Ant Concept","concept",1],["Ant Asset","asset",2],["Ant Animset","animset",1],["Ant FX","fx",1],["Mosquito Placeholders","asset",0],["Mosquito Logic","system",1],["Mosquito Concept","concept",1],["Mosquito Asset","asset",2],["Mosquito Animset","animset",1],["Mosquito FX","fx",1],["Boss Placeholders","asset",0],["Boss Logic","system",1],["Boss Concept","concept",1],["Boss Asset","asset",2],["Boss Animset","animset",1],["Boss FX","fx",1]]],
 ["Locomotion & Animation",[["Locomotion System Core","system",2],["Locomotion System V2","system",1],["Locomotion System V3","system",1],["Locomotion Combat Mode","system",1],["Emote System","system",1],["Emote Animation","animset",1],["Walk Animset","animset",1],["Walk/Run FX","fx",1],["Run Animset","animset",1],["Mantle Animset","animset",1],["Mantle FX","fx",1],["Idle Animset","animset",1],["Fall/Land Animset","animset",1],["Fall/Land FX","fx",1],["Slide/Roll/Dash Animset","animset",1],["Slide/Roll/Dash FX","fx",1]]],
 ["Ability & Inventory",[["Ability System Part 1","system",2],["Inventory System","system",3],["Inventory Update","system",1]]],
@@ -714,25 +811,41 @@ const SECTIONS=[
 ["Marketing",[["SteamPage & Socials Part 1","marketing",1],["SteamPage & Socials Part 2","marketing",2]]]
 ];
 
-const MVP_IDS=new Set(["hub-menu-part-1", "environment-concept", "environment-pipeline", "environment-blockout", "environment-v1", "destruction-system", "pickleman-curse-part-1", "missions", "mission-manager", "extraction-logic", "health-component", "health-component-update", "juicebox", "revive-system", "revive-animation", "hit-reaction", "sound-system", "rifle-placeholders", "rifle-logic", "rocketique-placeholders", "rocketique-logic", "minigun-placeholders", "minigun-logic", "pistol-placeholders", "pistol-logic", "racquet-placeholders", "combat-component-melee", "combat-component-melee-update", "combat-component-ranged", "combat-component-ranged-update", "throwable-component", "throwable-animset", "grenade-placeholders", "water-balloon-placeholders", "gadget-jump-pad-placeholders", "gadget-jump-pad-logic", "spawn-pool-manager", "map-minimap-system", "ragdoll-component", "ragdoll-component-update", "interaction-component", "npc-system-part-1", "ant-placeholders", "ant-logic", "mosquito-placeholders", "mosquito-logic", "boss-placeholders", "boss-logic", "locomotion-system-core", "locomotion-system-v2", "locomotion-system-v3", "locomotion-combat-mode", "emote-system", "emote-animation", "walk-animset", "walk-run-fx", "run-animset", "mantle-animset", "mantle-fx", "idle-animset", "fall-land-animset", "fall-land-fx", "slide-roll-dash-animset", "slide-roll-dash-fx", "ability-system-part-1", "inventory-system", "inventory-update", "thumbnail-part-1", "hud", "camera-system", "trap-system", "tomato-concept", "tomato-asset", "tomato-animset", "tomato-fx", "lemon-concept", "lemon-asset", "lemon-animset", "lemon-fx", "dualuzi-placeholders", "dualuzi-logic", "steampage-socials-part-1"]);
+const MVP_IDS=new Set(["hub-menu-part-1", "environment-concept", "environment-pipeline", "environment-blockout", "environment-v1", "destruction-system", "pickleman-curse-part-1", "missions", "mission-manager", "extraction-logic", "health-component", "health-component-update", "juicebox", "revive-system", "revive-animation", "hit-reaction", "sound-system", "rifle-placeholders", "rifle-logic", "rocketique-placeholders", "rocketique-logic", "minigun-placeholders", "minigun-logic", "pistol-placeholders", "pistol-logic", "racquet-placeholders", "combat-component-melee", "combat-component-melee-update", "combat-component-ranged", "combat-component-ranged-update", "throwable-component", "throwable-animset", "grenade-placeholders", "water-balloon-placeholders", "gadget-jump-pad-placeholders", "gadget-jump-pad-logic", "spawn-pool-manager", "map-minimap-system", "ragdoll-component", "ragdoll-component-update", "interaction-component", "npc-system-part-1", "ant-placeholders", "ant-logic", "mosquito-placeholders", "mosquito-logic", "boss-placeholders", "boss-logic", "locomotion-system-core", "locomotion-system-v2", "locomotion-system-v3", "locomotion-combat-mode", "emote-system", "emote-animation", "walk-animset", "walk-run-fx", "run-animset", "mantle-animset", "mantle-fx", "idle-animset", "fall-land-animset", "fall-land-fx", "slide-roll-dash-animset", "slide-roll-dash-fx", "ability-system-part-1", "inventory-system", "inventory-update", "thumbnail-part-1", "hud", "camera-system", "trap-system", "tomato-concept", "tomato-asset", "tomato-animset", "tomato-fx", "lemon-concept", "lemon-asset", "lemon-animset", "lemon-fx", "dualuzi-placeholders", "dualuzi-logic", "steampage-socials-part-1", "system-integration"]);
 const ID_MIGRATION={"s0t0": "hub-menu-part-1", "s0t1": "loadout-system", "s0t2": "environment-concept", "s0t3": "environment-pipeline", "s0t4": "environment-blockout", "s0t5": "environment-v1", "s0t6": "destruction-system", "s0t7": "missions", "s0t8": "mission-manager", "s0t9": "pickleman-curse-part-1", "s0t10": "pickleman-curse-part-2", "s0t11": "extraction-logic", "s0t12": "sound-system", "s1t0": "health-component", "s1t1": "health-component-update", "s1t2": "juicebox", "s1t3": "revive-system", "s1t4": "revive-animation", "s1t5": "hit-reaction", "s2t0": "combat-component-melee", "s2t1": "combat-component-melee-update", "s2t2": "combat-component-ranged", "s2t3": "combat-component-ranged-update", "s3t0": "rifle-concept", "s3t1": "rifle-asset", "s3t2": "rifle-animset", "s3t3": "rifle-fx", "s3t4": "rocketique-concept", "s3t5": "rocketique-asset", "s3t6": "rocketique-animset", "s3t7": "rocketique-fx", "s3t8": "minigun-concept", "s3t9": "minigun-asset", "s3t10": "minigun-animset", "s3t11": "minigun-fx", "s3t12": "pistol-concept", "s3t13": "pistol-asset", "s3t14": "pistol-animset", "s3t15": "pistol-fx", "s3t16": "racquet-concept", "s3t17": "racquet-asset", "s3t18": "racquet-animset", "s3t19": "racquet-fx", "s4t0": "throwable-component", "s4t1": "throwable-animset", "s4t2": "grenade-concept", "s4t3": "grenade-asset", "s4t4": "grenade-fx", "s4t5": "water-balloon-concept", "s4t6": "water-balloon-asset", "s4t7": "water-balloon-fx", "s4t8": "gadget-jump-pad-concept", "s4t9": "gadget-jump-pad-asset", "s4t10": "gadget-jump-pad-animation", "s4t11": "gadget-jump-pad-fx", "s5t0": "spawn-pool-manager", "s5t1": "map-minimap-system", "s5t2": "interaction-component", "s5t3": "ragdoll-component", "s5t4": "ragdoll-component-update", "s5t5": "npc-system-part-1", "s6t0": "ant-logic", "s6t1": "ant-concept", "s6t2": "ant-asset", "s6t3": "ant-animset", "s6t4": "ant-fx", "s6t5": "mosquito-logic", "s6t6": "mosquito-concept", "s6t7": "mosquito-asset", "s6t8": "mosquito-animset", "s6t9": "mosquito-fx", "s6t10": "boss-logic", "s6t11": "boss-concept", "s6t12": "boss-asset", "s6t13": "boss-animset", "s6t14": "boss-fx", "s7t0": "locomotion-system-core", "s7t1": "locomotion-system-v2", "s7t2": "locomotion-system-v3", "s7t3": "locomotion-combat-mode", "s7t4": "emote-system", "s7t5": "emote-animation", "s7t6": "idle-animset", "s7t7": "walk-animset", "s7t8": "run-animset", "s7t9": "mantle-animset", "s7t10": "fall-land-animset", "s7t11": "slide-roll-dash-animset", "s7t12": "walk-run-fx", "s7t13": "mantle-fx", "s7t14": "fall-land-fx", "s7t15": "slide-roll-dash-fx", "s8t0": "ability-system-part-1", "s8t1": "inventory-system", "s8t2": "inventory-update", "s9t0": "thumbnail-part-1", "s9t1": "hud", "s10t0": "camera-system", "s10t1": "trap-system", "s11t0": "tomato-concept", "s11t1": "tomato-asset", "s11t2": "tomato-animset", "s11t3": "tomato-fx", "s11t4": "lemon-concept", "s11t5": "lemon-asset", "s11t6": "lemon-animset", "s11t7": "lemon-fx", "s11t8": "banana-concept", "s11t9": "banana-asset", "s11t10": "banana-animset", "s11t11": "banana-fx", "s11t12": "onion-concept", "s11t13": "onion-asset", "s11t14": "onion-animset", "s11t15": "onion-fx", "s11t16": "pickle-concept", "s11t17": "pickle-asset", "s11t18": "pickle-animset", "s11t19": "pickle-fx", "s12t0": "katana-concept", "s12t1": "katana-asset", "s12t2": "katana-animset", "s12t3": "katana-fx", "s12t4": "dualuzi-concept", "s12t5": "dualuzi-asset", "s12t6": "dualuzi-animset", "s12t7": "dualuzi-fx", "s13t0": "steampage-socials-part-1"};
 
-const ALL_TASKS=[];
 const slug=s=>s.normalize("NFKD").replace(/[^\w\s/&-]/g,"")
   .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"");
-SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier])=>
-  ALL_TASKS.push({id:slug(name),name,disc,tier,sec,si})));
+
+/* The authored list is the spine; anything an admin adds later is folded in on
+   top of it, so custom work lives in the same sections and the same maps. */
+let ALL_TASKS=[], SEC_NAMES=[];
+function rebuildData(){
+  SEC_NAMES=SECTIONS.map(s=>s[0]);
+  ALL_TASKS=[];
+  SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier])=>
+    ALL_TASKS.push({id:slug(name),name,disc,tier,sec,si})));
+  Object.keys(customMap)
+    .sort((a,b)=>(customMap[a].at||0)-(customMap[b].at||0))
+    .forEach(id=>{
+      const c=customMap[id]; if(!c||!c.name) return;
+      let si=SEC_NAMES.indexOf(c.sec);
+      if(si<0){ SEC_NAMES.push(c.sec); si=SEC_NAMES.length-1; }
+      ALL_TASKS.push({id,name:c.name,disc:c.disc||"system",tier:c.tier??1,sec:c.sec,si,custom:true});
+    });
+}
 
 /* MVP is a strict subset of Alpha over one shared dataset, so a task ticked in
    either mode is ticked in both — no syncing between the two views. */
 let mode="mvp";
-const inView=t=>mode==="alpha"||MVP_IDS.has(t.id);
+const inView=t=>mode==="alpha"||MVP_IDS.has(t.id)||(t.custom&&customMap[t.id]&&customMap[t.id].mvp!==false);
 let TASKS=[], VIEW_SECTIONS=[], TICKS=[], TICK_SIG="";
 function applyMode(){
-  TASKS=ALL_TASKS.filter(inView);
-  VIEW_SECTIONS=SECTIONS.map(([nm],si)=>[nm,si]).filter(([,si])=>TASKS.some(t=>t.si===si));
+  document.body.classList.toggle("fridge",mode==="fridge");
   document.body.classList.toggle("mvp",mode==="mvp");
-  document.getElementById("modeName").textContent=mode==="mvp"?"MVP":"ALPHA";
+  TASKS=ALL_TASKS.filter(inView);
+  VIEW_SECTIONS=SEC_NAMES.map((nm,si)=>[nm,si]).filter(([,si])=>TASKS.some(t=>t.si===si));
+  document.getElementById("modeName").textContent=mode.toUpperCase();
 }
 
 /* ==========================================================================
@@ -757,10 +870,12 @@ const DB_PRIO  = "fg-mvp/prio";  // on the deck (priority queue)
 const DB_ASSIGN= "fg-mvp/assign";// who owns it
 const DB_RANK  = "fg-mvp/rank";  // manual ordering for deck + active
 const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
+const DB_IDEAS = "fg-mvp/ideas"; // the fridge
+const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=26;
+const BUILD=28;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -770,7 +885,7 @@ addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={};
+let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={}, ideaMap={}, customMap={};
 let weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
 
 /* device-local, never shared: who is looking and what they may do */
@@ -829,7 +944,8 @@ async function initStore(){
       await authm.signInAnonymously(authm.getAuth(a));
       const db=dbm.getDatabase(a);
       FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING),
-          prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK),req:dbm.ref(db,DB_REQ)};
+          prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK),req:dbm.ref(db,DB_REQ),
+          ideas:dbm.ref(db,DB_IDEAS),custom:dbm.ref(db,DB_CUSTOM)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -871,7 +987,8 @@ async function pull(){
     if(backend==="firebase"){
       const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
       doneMap=v.done||{}; doingMap=v.doing||{};
-      prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{}; return;
+      prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
+      ideaMap=v.ideas||{}; customMap=v.custom||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
@@ -881,22 +998,27 @@ async function pull(){
         if(d&&typeof d.prio==="object") prioMap=d.prio;
         if(d&&typeof d.assign==="object") assignMap=d.assign;
         if(d&&typeof d.rank==="object") rankMap=d.rank;
-        if(d&&typeof d.req==="object") reqMap=d.req; }
+        if(d&&typeof d.req==="object") reqMap=d.req;
+        if(d&&typeof d.ideas==="object") ideaMap=d.ideas;
+        if(d&&typeof d.custom==="object") customMap=d.custom; }
       return;
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
     prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{}; reqMap=raw.req||{};
+    ideaMap=raw.ideas||{}; customMap=raw.custom||{};
   }catch(e){}
 }
 
-const bundle=()=>({v:6,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,req:reqMap,at:Date.now()});
+const bundle=()=>({v:7,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,req:reqMap,
+                   ideas:ideaMap,custom:customMap,at:Date.now()});
 
 async function pushAll(){
   try{
     if(backend==="firebase"){
       await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),FB.set(FB.prio,prioMap),
-                         FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap),FB.set(FB.req,reqMap)]);
+                         FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap),FB.set(FB.req,reqMap),
+                         FB.set(FB.ideas,ideaMap),FB.set(FB.custom,customMap)]);
     }else if(backend==="claude"){
       await window.storage.set(SKEY,JSON.stringify(bundle()),true);
     }else{
@@ -963,7 +1085,7 @@ async function commit(id,to){
 }
 
 async function clearAll(){
-  doneMap={}; doingMap={}; prioMap={}; reqMap={}; rankMap={}; assignMap={};
+  doneMap={}; doingMap={}; prioMap={}; reqMap={}; rankMap={}; assignMap={};   // ideas and custom tasks survive a reset
   if(backend==="firebase"){ await FB.set(FB.root,null); return; }   // wipe the whole node
   await pushAll();
 }
@@ -972,13 +1094,13 @@ async function loadPrefs(){
   try{
     if(backend==="claude"){
       const r=await window.storage.get(PKEY);
-      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode; if(p.lens) lens=p.lens; }
+      if(r&&r.value){ const p=JSON.parse(r.value); if("weighted" in p) weighted=!!p.weighted; if(p.devs) devs=p.devs; if(MODES.includes(p.mode)) mode=p.mode; if(p.lens) lens=p.lens; }
       return;
     }
     const p=JSON.parse(localStorage.getItem(PKEY)||"{}");
     if("weighted" in p) weighted=!!p.weighted;
     if(p.devs) devs=p.devs;
-    if(p.mode==="alpha"||p.mode==="mvp") mode=p.mode;
+    if(MODES.includes(p.mode)) mode=p.mode;
     if(p.lens) lens=p.lens;
   }catch(e){}
 }
@@ -1266,7 +1388,7 @@ function card(t,kind){
       <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
       ${flagsHTML(t.id)}
       <span class="t-tier tp${t.tier}">T${t.tier}</span>
-      <span class="d-sec">${SECTIONS[t.si][0]}</span>
+      <span class="d-sec">${SEC_NAMES[t.si]}</span>
       <span class="grip"></span>
     </div>`;
   const c=wrap.querySelector(".deck-card");
@@ -1411,7 +1533,7 @@ function bindCard(wrap,card,t){
    key-only signature meant the other phone never noticed the change. */
 const kv=m=>Object.keys(m).sort().map(k=>k+":"+(typeof m[k]==="object"?JSON.stringify(m[k]):m[k])).join("|");
 const sig=()=>[doneMap,doingMap,prioMap].map(m=>Object.keys(m).sort().join("|")).join("#")
-  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap);
+  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap)+"#"+kv(ideaMap)+"#"+kv(customMap);
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si&&inScope(t)), k=all.filter(t=>isDone(t.id)).length;
@@ -1420,6 +1542,112 @@ function refreshHead(si){
   const mb=g.querySelector(".g-mini>i"); if(mb) mb.style.width=(all.length?Math.round(k/all.length*100):0)+"%";
 }
 function reqList(){ return ALL_TASKS.filter(t=>hasReq(t.id)); }
+
+function ideas(){
+  const list=Object.entries(ideaMap)
+    .filter(([,v])=>v&&v.text)
+    .sort((a,b)=>(b[1].at||0)-(a[1].at||0));
+  $("fridgeCount").textContent=list.length;
+  $("ideaEmpty").hidden=list.length>0;
+  $("ideaNote").textContent=list.length?`${list.length} on ice`:"ideas on ice";
+  const box=$("ideaList"); box.innerHTML="";
+  list.forEach(([id,v])=>{
+    const when=v.at?new Date(v.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+    const el=document.createElement("div"); el.className="note-card";
+    el.innerHTML=`<div class="note-txt"></div>
+      <div class="note-meta">${[v.by||"anon",when].filter(Boolean).join(" · ")}</div>
+      ${isAdmin()?'<button class="note-del" type="button">Remove</button>':""}`;
+    el.querySelector(".note-txt").textContent=v.text;   // user text, never markup
+    const del=el.querySelector(".note-del");
+    if(del) del.onclick=async()=>{
+      if(!confirm("Remove this note?")) return;
+      delete ideaMap[id]; ideas(); modeBtn();
+      await pushKey(DB_IDEAS,id,null);
+    };
+    box.appendChild(el);
+  });
+}
+
+function composeTask(){
+  if(!isAdmin()) return;
+  openSheet("New task",body=>{
+    let tier=1, disc="system", scopeAlphaOnly=false;
+
+    const mk=(label,html)=>{ const d=document.createElement("div"); d.className="sheet-field";
+      d.innerHTML=`<label>${label}</label>${html}`; body.appendChild(d); return d; };
+
+    const nameF=mk("Task name",'<input type="text" placeholder="e.g. Fridge Logic" autocomplete="off">');
+    const nameI=nameF.querySelector("input");
+
+    const tierF=mk("Tier",'<div class="pickrow"></div>');
+    TIERS.forEach(k=>{
+      const b=document.createElement("button"); b.type="button";
+      b.innerHTML=`T${k} · ${TIER[k].d}d`; b.setAttribute("aria-pressed",k===tier);
+      b.onclick=()=>{ tier=k; tierF.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b)); };
+      tierF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const discF=mk("Discipline",'<div class="pickrow"></div>');
+    Object.entries(DISC).forEach(([k,m])=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=m.name;
+      b.setAttribute("aria-pressed",k===disc); b.style.color=m.c;
+      b.onclick=()=>{ disc=k; discF.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b)); };
+      discF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const secF=mk("Section",'<select></select><input type="text" placeholder="New section name" style="margin-top:8px" hidden autocomplete="off">');
+    const sel=secF.querySelector("select"), newSec=secF.querySelector("input");
+    SEC_NAMES.forEach(nm=>{ const o=document.createElement("option"); o.value=nm; o.textContent=nm; sel.appendChild(o); });
+    const NEW="+ New section";
+    const on=document.createElement("option"); on.value=NEW; on.textContent=NEW; sel.appendChild(on);
+    sel.onchange=()=>{ newSec.hidden=sel.value!==NEW; if(!newSec.hidden) newSec.focus(); };
+
+    const scopeF=mk("Shows in",'<div class="pickrow"></div>');
+    [["MVP + Alpha",false],["Alpha only",true]].forEach(([label,alphaOnly])=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=label;
+      b.setAttribute("aria-pressed",alphaOnly===scopeAlphaOnly);
+      b.onclick=()=>{ scopeAlphaOnly=alphaOnly; scopeF.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); };
+      scopeF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const row=document.createElement("div"); row.className="gate-row";
+    const save=gbtn("Add task","",true);
+    save.onclick=async()=>{
+      const name=nameI.value.trim(); if(!name){ nameI.focus(); return; }
+      const sec = sel.value===NEW ? (newSec.value.trim()||"Custom") : sel.value;
+      let id=slug(name)||("t"+Date.now().toString(36));
+      if(ALL_TASKS.some(t=>t.id===id)) id+="-"+Date.now().toString(36).slice(-4);
+      const rec={name,disc,tier,sec,mvp:!scopeAlphaOnly,at:Date.now()};
+      customMap[id]=rec;
+      rebuildData(); applyMode(); closeGate(); buildTicks(); all_();
+      await pushKey(DB_CUSTOM,id,rec);
+    };
+    const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
+    row.append(save,cancel); body.appendChild(row);
+    setTimeout(()=>nameI.focus(),60);
+  });
+}
+
+function composeIdea(){
+  openSheet("Park an idea",body=>{
+    const f=document.createElement("div"); f.className="sheet-field";
+    f.innerHTML=`<label>Your note</label><textarea placeholder="Something that shouldn't be forgotten…"></textarea>`;
+    const ta=f.querySelector("textarea");
+    body.appendChild(f);
+    const row=document.createElement("div"); row.className="gate-row";
+    const save=gbtn("Put on ice","",true);
+    save.onclick=async()=>{
+      const text=ta.value.trim(); if(!text) return;
+      const id="i"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      const v={text,by:lens==="main"?(role||"anon"):lens,at:Date.now()};
+      ideaMap[id]=v; closeGate(); ideas(); modeBtn();
+      await pushKey(DB_IDEAS,id,v);
+    };
+    const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
+    row.append(save,cancel); body.appendChild(row);
+    setTimeout(()=>ta.focus(),60);
+  });
+}
 
 function donePane(){
   const list=doneListQ(), box=$("doneList");
@@ -1440,7 +1668,7 @@ function donePane(){
       <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
       <span class="t-flags">${w?`<span class="t-who who-${w}">${w}</span>`:""}</span>
       <span class="t-tier tp${t.tier}">T${t.tier}</span>
-      <span class="d-sec">${SECTIONS[t.si][0]}${when?" · "+when:""}</span>`;
+      <span class="d-sec">${SEC_NAMES[t.si]}${when?" · "+when:""}</span>`;
     box.appendChild(c);
   });
 }
@@ -1459,7 +1687,7 @@ function adminPane(){
     const el=document.createElement("div"); el.className="req-card";
     el.innerHTML=`<div class="req-top"><span class="req-name">${t.name}</span>
         <span class="req-what">${what}</span></div>
-      <div class="req-meta">${SECTIONS[t.si][0]}${w?" · "+w:""}${when?" · "+when:""}</div>
+      <div class="req-meta">${SEC_NAMES[t.si]}${w?" · "+w:""}${when?" · "+when:""}</div>
       <div class="req-acts">
         <button class="req-ok" type="button">Approve</button>
         <button class="req-no" type="button">Reject</button>
@@ -1492,16 +1720,21 @@ function crossHint(){
     q=keep; $("search").value=keep; groups();
   };
 }
-function otherPct(){
-  let other=mode==="mvp"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id));
-  if(lens!=="main") other=other.filter(t=>whoOf(t.id)===lens);
+const MODES=["mvp","alpha","fridge"];
+const nextMode=()=>MODES[(MODES.indexOf(mode)+1)%MODES.length];
+function pctOf(m){
+  let l=m==="alpha"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id)||(t.custom&&customMap[t.id]&&customMap[t.id].mvp!==false));
+  l=l.filter(inScope);
   let d=0,a=0;
-  other.forEach(t=>{const w=weighted?TIER[t.tier].d:1; a+=w; if(isDone(t.id))d+=w;});
+  l.forEach(t=>{const w=weighted?TIER[t.tier].d:1; a+=w; if(isDone(t.id))d+=w;});
   return a?Math.round(d/a*100):0;
 }
 function modeBtn(){
-  $("modeOtherName").textContent=mode==="mvp"?"ALPHA":"MVP";
-  $("modeOtherPct").textContent=otherPct()+"%";
+  const nx=nextMode();
+  $("modeOtherName").textContent=nx==="fridge"?"FRIDGE":nx.toUpperCase();
+  $("modeOtherPct").textContent=nx==="fridge"
+    ? String(Object.keys(ideaMap).length)
+    : pctOf(nx)+"%";
 }
 function primeBtn(){
   const b=$("primeBtn");
@@ -1517,16 +1750,26 @@ function applyLens(){
 
 /* ---------- gate: every screen is rebuilt from scratch, so no stale state ---------- */
 function openGate(){ const g=$("gate"); g.hidden=false; g.classList.remove("done"); document.body.style.overflow="hidden"; }
-function closeGate(){
+var closeGate=function(){
   const g=$("gate"); g.classList.add("done"); document.body.style.overflow="";
   setTimeout(()=>{ g.hidden=true; g.classList.remove("done"); },360);
-}
+};
 const gbtn=(label,sub,primary)=>{
   const b=document.createElement("button");
   b.type="button"; b.className="gbtn"+(primary?" gbtn-primary":"");
   b.innerHTML=label+(sub?`<span>${sub}</span>`:"");
   return b;
 };
+
+function openSheet(title,build){
+  $("gate").classList.add("gate--sheet");
+  $("gateQ").textContent=title;
+  const body=$("gateBody"); body.innerHTML="";
+  build(body);
+  openGate();
+}
+const _closeGate=closeGate;
+closeGate=function(){ $("gate").classList.remove("gate--sheet"); _closeGate(); };
 
 function askRole(){
   $("gateQ").textContent="How are you joining?";
@@ -1610,6 +1853,9 @@ function showPane(id){
 
 function setMode(m){
   mode=m; savePrefs(); applyMode();
+  if(m==="fridge"){ showPane("pane-fridge"); primeBtn(); modeBtn(); ideas();
+    scrollTo({top:0,behavior:"instant"}); return; }
+  if($("pane-fridge").classList.contains("is-active")) showPane("pane-overview");
   tierF.clear(); discF.clear(); q=""; $("search").value="";
   open.clear();
   buildTicks(); chips(); all_(); modeBtn(); primeBtn();
@@ -1619,7 +1865,7 @@ function summary(){
   if(scope().map(t=>t.id).join("|")!==TICK_SIG) buildTicks();  // scope changed under us
   hero(); paintTicks(); estimate(); tierRows(); discRows(); modeBtn();
 }
-function all_(){ summary(); deck(); active(); donePane(); adminPane(); groups(); }
+function all_(){ summary(); deck(); active(); donePane(); adminPane(); ideas(); groups(); }
 
 /* ===== events ===== */
 $("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();groups();});
@@ -1660,13 +1906,18 @@ document.addEventListener("visibilitychange",async()=>{
   await initStore();
   msg(backend==="firebase"?"Syncing…":"Loading…");
   await Promise.all([pull(),loadPrefs()]);
+  rebuildData();
   if(migrate()|normalize()){ msg("Tidying…"); await pushAll(); }
   applyMode();
+  if(mode==="fridge") showPane("pane-fridge");
   $("wToggle").checked=weighted;
   $("panes").hidden=false;
   buildTicks(); chips(); teamSeg(); all_(); modeBtn();
-  $("modeBtn").onclick=()=>setMode(mode==="mvp"?"alpha":"mvp");
+  $("modeBtn").onclick=()=>setMode(nextMode());
   $("primeBtn").onclick=pickLens;
+  $("fridgeBtn").onclick=()=>setMode("fridge");
+  $("addIdea").onclick=()=>{ if(canEdit()) composeIdea(); };
+  $("addTask").onclick=composeTask;
   document.addEventListener("click",e=>{ if(openWrap&&!e.target.closest(".swipe")) closeOpen(); });
 
   try{
@@ -1698,7 +1949,8 @@ document.addEventListener("visibilitychange",async()=>{
       // and pending requests were arriving at the database but never applied here
       doneMap=v.done||{};   doingMap=v.doing||{}; prioMap=v.prio||{};
       assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
-      if(sig()!==before) all_();
+      ideaMap=v.ideas||{};  customMap=v.custom||{};
+      if(sig()!==before){ rebuildData(); applyMode(); all_(); }
       stamp("live");
     });
     $("refreshBtn").style.display="none";
