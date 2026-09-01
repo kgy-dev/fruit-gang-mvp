@@ -174,7 +174,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .cswipe .deck-card{margin-bottom:0;transition:transform .22s cubic-bezier(.2,.8,.3,1)}
 .cswipe.drag .deck-card{transition:none}
 .cswipe-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;pointer-events:none}
+  padding:0 16px;pointer-events:none;opacity:0;transition:opacity .16s}
+.cswipe.drag .cswipe-bg,.iceswipe.drag .cswipe-bg{opacity:1}
 .cswipe-bg em{font-style:normal;font-family:var(--mono);font-size:8.5px;font-weight:700;
   letter-spacing:.13em;color:var(--dim);transition:color .18s}
 .cswipe.armed{background:rgba(255,255,255,.07)}
@@ -564,15 +565,36 @@ body.fridge .frost{opacity:1}
 .iceswipe{position:relative;overflow:hidden;border-radius:14px;margin-bottom:9px;transition:background-color .2s}
 .iceswipe .ice{transition:transform .22s cubic-bezier(.2,.8,.3,1)}
 .iceswipe.drag .ice{transition:none}
-.iceswipe.armed{background:rgba(255,255,255,.08)}
+.iceswipe.armed{background:rgba(255,255,255,.09)}
+/* the action words belong to the gesture, not to the note — keep them out of
+   sight until a swipe is actually under way */
+.iceswipe .cswipe-bg{opacity:0;transition:opacity .16s}
+.iceswipe.drag .cswipe-bg{opacity:1}
 .iceswipe.armed .cswipe-bg em{color:var(--ink)}
 .ice{
-  position:relative;z-index:1;cursor:pointer;padding:0 15px;border-radius:14px;
-  background:linear-gradient(150deg,rgba(190,240,250,.11),rgba(120,200,220,.045));
-  border:1px solid rgba(150,220,235,.20);
-  box-shadow:inset 0 1px 0 rgba(220,250,255,.16);
-  touch-action:pan-y;
+  position:relative;z-index:1;overflow:hidden;cursor:pointer;padding:0 15px;border-radius:14px;
+  background:
+    linear-gradient(150deg,rgba(190,240,250,.13),rgba(120,200,220,.05)),
+    linear-gradient(180deg,#12222a,#0e1b22);          /* opaque base */
+  border:1px solid rgba(150,220,235,.22);
+  box-shadow:inset 0 1px 0 rgba(220,250,255,.18);
+  touch-action:pan-y;transition:border-color .2s,box-shadow .2s;
 }
+/* a slow sheen drifts across the ice, staggered so the wall never pulses in unison */
+.ice::after{
+  content:"";position:absolute;inset:-1px;pointer-events:none;animation-delay:inherit;
+  background:linear-gradient(104deg,transparent 34%,rgba(225,252,255,.14) 47%,transparent 60%);
+  transform:translateX(-130%);
+  animation:sheen 9s ease-in-out infinite;
+}
+@keyframes sheen{0%,76%{transform:translateX(-130%)}92%,100%{transform:translateX(130%)}}
+.ice::before{
+  content:"\2744";position:absolute;right:-6px;bottom:-10px;font-size:44px;
+  color:rgba(190,240,250,.07);pointer-events:none;transform:rotate(-12deg);
+}
+.ice:active{border-color:rgba(150,220,235,.42)}
+.ice.open{box-shadow:inset 0 1px 0 rgba(220,250,255,.26),0 6px 22px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion: reduce){ .ice::after{animation:none;opacity:0} }
 .ice-head{height:62px;display:flex;align-items:center;gap:11px}
 .ice-title{
   flex:1;min-width:0;font-family:var(--dsp);font-weight:600;font-size:15.5px;
@@ -589,9 +611,17 @@ body.fridge .frost{opacity:1}
 .ice.open .ice-body{max-height:520px;opacity:1;padding-bottom:15px}
 .ice-by{margin-top:11px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--dim)}
-.ice.locked{border-color:rgba(150,220,235,.42);
-  box-shadow:inset 0 1px 0 rgba(220,250,255,.24),inset 3px 0 0 var(--hot)}
+.ice.locked{border-color:rgba(150,220,235,.46);
+  box-shadow:inset 0 1px 0 rgba(220,250,255,.26),inset 3px 0 0 var(--hot)}
+.ice.locked::after{animation-duration:5.5s}
+.ice-lock{flex:none;font-size:11px;color:var(--hot);opacity:.9}
+.ice-title{text-shadow:0 1px 0 rgba(0,0,0,.4),0 0 18px rgba(150,220,235,.18)}
 
+.temp{display:flex;align-items:center;gap:9px;margin:-4px 0 13px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.temp i{flex:1;height:1px;background:linear-gradient(90deg,rgba(150,220,235,.35),transparent)}
+.deck-empty .de-mark{border-color:rgba(150,220,235,.3)}
+body.fridge .deck-empty p{color:#cdeef7}
 .addbtn{padding:9px 13px;border-radius:9px;border:1px solid var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent);
   color:var(--hot);font-family:var(--mono);font-size:12px;font-weight:700}
@@ -654,7 +684,7 @@ body.fridge .frost{opacity:1}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B29</div>
+    <div class="splash-tag">Production Tracker · B31</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -764,14 +794,15 @@ body.fridge .frost{opacity:1}
     <section class="pane" id="pane-fridge" role="tabpanel">
       <div class="sec"><h2>The Fridge</h2>
         <span class="note" id="ideaNote">ideas on ice</span></div>
+      <div class="temp" id="tempLine"></div>
       <div class="actions" style="margin-bottom:12px">
         <button class="addbtn" id="addIdea" type="button">+ New note</button>
       </div>
       <div id="ideaList"></div>
       <div class="deck-empty" id="ideaEmpty" hidden>
-        <div class="de-mark"></div>
+        <div class="de-mark" style="border-style:solid;border-color:rgba(150,220,235,.35);display:grid;place-items:center;font-size:15px;color:#8fe6f2">&#10052;</div>
         <p>The fridge is empty.</p>
-        <span>Park an idea here before it melts. Nothing here is a commitment.</span>
+        <span>Park an idea here before it melts.<br>Nothing in here is a promise — that is the point.</span>
       </div>
     </section>
 
@@ -898,7 +929,7 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=29;
+const BUILD=31;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1572,12 +1603,18 @@ function ideas(){
   const list=Object.entries(ideaMap)
     .filter(([,v])=>v&&v.text)
     .sort((a,b)=>(b[1].at||0)-(a[1].at||0));
-  const cnt=list.length;
+  const cnt=list.length, locked=list.filter(([,v])=>v.lock).length;
   $("fridgeCount").textContent=cnt;
   $("ideaEmpty").hidden=cnt>0;
   $("ideaNote").textContent=cnt?`${cnt} on ice`:"ideas on ice";
+  // a bit of theatre: the more you park, the colder it reads
+  const temp=-4-Math.min(cnt,26);
+  $("tempLine").innerHTML=`<span>${temp}°C</span><i></i><span>`+
+    (cnt?`${cnt} frozen${locked?` · ${locked} sealed`:""}`:"door open")+`</span>`;
   const box=$("ideaList"); box.innerHTML="";
-  list.forEach(([id,v])=>box.appendChild(iceCard(id,v)));
+  list.forEach(([id,v],i)=>{ const el=iceCard(id,v);
+    el.querySelector(".ice").style.animationDelay=(i*1.35%9).toFixed(2)+"s";
+    box.appendChild(el); });
 }
 
 function iceCard(id,v){
@@ -1626,8 +1663,10 @@ function bindIce(wrap,card,id,v){
     if(lock!=="x"){ settle(); return; }
     const d=dx; settle();
     if(d>=70&&!v.lock){                       // out of the fridge
-      delete ideaMap[id]; ideas(); modeBtn();
-      await pushKey(DB_IDEAS,id,null);
+      confirmSheet("Take it out?",
+        `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
+        "Remove",
+        async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
     }else if(d<=-70&&isAdmin()){              // freeze it in place
       v.lock=!v.lock; ideaMap[id]=v; ideas();
       await pushKey(DB_IDEAS,id,v);
@@ -1695,6 +1734,20 @@ function composeTask(){
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
     setTimeout(()=>nameI.focus(),60);
+  });
+}
+
+function confirmSheet(title,msg,yesLabel,onYes){
+  openSheet(title,body=>{
+    const p=document.createElement("p");
+    p.style.cssText="margin:0 0 18px;font-size:14px;line-height:1.55;color:var(--muted);text-align:left";
+    p.textContent=msg;
+    body.appendChild(p);
+    const row=document.createElement("div"); row.className="gate-row";
+    const yes=gbtn(yesLabel,"",true);
+    yes.onclick=async()=>{ closeGate(); await onYes(); };
+    const no=gbtn("Keep it","",false); no.className="gbtn gbtn-ghost"; no.onclick=closeGate;
+    row.append(yes,no); body.appendChild(row);
   });
 }
 
