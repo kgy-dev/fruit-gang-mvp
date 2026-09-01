@@ -539,9 +539,8 @@ body.fridge .mark-dot{background:var(--hot);box-shadow:0 0 16px var(--hot)}
 .frost{
   position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s;
   background:
-    radial-gradient(120px 200px at 8% -4%,rgba(168,236,245,.16),transparent 70%),
-    radial-gradient(160px 240px at 96% 4%,rgba(95,216,232,.13),transparent 70%),
-    radial-gradient(200px 160px at 50% 104%,rgba(168,236,245,.10),transparent 70%);
+    radial-gradient(130px 210px at 6% -6%,rgba(168,236,245,.15),transparent 72%),
+    radial-gradient(150px 230px at 97% 2%,rgba(95,216,232,.12),transparent 72%);
 }
 body.fridge .frost{opacity:1}
 
@@ -560,14 +559,38 @@ body.fridge .frost{opacity:1}
 .fridge-btn em{margin-left:auto;font-style:normal;font-family:var(--mono);font-size:16px;
   font-weight:600;color:#8fe6f2}
 
-.note-card{position:relative;padding:14px 15px;margin-bottom:9px;border-radius:13px;
-  background:var(--panel);border:1px solid var(--line-soft);border-left:2.5px solid var(--hot)}
-.note-txt{font-size:14.5px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
-.note-meta{margin-top:9px;font-family:var(--mono);font-size:9px;letter-spacing:.09em;
+/* Notes read like something scratched into frost: a pale etched title on a
+   translucent slab. Every tile is the same height until you open one. */
+.iceswipe{position:relative;overflow:hidden;border-radius:14px;margin-bottom:9px;transition:background-color .2s}
+.iceswipe .ice{transition:transform .22s cubic-bezier(.2,.8,.3,1)}
+.iceswipe.drag .ice{transition:none}
+.iceswipe.armed{background:rgba(255,255,255,.08)}
+.iceswipe.armed .cswipe-bg em{color:var(--ink)}
+.ice{
+  position:relative;z-index:1;cursor:pointer;padding:0 15px;border-radius:14px;
+  background:linear-gradient(150deg,rgba(190,240,250,.11),rgba(120,200,220,.045));
+  border:1px solid rgba(150,220,235,.20);
+  box-shadow:inset 0 1px 0 rgba(220,250,255,.16);
+  touch-action:pan-y;
+}
+.ice-head{height:62px;display:flex;align-items:center;gap:11px}
+.ice-title{
+  flex:1;min-width:0;font-family:var(--dsp);font-weight:600;font-size:15.5px;
+  letter-spacing:.01em;color:#e6fbff;text-shadow:0 1px 0 rgba(0,0,0,.35);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ice-when{flex:none;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dim)}
+.ice-lock{flex:none;font-size:11px;opacity:.85}
+.ice-body{
+  max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .25s;
+  opacity:0;font-size:14.5px;line-height:1.55;color:var(--muted);
+  overflow-wrap:anywhere;white-space:pre-wrap;
+}
+.ice.open .ice-body{max-height:520px;opacity:1;padding-bottom:15px}
+.ice-by{margin-top:11px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--dim)}
-.note-del{position:absolute;top:9px;right:9px;padding:4px 7px;border-radius:7px;
-  font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dim);
-  background:var(--panel-2);border:1px solid var(--line)}
+.ice.locked{border-color:rgba(150,220,235,.42);
+  box-shadow:inset 0 1px 0 rgba(220,250,255,.24),inset 3px 0 0 var(--hot)}
 
 .addbtn{padding:9px 13px;border-radius:9px;border:1px solid var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent);
@@ -631,7 +654,7 @@ body.fridge .frost{opacity:1}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B28</div>
+    <div class="splash-tag">Production Tracker · B29</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -875,7 +898,7 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
-const BUILD=28;
+const BUILD=29;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1543,29 +1566,76 @@ function refreshHead(si){
 }
 function reqList(){ return ALL_TASKS.filter(t=>hasReq(t.id)); }
 
+const ideaTitle=v=>(v.title&&v.title.trim())||(v.text||"").split("\n")[0].slice(0,60)||"Untitled";
+
 function ideas(){
   const list=Object.entries(ideaMap)
     .filter(([,v])=>v&&v.text)
     .sort((a,b)=>(b[1].at||0)-(a[1].at||0));
-  $("fridgeCount").textContent=list.length;
-  $("ideaEmpty").hidden=list.length>0;
-  $("ideaNote").textContent=list.length?`${list.length} on ice`:"ideas on ice";
+  const cnt=list.length;
+  $("fridgeCount").textContent=cnt;
+  $("ideaEmpty").hidden=cnt>0;
+  $("ideaNote").textContent=cnt?`${cnt} on ice`:"ideas on ice";
   const box=$("ideaList"); box.innerHTML="";
-  list.forEach(([id,v])=>{
-    const when=v.at?new Date(v.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
-    const el=document.createElement("div"); el.className="note-card";
-    el.innerHTML=`<div class="note-txt"></div>
-      <div class="note-meta">${[v.by||"anon",when].filter(Boolean).join(" · ")}</div>
-      ${isAdmin()?'<button class="note-del" type="button">Remove</button>':""}`;
-    el.querySelector(".note-txt").textContent=v.text;   // user text, never markup
-    const del=el.querySelector(".note-del");
-    if(del) del.onclick=async()=>{
-      if(!confirm("Remove this note?")) return;
+  list.forEach(([id,v])=>box.appendChild(iceCard(id,v)));
+}
+
+function iceCard(id,v){
+  const when=v.at?new Date(v.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
+  const wrap=document.createElement("div"); wrap.className="iceswipe"; wrap.dataset.id=id;
+  wrap.innerHTML=`<div class="cswipe-bg"><em>REMOVE</em><em>${isAdmin()?"LOCK":""}</em></div>
+    <div class="ice${v.lock?" locked":""}">
+      <div class="ice-head">
+        <span class="ice-title"></span>
+        ${v.lock?'<span class="ice-lock">\u2744</span>':""}
+        <span class="ice-when">${when}</span>
+      </div>
+      <div class="ice-body"><span class="ice-text"></span>
+        <div class="ice-by">${v.by||"anon"}</div></div>
+    </div>`;
+  const card=wrap.querySelector(".ice");
+  card.querySelector(".ice-title").textContent=ideaTitle(v);   // plain text, never markup
+  card.querySelector(".ice-text").textContent=v.text||"";
+  bindIce(wrap,card,id,v);
+  return wrap;
+}
+
+/* Swipe right to take a note out of the fridge; admins swipe left to freeze one
+   in place. A locked note refuses the remove gesture outright. */
+function bindIce(wrap,card,id,v){
+  let x0=0,y0=0,dx=0,lock=null,live=false;
+  const settle=()=>{ card.style.transform="translateX(0px)"; wrap.classList.remove("armed","drag"); };
+  card.addEventListener("pointerdown",e=>{ live=true; lock=null; dx=0; x0=e.clientX; y0=e.clientY; });
+  card.addEventListener("pointermove",e=>{
+    if(!live) return;
+    const ax=e.clientX-x0, ay=e.clientY-y0;
+    if(lock===null){
+      if(Math.abs(ax)>10&&Math.abs(ax)>Math.abs(ay)+3){ lock="x"; wrap.classList.add("drag"); }
+      else if(Math.abs(ay)>10){ live=false; return; }
+      else return;
+    }
+    e.preventDefault();
+    const canRight=!v.lock, canLeft=isAdmin();
+    dx=Math.max(canLeft?-130:0,Math.min(canRight?130:0,ax));
+    card.style.transform=`translateX(${dx}px)`;
+    wrap.classList.toggle("armed",Math.abs(dx)>=70);
+  },{passive:false});
+  const finish=async()=>{
+    if(!live) return;
+    live=false;
+    if(lock!=="x"){ settle(); return; }
+    const d=dx; settle();
+    if(d>=70&&!v.lock){                       // out of the fridge
       delete ideaMap[id]; ideas(); modeBtn();
       await pushKey(DB_IDEAS,id,null);
-    };
-    box.appendChild(el);
-  });
+    }else if(d<=-70&&isAdmin()){              // freeze it in place
+      v.lock=!v.lock; ideaMap[id]=v; ideas();
+      await pushKey(DB_IDEAS,id,v);
+    }
+  };
+  card.addEventListener("pointerup",finish);
+  card.addEventListener("pointercancel",finish);
+  card.addEventListener("click",()=>{ if(lock==="x"){ lock=null; return; } card.classList.toggle("open"); });
 }
 
 function composeTask(){
@@ -1630,22 +1700,26 @@ function composeTask(){
 
 function composeIdea(){
   openSheet("Park an idea",body=>{
+    const tf=document.createElement("div"); tf.className="sheet-field";
+    tf.innerHTML=`<label>Title</label><input type="text" placeholder="Short and memorable" autocomplete="off">`;
+    const ti=tf.querySelector("input"); body.appendChild(tf);
+
     const f=document.createElement("div"); f.className="sheet-field";
-    f.innerHTML=`<label>Your note</label><textarea placeholder="Something that shouldn't be forgotten…"></textarea>`;
+    f.innerHTML=`<label>The idea</label><textarea placeholder="Something that shouldn't be forgotten…"></textarea>`;
     const ta=f.querySelector("textarea");
     body.appendChild(f);
     const row=document.createElement("div"); row.className="gate-row";
     const save=gbtn("Put on ice","",true);
     save.onclick=async()=>{
-      const text=ta.value.trim(); if(!text) return;
+      const text=ta.value.trim(); if(!text){ ta.focus(); return; }
       const id="i"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-      const v={text,by:lens==="main"?(role||"anon"):lens,at:Date.now()};
+      const v={title:ti.value.trim(),text,by:lens==="main"?(role||"anon"):lens,at:Date.now(),lock:false};
       ideaMap[id]=v; closeGate(); ideas(); modeBtn();
       await pushKey(DB_IDEAS,id,v);
     };
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
-    setTimeout(()=>ta.focus(),60);
+    setTimeout(()=>ti.focus(),60);
   });
 }
 
@@ -1729,12 +1803,18 @@ function pctOf(m){
   l.forEach(t=>{const w=weighted?TIER[t.tier].d:1; a+=w; if(isDone(t.id))d+=w;});
   return a?Math.round(d/a*100):0;
 }
+const MODE_ACCENT={mvp:"#ff4a33",alpha:"#e0a52a",fridge:"#5fd8e8"};
 function modeBtn(){
-  const nx=nextMode();
-  $("modeOtherName").textContent=nx==="fridge"?"FRIDGE":nx.toUpperCase();
+  const nx=nextMode(), c=MODE_ACCENT[nx], b=$("modeBtn");
+  $("modeOtherName").textContent=nx.toUpperCase();
   $("modeOtherPct").textContent=nx==="fridge"
-    ? String(Object.keys(ideaMap).length)
+    ? String(Object.keys(ideaMap).filter(k=>ideaMap[k]&&ideaMap[k].text).length)
     : pctOf(nx)+"%";
+  // the button is a signpost: it looks like wherever it is about to take you
+  b.style.borderColor=c;
+  b.style.background=`color-mix(in srgb,${c} 13%,transparent)`;
+  $("modeOtherName").style.color=c;
+  $("modeOtherPct").style.color=c;
 }
 function primeBtn(){
   const b=$("primeBtn");
