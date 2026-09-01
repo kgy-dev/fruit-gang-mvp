@@ -568,9 +568,14 @@ body.fridge .frost{opacity:1}
 .iceswipe.armed{background:rgba(255,255,255,.09)}
 /* the action words belong to the gesture, not to the note — keep them out of
    sight until a swipe is actually under way */
-.iceswipe .cswipe-bg{opacity:0;transition:opacity .16s}
-.iceswipe.drag .cswipe-bg{opacity:1}
-.iceswipe.armed .cswipe-bg em{color:var(--ink)}
+/* The card is opaque and covers these completely, so they only ever show in the
+   strip a swipe opens up — no gating needed, and nothing bleeds through. */
+.iceswipe .cswipe-bg.act{padding:0 18px}
+.iceswipe .act em{font-size:9px;letter-spacing:.14em;white-space:nowrap;transition:color .16s}
+.iceswipe .act-l{color:#ff8f7a}
+.iceswipe .act-r{color:#9fe9f5}
+.iceswipe.armed .act em{color:#fff}
+.iceswipe.armed{background:linear-gradient(90deg,rgba(255,90,70,.20),rgba(95,216,232,.20))}
 .ice{
   position:relative;z-index:1;overflow:hidden;cursor:pointer;padding:0 15px;border-radius:14px;
   background:
@@ -588,9 +593,12 @@ body.fridge .frost{opacity:1}
   animation:sheen 9s ease-in-out infinite;
 }
 @keyframes sheen{0%,76%{transform:translateX(-130%)}92%,100%{transform:translateX(130%)}}
+/* a cold rim of light instead of a glyph — nothing to collide with the date */
 .ice::before{
-  content:"\2744";position:absolute;right:-6px;bottom:-10px;font-size:44px;
-  color:rgba(190,240,250,.07);pointer-events:none;transform:rotate(-12deg);
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:14px;
+  background:
+    radial-gradient(120px 70px at 100% 0%,rgba(140,225,245,.16),transparent 68%),
+    radial-gradient(90px 60px at 0% 100%,rgba(95,216,232,.10),transparent 70%);
 }
 .ice:active{border-color:rgba(150,220,235,.42)}
 @media (prefers-reduced-motion: reduce){ .ice::after{animation:none;opacity:0} }
@@ -601,6 +609,13 @@ body.fridge .frost{opacity:1}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .ice-when{flex:none;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dim)}
+/* stuck on like a magnet on the door */
+.magnet{
+  flex:none;padding:3px 7px;border-radius:5px;transform:rotate(-3deg);
+  background:linear-gradient(180deg,#a9edf7,#5fd8e8);color:#062028;
+  font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.13em;
+  box-shadow:0 2px 5px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.5);
+}
 .read-txt{margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--ink);
   text-align:left;overflow-wrap:anywhere;white-space:pre-wrap;
   max-height:46vh;overflow-y:auto}
@@ -678,7 +693,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B34</div>
+    <div class="splash-tag">Production Tracker · B35</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -928,7 +943,7 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
   document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
-const BUILD=34;
+const BUILD=35;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1624,12 +1639,12 @@ function readIdea(id,v){
       {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
     const p=document.createElement("p"); p.className="read-txt"; p.textContent=v.text||"";
     const meta=document.createElement("div"); meta.className="read-meta";
-    meta.textContent=[v.by||"anon",when,v.lock?"frozen":""].filter(Boolean).join(" · ");
+    meta.textContent=[v.by||"anon",when,v.lock?"sealed":""].filter(Boolean).join(" · ");
     body.append(p,meta);
 
     const row=document.createElement("div"); row.className="gate-row";
     if(isAdmin()){
-      const lockBtn=gbtn(v.lock?"Unfreeze":"Freeze","",false);
+      const lockBtn=gbtn(v.lock?"Thaw":"Deep freeze","",false);
       lockBtn.onclick=async()=>{
         v.lock=!v.lock; ideaMap[id]=v; closeGate(); ideas();
         await pushKey(DB_IDEAS,id,v);
@@ -1644,10 +1659,11 @@ function readIdea(id,v){
 function iceCard(id,v){
   const when=v.at?new Date(v.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
   const wrap=document.createElement("div"); wrap.className="iceswipe"; wrap.dataset.id=id;
-  wrap.innerHTML=`<div class="cswipe-bg"><em>REMOVE</em><em>${isAdmin()?"LOCK":""}</em></div>
+  wrap.innerHTML=`<div class="cswipe-bg act"><em class="act-l">UNFREEZE</em><em class="act-r">${isAdmin()?"DEEP FREEZE":""}</em></div>
     <div class="ice${v.lock?" locked":""}">
       <div class="ice-head">
         <span class="ice-title"></span>
+        ${v.lock?'<span class="magnet">SEALED</span>':""}
         <span class="ice-when">${when}</span>
       </div>
     </div>`;
@@ -1696,9 +1712,9 @@ function bindIce(wrap,card,id,v){
     settle();
     if(!hor) return;
     if(d>=T&&!v.lock){
-      confirmSheet("Take it out?",
+      confirmSheet("Unfreeze this?",
         `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
-        "Remove",
+        "Unfreeze",
         async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
     }else if(d<=-T&&isAdmin()){
       v.lock=!v.lock; ideaMap[id]=v; ideas();
