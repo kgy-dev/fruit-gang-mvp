@@ -678,7 +678,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B32</div>
+    <div class="splash-tag">Production Tracker · B34</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -732,7 +732,7 @@ body.fridge .deck-empty p{color:#cdeef7}
       </div>
 
       <button class="fridge-btn" id="fridgeBtn" type="button">
-        <i>❄</i>
+        <i>&#10052;</i>
         <span><b>The Fridge</b><span>ideas on ice</span></span>
         <em id="fridgeCount">0</em>
       </button>
@@ -928,7 +928,7 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
   document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
-const BUILD=32;
+const BUILD=34;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
@@ -1660,41 +1660,59 @@ function iceCard(id,v){
 /* Swipe right to take a note out of the fridge; admins swipe left to freeze one
    in place. A locked note refuses the remove gesture outright. */
 function bindIce(wrap,card,id,v){
-  let x0=0,y0=0,dx=0,lock=null,live=false;
+  /* The card slides inside a clipped wrapper, so the finger can end up over a
+     hidden edge; capture the pointer or pointerup never reaches us. */
+  const T=64;
+  let x0=0,y0=0,dx=0,lock=null,live=false,pid=null,swiped=false;
   const settle=()=>{ card.style.transform="translateX(0px)"; wrap.classList.remove("armed","drag"); };
-  card.addEventListener("pointerdown",e=>{ live=true; lock=null; dx=0; x0=e.clientX; y0=e.clientY; });
+
+  card.addEventListener("pointerdown",e=>{
+    live=true; lock=null; dx=0; swiped=false;
+    x0=e.clientX; y0=e.clientY; pid=e.pointerId;
+  });
+
   card.addEventListener("pointermove",e=>{
     if(!live) return;
     const ax=e.clientX-x0, ay=e.clientY-y0;
     if(lock===null){
-      if(Math.abs(ax)>10&&Math.abs(ax)>Math.abs(ay)+3){ lock="x"; wrap.classList.add("drag"); }
-      else if(Math.abs(ay)>10){ live=false; return; }
+      if(Math.abs(ax)>10&&Math.abs(ax)>Math.abs(ay)+3){
+        lock="x"; swiped=true; wrap.classList.add("drag");
+        try{ card.setPointerCapture(pid); }catch(_){}
+      }else if(Math.abs(ay)>10){ live=false; return; }
       else return;
     }
     e.preventDefault();
-    const canRight=!v.lock, canLeft=isAdmin();
-    dx=Math.max(canLeft?-130:0,Math.min(canRight?130:0,ax));
+    const right=!v.lock, left=isAdmin();          // locked notes refuse to leave
+    dx=Math.max(left?-130:0, Math.min(right?130:0, ax));
     card.style.transform=`translateX(${dx}px)`;
-    wrap.classList.toggle("armed",Math.abs(dx)>=70);
+    wrap.classList.toggle("armed",Math.abs(dx)>=T);
   },{passive:false});
+
   const finish=async()=>{
     if(!live) return;
     live=false;
-    if(lock!=="x"){ settle(); return; }
-    const d=dx; settle();
-    if(d>=70&&!v.lock){                       // out of the fridge
+    try{ card.releasePointerCapture(pid); }catch(_){}
+    const d=dx, hor=lock==="x";
+    settle();
+    if(!hor) return;
+    if(d>=T&&!v.lock){
       confirmSheet("Take it out?",
         `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
         "Remove",
         async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
-    }else if(d<=-70&&isAdmin()){              // freeze it in place
+    }else if(d<=-T&&isAdmin()){
       v.lock=!v.lock; ideaMap[id]=v; ideas();
       await pushKey(DB_IDEAS,id,v);
     }
   };
   card.addEventListener("pointerup",finish);
   card.addEventListener("pointercancel",finish);
-  card.addEventListener("click",()=>{ if(lock==="x"){ lock=null; return; } readIdea(id,v); });
+
+  // a gesture must never fall through and open the note behind it
+  card.addEventListener("click",e=>{
+    if(swiped){ e.preventDefault(); e.stopPropagation(); swiped=false; return; }
+    readIdea(id,v);
+  });
 }
 
 function composeTask(){
