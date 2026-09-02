@@ -353,13 +353,111 @@ body.admin .tab.admin-only{display:flex}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-@media (min-width:960px){
-  .panes{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);align-items:start}
-  .pane{display:block !important;padding:22px 24px 40px}
-  #pane-active,#pane-deck,#pane-done,#pane-admin{grid-column:1;border-top:1px solid var(--line-soft);padding-top:18px}
-  #pane-tasks{grid-column:2;grid-row:1/5}
-  .pane--tasks{border-left:1px solid var(--line-soft)}
-  .navseg{display:none}
+/* ===== desktop: a real sidebar, one pane at a time ====================
+   The old rule stacked every pane in one column, which turned a wide screen
+   into a very long page. Here the nav moves to the left and the content gets
+   the room instead. Same document, same data — only the shell changes. */
+@media (min-width:1024px){
+  .app{
+    display:grid;grid-template-columns:250px minmax(0,1fr);
+    max-width:1480px;padding-bottom:0;
+  }
+  /* Header and nav share one tall cell. Given a row of their own, sticky has no
+     travel — the containing block is exactly the element's height, so it just
+     scrolls away. Stacking them in the same cell gives them the full column. */
+  .topbar{
+    grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
+    flex-direction:column;align-items:stretch;gap:13px;
+    padding:22px 16px 18px;border-bottom:none;
+    box-shadow:inset 3px 0 0 var(--hot);
+  }
+  .topbar .mark{gap:9px}
+  .mark-txt{font-size:19px}
+  .mark-sub{align-self:flex-start;min-width:0;padding:3px 8px}
+  .sync{order:9;margin:0;text-align:left;font-size:9.5px}
+  .primebtn{order:7;margin:0;width:100%;padding:10px;text-align:center;letter-spacing:.16em}
+  .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
+    align-items:center;padding:10px 12px;min-width:0}
+  .mb-lab{font-size:9px}
+  .mb-pct{font-size:13px}
+
+  .navseg{
+    grid-area:1/1;align-self:start;margin-top:var(--barH,168px);
+    position:sticky;top:var(--barH,168px);
+    display:flex;flex-direction:column;gap:4px;
+    padding:14px 12px 26px;background:var(--bg);border-bottom:none;
+  }
+  body.crew .navseg,body.admin .navseg{gap:4px;padding-left:12px;padding-right:12px}
+  .tab,body.crew .tab,body.admin .tab{
+    justify-content:flex-start;gap:9px;padding:11px 13px;
+    font-size:10px;letter-spacing:.12em;border-radius:10px;
+  }
+  .tab .badge{margin-left:auto}
+
+  .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
+  .pane{padding:28px 32px 72px}
+  #pane-overview{max-width:760px}
+  #pane-tasks{max-width:980px}
+  #pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1060px}
+  .ring{--r:320px}
+  .task{padding:9px 12px;min-height:48px}
+  .group-head{padding:15px 16px}
+  body.fridge .navseg{display:none}
+}
+
+/* ===== desktop presentation =====
+   Panes are swapped, not scrolled to, so each one announces itself. All of this
+   lives behind the desktop breakpoint; the phone layout never sees a line of it. */
+@media (min-width:1024px){
+  html{scroll-behavior:smooth}
+
+  .pane.is-active{animation:paneIn .3s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes paneIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* the sidebar marks where you are with a bar, not just a fill */
+  .tab{position:relative;overflow:visible}
+  .tab[aria-selected="true"]::before{
+    content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:3px;height:20px;border-radius:0 3px 3px 0;background:var(--hot);
+  }
+
+  .sec{margin:32px 0 14px}
+  .sec h2{font-size:19px;letter-spacing:.02em}
+  .pane>.sec:first-child{margin-top:4px}
+
+  .deck-card,.ice,.req-card,.note-card{
+    transition:transform .18s cubic-bezier(.2,.8,.3,1),border-color .2s,box-shadow .2s}
+  .group{transition:border-color .2s}
+
+  /* the reading and compose windows get room to breathe */
+  .gate-card{max-width:420px}
+  .gate--sheet .gate-card{max-width:560px}
+  .read-txt{font-size:15.5px;max-height:52vh}
+}
+@media (min-width:1024px) and (hover:hover) and (pointer:fine){
+  .deck-card:hover,.ice:hover,.req-card:hover{transform:translateY(-1px)}
+}
+@media (min-width:1024px) and (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .pane.is-active{animation:none}
+  .deck-card:hover,.ice:hover,.req-card:hover{transform:none}
+}
+
+/* wide screens get two columns where the order does not matter */
+@media (min-width:1340px){
+  #doneList,#ideaList,#reqList{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;align-items:start}
+}
+
+/* a pointer can hover; a finger cannot */
+@media (hover:hover) and (pointer:fine){
+  .tab:hover{color:var(--ink);background:var(--panel-2)}
+  .task:hover{background-color:var(--panel-2)}
+  .deck-card:hover{border-color:var(--line)}
+  .ice:hover{border-color:rgba(150,220,235,.42)}
+  .btn:hover,.addbtn:hover,.gbtn:hover{border-color:var(--hot)}
+  .chip:hover,.tseg button:hover{color:var(--ink)}
+  .note-del:hover,.req-ok:hover,.req-no:hover{filter:brightness(1.25)}
+  .fridge-btn:hover{background:rgba(95,216,232,.2)}
 }
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important}}
 
@@ -634,6 +732,12 @@ body.fridge .deck-empty p{color:#cdeef7}
 .addbtn{padding:9px 13px;border-radius:9px;border:1px solid var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent);
   color:var(--hot);font-family:var(--mono);font-size:12px;font-weight:700}
+.tl-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--line-soft);text-align:left}
+.tl-row span{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);flex:none}
+.tl-row b{font-size:14.5px;font-weight:500;color:var(--ink);text-align:right;overflow-wrap:anywhere}
+.tl-row:last-of-type{border-bottom:none;margin-bottom:8px}
 .sheet-field{margin-bottom:12px;text-align:left}
 .sheet-field label{display:block;font-family:var(--mono);font-size:9px;font-weight:600;
   letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
@@ -693,7 +797,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B35</div>
+    <div class="splash-tag">Production Tracker · B40</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -858,7 +962,9 @@ const TIER={
 const TIERS=[0,1,2,3];
 
 const SECTIONS=[
-["Hub & Mission Flow",[["Hub/Menu Part 1","system",2],["Hub/Menu Part 2","system",3],["Loadout System","system",2],["Environment Concept","concept",1],["Environment Pipeline","asset",1],["Environment Blockout","asset",1],["Environment V1","asset",3],["Destruction System","system",2],["Pickleman Curse Part 1","system",1],["Pickleman Curse Part 2","system",1],["Missions","system",2],["Mission Manager","system",2],["Extraction Logic","system",1]]],
+["Hub & Mission Flow",[["Hub/Menu Part 1","system",2],["Hub/Menu Part 2","system",3],["Loadout System","system",2],["Destruction System","system",2],["Pickleman Curse Part 1","system",1],["Pickleman Curse Part 2","system",1],["Missions","system",2],["Mission Manager","system",2],["Extraction Logic","system",1]]],
+["Environment",[["Environment Concept","concept",1],["Environment Pipeline","asset",1],
+  ["Environment Blockout","asset",1],["Environment V1","asset",3]]],
 ["Health & Survival",[["Health Component","system",3],["Health Component Update","system",1],["JuiceBox","asset",1],["Revive System","system",2],["Revive Animation","animset",1],["Hit Reaction","system",2],["Sound System","system",1]]],
 ["Weapons",[["Rifle Placeholders","asset",0],["Rifle Logic","system",1],["Rifle Concept","concept",1],["Rifle Asset","asset",2],["Rifle Animset","animset",1],["Rifle FX","fx",1],["Rocketique Placeholders","asset",0],["Rocketique Logic","system",1],["Rocketique Concept","concept",1],["Rocketique Asset","asset",2],["Rocketique Animset","animset",1],["Rocketique FX","fx",1],["Minigun Placeholders","asset",0],["Minigun Logic","system",1],["Minigun Concept","concept",1],["Minigun Asset","asset",2],["Minigun Animset","animset",1],["Minigun FX","fx",1],["Pistol Placeholders","asset",0],["Pistol Logic","system",1],["Pistol Concept","concept",1],["Pistol Asset","asset",2],["Pistol Animset","animset",1],["Pistol FX","fx",1],["Racquet Placeholders","asset",0],["Racquet Concept","concept",1],["Racquet Asset","asset",1],["Racquet Animset","animset",1],["Racquet FX","fx",1]]],
 ["Combat Core",[["Combat Component Melee","system",3],["Combat Component Melee Update","system",1],["Combat Component Ranged","system",3],["Combat Component Ranged Update","system",1]]],
@@ -885,23 +991,47 @@ const slug=s=>s.normalize("NFKD").replace(/[^\w\s/&-]/g,"")
 let ALL_TASKS=[], SEC_NAMES=[];
 function rebuildData(){
   SEC_NAMES=SECTIONS.map(s=>s[0]);
-  ALL_TASKS=[];
-  SECTIONS.forEach(([sec,items],si)=>items.forEach(([name,disc,tier])=>
-    ALL_TASKS.push({id:slug(name),name,disc,tier,sec,si})));
+  const draft=[];
+  SECTIONS.forEach(([sec,items])=>items.forEach(([name,disc,tier])=>
+    draft.push({id:slug(name),name,disc,tier,sec})));
   Object.keys(customMap)
     .sort((a,b)=>(customMap[a].at||0)-(customMap[b].at||0))
     .forEach(id=>{
       const c=customMap[id]; if(!c||!c.name) return;
-      let si=SEC_NAMES.indexOf(c.sec);
-      if(si<0){ SEC_NAMES.push(c.sec); si=SEC_NAMES.length-1; }
-      ALL_TASKS.push({id,name:c.name,disc:c.disc||"system",tier:c.tier??1,sec:c.sec,si,custom:true});
+      draft.push({id,name:c.name,disc:c.disc||"system",tier:c.tier??1,sec:c.sec,custom:true});
     });
+  /* Overrides are layered on, never merged into the authored list. Ids stay
+     derived from the original name, so renaming a task keeps its history. */
+  draft.forEach(t=>{
+    const e=editMap[t.id]; if(!e) return;
+    if(e.name) t.name=e.name;
+    if(e.disc) t.disc=e.disc;
+    if(e.tier!=null) t.tier=e.tier;
+    if(e.sec) t.sec=e.sec;
+  });
+  const seen=new Set();
+  ALL_TASKS=draft.map(t=>{
+    // if a future built-in ever slugs to the same id, the newcomer gets suffixed
+    // rather than silently sharing one task's progress with another
+    let id=t.id, k=2;
+    while(seen.has(id)) id=t.id+"-"+(k++);
+    seen.add(id);
+    let si=SEC_NAMES.indexOf(t.sec);
+    if(si<0){ SEC_NAMES.push(t.sec); si=SEC_NAMES.length-1; }
+    return {...t,id,si};
+  });
 }
 
 /* MVP is a strict subset of Alpha over one shared dataset, so a task ticked in
    either mode is ticked in both — no syncing between the two views. */
 let mode="mvp";
-const inView=t=>mode==="alpha"||MVP_IDS.has(t.id)||(t.custom&&customMap[t.id]&&customMap[t.id].mvp!==false);
+const inMvp=t=>{
+  const e=editMap[t.id];
+  if(e&&typeof e.mvp==="boolean") return e.mvp;
+  if(t.custom) return !(customMap[t.id]&&customMap[t.id].mvp===false);
+  return MVP_IDS.has(t.id);
+};
+const inView=t=>mode==="alpha"||inMvp(t);
 let TASKS=[], VIEW_SECTIONS=[], TICKS=[], TICK_SIG="";
 function applyMode(){
   document.body.classList.toggle("fridge",mode==="fridge");
@@ -935,6 +1065,7 @@ const DB_RANK  = "fg-mvp/rank";  // manual ordering for deck + active
 const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 const DB_IDEAS = "fg-mvp/ideas"; // the fridge
 const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
+const DB_EDITS = "fg-mvp/edits"; // admin overrides on any task
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
@@ -943,17 +1074,23 @@ const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
   document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
-const BUILD=35;
+const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
+
+const BUILD=40;
 function fitBar(){
   const tb=document.querySelector(".topbar");
-  if(tb) document.documentElement.style.setProperty("--barH",Math.round(tb.getBoundingClientRect().height)+"px");
+  if(!tb) return;
+  const h=Math.round(tb.getBoundingClientRect().height);
+  // on desktop the header sits above the nav in the same column, so the nav
+  // sticks to its full height; on mobile it is the bar across the top
+  document.documentElement.style.setProperty("--barH",h+"px");
 }
 addEventListener("resize",fitBar);
 addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={}, ideaMap={}, customMap={};
+let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={}, ideaMap={}, customMap={}, editMap={};
 let weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
 
 /* device-local, never shared: who is looking and what they may do */
@@ -1013,7 +1150,7 @@ async function initStore(){
       const db=dbm.getDatabase(a);
       FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING),
           prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK),req:dbm.ref(db,DB_REQ),
-          ideas:dbm.ref(db,DB_IDEAS),custom:dbm.ref(db,DB_CUSTOM)};
+          ideas:dbm.ref(db,DB_IDEAS),custom:dbm.ref(db,DB_CUSTOM),edits:dbm.ref(db,DB_EDITS)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -1056,7 +1193,7 @@ async function pull(){
       const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
       doneMap=v.done||{}; doingMap=v.doing||{};
       prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
-      ideaMap=v.ideas||{}; customMap=v.custom||{}; return;
+      ideaMap=v.ideas||{}; customMap=v.custom||{}; editMap=v.edits||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
@@ -1068,25 +1205,26 @@ async function pull(){
         if(d&&typeof d.rank==="object") rankMap=d.rank;
         if(d&&typeof d.req==="object") reqMap=d.req;
         if(d&&typeof d.ideas==="object") ideaMap=d.ideas;
-        if(d&&typeof d.custom==="object") customMap=d.custom; }
+        if(d&&typeof d.custom==="object") customMap=d.custom;
+        if(d&&typeof d.edits==="object") editMap=d.edits; }
       return;
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
     prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{}; reqMap=raw.req||{};
-    ideaMap=raw.ideas||{}; customMap=raw.custom||{};
+    ideaMap=raw.ideas||{}; customMap=raw.custom||{}; editMap=raw.edits||{};
   }catch(e){}
 }
 
 const bundle=()=>({v:7,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,req:reqMap,
-                   ideas:ideaMap,custom:customMap,at:Date.now()});
+                   ideas:ideaMap,custom:customMap,edits:editMap,at:Date.now()});
 
 async function pushAll(){
   try{
     if(backend==="firebase"){
       await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),FB.set(FB.prio,prioMap),
                          FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap),FB.set(FB.req,reqMap),
-                         FB.set(FB.ideas,ideaMap),FB.set(FB.custom,customMap)]);
+                         FB.set(FB.ideas,ideaMap),FB.set(FB.custom,customMap),FB.set(FB.edits,editMap)]);
     }else if(backend==="claude"){
       await window.storage.set(SKEY,JSON.stringify(bundle()),true);
     }else{
@@ -1153,8 +1291,15 @@ async function commit(id,to){
 }
 
 async function clearAll(){
-  doneMap={}; doingMap={}; prioMap={}; reqMap={}; rankMap={}; assignMap={};   // ideas and custom tasks survive a reset
-  if(backend==="firebase"){ await FB.set(FB.root,null); return; }   // wipe the whole node
+  /* Reset clears progress, not the board itself. Tasks added inside the app,
+     admin edits and fridge notes are authored content — wiping the whole node
+     would take them with it, which is never what "reset progress" means. */
+  doneMap={}; doingMap={}; prioMap={}; reqMap={}; rankMap={}; assignMap={};
+  if(backend==="firebase"){
+    await Promise.all([FB.set(FB.done,null),FB.set(FB.doing,null),FB.set(FB.prio,null),
+                       FB.set(FB.req,null),FB.set(FB.rank,null),FB.set(FB.assign,null)]);
+    return;
+  }
   await pushAll();
 }
 
@@ -1415,11 +1560,17 @@ function bindSwipe(wrap,row,t){
   };
   row.addEventListener("pointerup",finish);
   row.addEventListener("pointercancel",finish);
-  row.addEventListener("click",e=>{
+  /* the box moves the task along, the row opens it — same split as the cards */
+  row.querySelector(".sbox").addEventListener("click",e=>{
+    e.stopPropagation();
     if(lock==="x"){ lock=null; return; }
-    if(openWrap===wrap){ closeOpen(); return; }
     if(!canEdit()) return;
     advance(t);
+  });
+  row.addEventListener("click",()=>{
+    if(lock==="x"){ lock=null; return; }
+    if(openWrap===wrap){ closeOpen(); return; }
+    openTask(t);
   });
 }
 /* todo -> in progress -> done -> todo */
@@ -1601,7 +1752,7 @@ function bindCard(wrap,card,t){
    key-only signature meant the other phone never noticed the change. */
 const kv=m=>Object.keys(m).sort().map(k=>k+":"+(typeof m[k]==="object"?JSON.stringify(m[k]):m[k])).join("|");
 const sig=()=>[doneMap,doingMap,prioMap].map(m=>Object.keys(m).sort().join("|")).join("#")
-  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap)+"#"+kv(ideaMap)+"#"+kv(customMap);
+  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap)+"#"+kv(ideaMap)+"#"+kv(customMap)+"#"+kv(editMap);
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si&&inScope(t)), k=all.filter(t=>isDone(t.id)).length;
@@ -1650,6 +1801,17 @@ function readIdea(id,v){
         await pushKey(DB_IDEAS,id,v);
       };
       row.appendChild(lockBtn);
+    }
+    if(!v.lock&&DESKTOP()){            // a mouse cannot swipe; a finger can, so this is desktop only
+      const rm=gbtn("Unfreeze","",false);
+      rm.onclick=()=>{
+        closeGate();
+        setTimeout(()=>confirmSheet("Unfreeze this?",
+          `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
+          "Unfreeze",
+          async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); }),380);
+      };
+      row.appendChild(rm);
     }
     const close=gbtn("Close","",true); close.onclick=closeGate;
     row.appendChild(close); body.appendChild(row);
@@ -1728,6 +1890,112 @@ function bindIce(wrap,card,id,v){
   card.addEventListener("click",e=>{
     if(swiped){ e.preventDefault(); e.stopPropagation(); swiped=false; return; }
     readIdea(id,v);
+  });
+}
+
+const STATE_NAME=["Not started","In progress","Done"];
+
+/* One window per task: everyone can read it, an admin can rewrite it. */
+function openTask(t){
+  openSheet(t.name,body=>{
+    const line=(k,v,c)=>{
+      const d=document.createElement("div"); d.className="tl-row";
+      d.innerHTML=`<span>${k}</span><b${c?` style="color:${c}"`:""}></b>`;
+      d.querySelector("b").textContent=v; body.appendChild(d);
+    };
+    const w=whoOf(t.id);
+    line("Section",SEC_NAMES[t.si]);
+    line("Tier",`T${t.tier} · ${TIER[t.tier].when}`,`var(--t${t.tier})`);
+    line("Discipline",DISC[t.disc].name,DISC[t.disc].c);
+    line("State",hasReq(t.id)?"Awaiting approval":STATE_NAME[stateOf(t.id)]);
+    line("Owner",w||"unassigned",w?`var(--${w.toLowerCase()})`:"");
+    line("On the deck",isPrio(t.id)?"yes":"no");
+    line("Scope",inMvp(t)?"MVP + Alpha":"Alpha only");
+
+    const row=document.createElement("div"); row.className="gate-row";
+    if(isAdmin()){
+      const ed=gbtn("Edit task","",false);
+      ed.onclick=()=>{ closeGate(); setTimeout(()=>editTask(t),380); };
+      row.appendChild(ed);
+    }
+    const close=gbtn("Close","",true); close.onclick=closeGate;
+    row.appendChild(close); body.appendChild(row);
+  });
+}
+
+function editTask(t){
+  if(!isAdmin()) return;
+  const cur=editMap[t.id]||{};
+  openSheet("Edit task",body=>{
+    let tier=t.tier, disc=t.disc, alphaOnly=!inMvp(t);
+    const mk=(label,html)=>{ const d=document.createElement("div"); d.className="sheet-field";
+      d.innerHTML=`<label>${label}</label>${html}`; body.appendChild(d); return d; };
+
+    const nameF=mk("Task name",'<input type="text" autocomplete="off">');
+    const nameI=nameF.querySelector("input"); nameI.value=t.name;
+
+    const tierF=mk("Tier",'<div class="pickrow"></div>');
+    TIERS.forEach(k=>{
+      const b=document.createElement("button"); b.type="button";
+      b.innerHTML=`T${k} · ${TIER[k].d}d`; b.setAttribute("aria-pressed",k===tier);
+      b.onclick=()=>{ tier=k; tierF.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b)); };
+      tierF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const discF=mk("Discipline",'<div class="pickrow"></div>');
+    Object.entries(DISC).forEach(([k,mm])=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=mm.name;
+      b.setAttribute("aria-pressed",k===disc); b.style.color=mm.c;
+      b.onclick=()=>{ disc=k; discF.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b)); };
+      discF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const secF=mk("Section",'<select></select><input type="text" placeholder="New section name" style="margin-top:8px" hidden autocomplete="off">');
+    const sel=secF.querySelector("select"), newSec=secF.querySelector("input");
+    SEC_NAMES.forEach(nm=>{ const o=document.createElement("option"); o.value=nm; o.textContent=nm;
+      if(nm===SEC_NAMES[t.si]) o.selected=true; sel.appendChild(o); });
+    const NEW="+ New section";
+    const on=document.createElement("option"); on.value=NEW; on.textContent=NEW; sel.appendChild(on);
+    sel.onchange=()=>{ newSec.hidden=sel.value!==NEW; if(!newSec.hidden) newSec.focus(); };
+
+    const scopeF=mk("Shows in",'<div class="pickrow"></div>');
+    [["MVP + Alpha",false],["Alpha only",true]].forEach(([label,ao])=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=label;
+      b.setAttribute("aria-pressed",ao===alphaOnly);
+      b.onclick=()=>{ alphaOnly=ao; scopeF.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); };
+      scopeF.querySelector(".pickrow").appendChild(b);
+    });
+
+    const row=document.createElement("div"); row.className="gate-row";
+    const save=gbtn("Save","",true);
+    save.onclick=async()=>{
+      const name=nameI.value.trim(); if(!name){ nameI.focus(); return; }
+      const sec = sel.value===NEW ? (newSec.value.trim()||SEC_NAMES[t.si]) : sel.value;
+      if(t.custom){
+        const c={...customMap[t.id],name,disc,tier,sec,mvp:!alphaOnly};
+        customMap[t.id]=c; rebuildData(); applyMode(); closeGate(); buildTicks(); all_();
+        await pushKey(DB_CUSTOM,t.id,c);
+      }else{
+        const e={...cur,name,disc,tier,sec,mvp:!alphaOnly};
+        editMap[t.id]=e; rebuildData(); applyMode(); closeGate(); buildTicks(); all_();
+        await pushKey(DB_EDITS,t.id,e);
+      }
+    };
+    const reset=gbtn(t.custom?"Delete task":"Reset to original","",false);
+    reset.onclick=()=>{
+      closeGate();
+      setTimeout(()=>confirmSheet(t.custom?"Delete this task?":"Reset this task?",
+        t.custom ? `“${t.name}” disappears for everyone, and its progress goes with it.`
+                 : `“${t.name}” goes back to the name, tier, discipline and section it shipped with.`,
+        t.custom?"Delete":"Reset", async()=>{
+          if(t.custom){ delete customMap[t.id]; await pushKey(DB_CUSTOM,t.id,null); }
+          else { delete editMap[t.id]; await pushKey(DB_EDITS,t.id,null); }
+          rebuildData(); applyMode(); buildTicks(); all_();
+        }),380);
+    };
+    const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
+    row.append(save,reset,cancel); body.appendChild(row);
+    setTimeout(()=>nameI.focus(),60);
   });
 }
 
@@ -2068,9 +2336,12 @@ $("resetBtn").addEventListener("click",async()=>{
         p=Object.keys(prioMap).length, q=Object.keys(reqMap).length,
         a=Object.keys(assignMap).length;
   if(!(d+g+p+q+a)) return;
-  if(!confirm(`Reset everything for everyone?\n\n`+
-              `${d} completed · ${g} in progress · ${p} on the deck\n`+
+  const keep=Object.keys(customMap).length, ed=Object.keys(editMap).length,
+        ideas_=Object.keys(ideaMap).length;
+  if(!confirm(`Reset progress for everyone?\n\n`+
+              `Clears: ${d} completed · ${g} in progress · ${p} on the deck\n`+
               `${a} assignments · ${q} pending requests · custom ordering\n\n`+
+              `Keeps: ${keep} added tasks · ${ed} edited tasks · ${ideas_} fridge notes\n\n`+
               `This cannot be undone.`)) return;
   try{ await clearAll(); stamp("reset"); }catch(e){}
   buildTicks(); all_();
@@ -2112,7 +2383,8 @@ document.addEventListener("visibilitychange",async()=>{
     const l=localStorage.getItem(MKEY); if(l==="main"||PEOPLE.includes(l)) lens=l;
   }catch(e){}
   applyRole(); applyLens();
-  fitBar();
+  fitBar(); requestAnimationFrame(fitBar);
+  if(DESKTOP()) addEventListener("load",fitBar);   // the sidebar header is tall; remeasure once fonts land
   $("buildTag").textContent=`build ${BUILD} · ${backend}${navigator.standalone?" · standalone":""}`;
 
   // hold the splash long enough to read, never longer than needed
@@ -2136,7 +2408,7 @@ document.addEventListener("visibilitychange",async()=>{
       // and pending requests were arriving at the database but never applied here
       doneMap=v.done||{};   doingMap=v.doing||{}; prioMap=v.prio||{};
       assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
-      ideaMap=v.ideas||{};  customMap=v.custom||{};
+      ideaMap=v.ideas||{};  customMap=v.custom||{}; editMap=v.edits||{};
       if(sig()!==before){ rebuildData(); applyMode(); all_(); }
       stamp("live");
     });
