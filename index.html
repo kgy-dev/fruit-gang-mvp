@@ -355,178 +355,168 @@ body.admin .tab.admin-only{display:flex}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* ===== desktop =========================================================
-   Three columns, not a stretched phone. A rail that carries identity, the
-   headline ring and every switch; a primary pane you drive with the nav; and a
-   second pane you can point at any other view. Below 1024px none of this
-   exists and the phone layout runs exactly as before. */
+   Three fixed regions. Left: everything about identity and the project — logo,
+   role, lens, mode, live, the ring, the fridge shortcut and the footer, all
+   pinned. Middle and right: two independent panes, each with its own tab strip
+   above it, so two views can be read side by side. Below 1024px none of this
+   applies and the phone layout is untouched. */
 @media (min-width:1024px){
   html,body{overflow-x:clip}
   html{scroll-behavior:smooth}
   .app{
-    display:grid;grid-template-columns:var(--rail,268px) minmax(0,1fr);
+    display:grid;
+    grid-template-columns:var(--rail,296px) minmax(0,1fr) minmax(0,.52fr);
+    grid-template-rows:auto minmax(0,1fr);
     max-width:none;width:100%;padding-bottom:0;min-height:100vh;
   }
 
-  /* ---- rail ---- */
+  /* ---- rail: one sticky column, wider, with room to breathe ---- */
   .topbar{
-    grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
-    flex-direction:column;align-items:stretch;gap:11px;
-    padding:20px 16px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
+    grid-column:1;grid-row:1/3;align-self:start;position:sticky;top:0;z-index:31;
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;
+    padding:22px 18px 24px;border-bottom:none;border-right:1px solid var(--line-soft);
+    box-shadow:none;background:var(--bg);min-height:100vh;
   }
-  .mark-txt{font-size:17px}
-  .mark-dot{width:7px;height:7px}
-  .mark-sub{align-self:flex-start;min-width:0;padding:2px 7px;font-size:8.5px;
+  .topbar .mark{order:1;grid-column:1/-1;gap:9px}
+  .mark-txt{font-size:19px}
+  .mark-dot{width:8px;height:8px}
+  .mark-sub{order:2;grid-column:1/-1;justify-self:start;min-width:0;padding:3px 9px;font-size:9px;
     background:transparent !important;color:var(--hot) !important;
-    border-color:color-mix(in srgb,var(--hot) 38%,transparent) !important}
-  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.65}
-  .primebtn{order:7;margin:0;width:100%;padding:8px;text-align:center;border-radius:7px}
-  .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
-    align-items:center;padding:8px 11px;min-width:0;border-radius:7px}
-  .mb-lab{font-size:8px} .mb-pct{font-size:12px}
+    border-color:color-mix(in srgb,var(--hot) 40%,transparent) !important}
+  /* lens and mode sit shoulder to shoulder, and both are properly tappable */
+  .primebtn{order:3;grid-column:1;margin:0;width:auto;min-height:46px;padding:0 10px;
+    display:flex;align-items:center;justify-content:center;border-radius:9px;
+    font-size:10px;letter-spacing:.14em}
+  .modebtn{order:4;grid-column:2;margin:0;width:auto;min-height:46px;
+    flex-direction:row;justify-content:space-between;align-items:center;
+    padding:0 12px;border-radius:9px}
+  .mb-lab{font-size:8.5px} .mb-pct{font-size:13px}
+  .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
+  .rail-extra{order:6;grid-column:1/-1;display:block;padding:0;margin-top:6px}
+  .navseg{display:none}                 /* the tabs belong above the panes now */
 
-  .navseg{
-    grid-area:1/1;align-self:start;margin-top:var(--barH,178px);
-    position:sticky;top:var(--barH,178px);
-    display:flex;flex-direction:column;gap:1px;
-    padding:10px 12px 0;background:var(--bg);border-bottom:none;
-    border-top:1px solid var(--line-soft);margin-left:12px;margin-right:12px;
-  }
-  .navseg::before{display:none}   /* the faint label read as a stray artefact */
-  .tab,body.crew .tab,body.admin .tab{
-    justify-content:flex-start;gap:10px;padding:0 10px;height:32px;
-    font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:0;
-    text-transform:none;border-radius:7px;color:var(--muted);border:none;background:transparent}
-  .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2);font-weight:600}
-  .tab[aria-selected="true"]::before{
-    display:block;content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
-    width:3px;height:17px;border-radius:0 3px 3px 0;background:var(--hot)}
-  .tab.is-side-view{color:var(--ink);background:color-mix(in srgb,var(--panel-2) 60%,transparent)}
-  .tab .badge,body.crew .tab .badge,body.admin .tab .badge{
-    margin-left:auto;min-width:18px;height:17px;border-radius:9px;
-    font-family:var(--mono);font-size:9.5px;padding:0 5px}
-
-  /* ---- rail: ring, fridge, controls, footer ---- */
-  /* it lives inside the nav, so it simply follows the tab list — the old
-     absolute offset pushed the whole block below the fold */
-  .rail-extra{display:block;padding:16px 2px 26px;margin-top:14px;
-    border-top:1px solid var(--line-soft)}
-  .rail-ring{position:relative;width:132px;margin:0 auto}
+  .rail-ring{position:relative;width:100%;max-width:190px;margin:6px auto 0}
   .rail-ring svg{width:100%;height:auto;display:block}
   .rr-track{fill:none;stroke:var(--line);stroke-width:6}
   .rr-prog{fill:none;stroke:url(#hg);stroke-width:6;stroke-linecap:round;
     transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.3,1)}
-  .rr-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px}
-  .rr-mid b{font-family:var(--dsp);font-weight:800;font-size:33px;letter-spacing:-.02em;color:var(--ink)}
-  .rr-mid i{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);align-self:flex-start;margin-top:9px}
-  .rr-sub{margin-top:9px;text-align:center;font-family:var(--mono);font-size:9.5px;
+  .rr-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:2px}
+  .rr-mid b{font-family:var(--dsp);font-weight:800;font-size:46px;letter-spacing:-.02em;color:var(--ink)}
+  .rr-mid i{font-style:normal;font-family:var(--mono);font-size:15px;color:var(--muted);
+    align-self:flex-start;margin-top:12px}
+  .rr-sub{margin-top:10px;text-align:center;font-family:var(--mono);font-size:10px;
     letter-spacing:.06em;color:var(--dim)}
-  .rail-fridge{margin-top:16px;padding:11px 12px}
-  /* fridge: notes on the left, a standing composer on the right */
-  #pane-fridge.is-active{display:grid;grid-template-columns:minmax(0,1fr) 340px;
-    column-gap:30px;align-items:start}
+  .rail-fridge{margin-top:18px;padding:13px 13px}
+  .rail-fridge b{font-size:13.5px}
+  #pane-overview>.fridge-btn{display:none}
+  .rail-extra .actions{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);
+    display:flex;flex-wrap:wrap;gap:9px}
+  .rail-extra .foot{margin-top:12px;font-size:10.5px;line-height:1.65}
+  .rail-extra .btn{padding:8px 12px;font-size:12px}
+
+  /* ---- tab strips, one per pane ---- */
+  .navseg,.sidetabs{background:var(--bg)}
+  .maintabs{
+    grid-column:2;grid-row:1;display:flex;gap:4px;align-items:center;
+    padding:14px 18px 12px;border-bottom:1px solid var(--line-soft);
+    position:sticky;top:0;z-index:24;overflow-x:auto;scrollbar-width:none}
+  .maintabs::-webkit-scrollbar{display:none}
+  .sidetabs{
+    grid-column:3;grid-row:1;display:flex;gap:4px;align-items:center;
+    padding:14px 16px 12px;border-left:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line-soft);
+    position:sticky;top:0;z-index:24;overflow-x:auto;scrollbar-width:none}
+  .sidetabs::-webkit-scrollbar{display:none}
+  .maintabs .tab,body.crew .maintabs .tab,body.admin .maintabs .tab,.stab{
+    flex:none;justify-content:center;gap:7px;padding:0 13px;height:32px;border:none;
+    display:inline-flex;align-items:center;border-radius:8px;background:transparent;
+    font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
+    text-transform:none;color:var(--muted);white-space:nowrap}
+  .maintabs .tab[aria-selected="true"],.stab[aria-selected="true"]{
+    color:var(--ink);background:var(--panel-2);font-weight:600}
+  .maintabs .tab::before{display:none}
+  .maintabs .tab .badge{margin-left:0;min-width:18px;height:17px;border-radius:9px;
+    font-family:var(--mono);font-size:9.5px;padding:0 5px}
+
+  /* ---- panes ---- */
+  .panes{display:contents}
+  .pane{display:none}
+  .pane.is-active{display:block;grid-column:2;grid-row:2;padding:22px 18px 90px}
+  .pane.is-side{display:block;grid-column:3;grid-row:2;padding:22px 16px 90px;
+    border-left:1px solid var(--line-soft)}
+  .pane>.sec:first-child{margin:0 0 16px;padding:0 0 12px;
+    border-bottom:1px solid var(--line-soft);position:static}
+  .pane>.filters:first-child{position:static;margin:0 0 14px;padding:0;border:none}
+  .pane>.sec:first-child h2{font-size:18px}
+  .sec{margin:24px 0 10px}
+  .sec h2{font-size:14px}
+
+  /* overview: ring column runs full height so nothing leaves a hole */
+  #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);
+    column-gap:28px;align-items:start}
+  #pane-overview.is-active>.sec{grid-column:1/-1}
+  #pane-overview.is-active>.hero{grid-column:1;grid-row:2/4;align-self:start}
+  #pane-overview.is-active>#estCard{grid-column:2;grid-row:2;margin-top:0 !important}
+  #pane-overview.is-active>.ov-side{grid-column:2;grid-row:3}
+  #pane-overview.is-active .ov-side>.sec:first-child{margin-top:18px}
+  #pane-overview.is-active .ring{--r:290px}
+  .pane.is-side .ring{--r:200px}
+  .pane.is-side .est-date{font-size:22px}
+
+  /* ---- backlog reads as a table in the main column ---- */
+  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 100px 100px 42px;
+    align-items:center;gap:12px;padding:0 12px 9px;
+    border-bottom:1px solid var(--line);margin-bottom:2px;
+    font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--dim)}
+  .thead>span:nth-child(3),.thead>span:nth-child(4){text-align:right}
+  .thead>span:last-child{text-align:center}
+  .pane.is-side .thead{display:none}
+  .group{background:transparent;border:none;border-bottom:1px solid var(--line-soft);
+    border-radius:0;margin:0}
+  .group-head{padding:11px 12px;min-height:40px;border-radius:0}
+  .g-name{font-family:var(--body);font-size:13.5px;font-weight:600;
+    text-transform:none;letter-spacing:0}
+  .group-body{padding:0 0 8px;border-top:none}
+  .swipe{border-radius:0}
+  .task{grid-template-columns:20px minmax(0,1fr) 100px 100px 42px;gap:12px;
+    padding:0 12px;min-height:38px;border-radius:0;background-color:var(--bg)}
+  .task.is-done,.task.is-doing,.task.is-req{background-image:none}
+  .task .t-name{font-size:13.5px}
+  .task .t-disc{font-size:9.5px}
+  .task .t-flags{justify-content:flex-end}
+  .task .t-tier{width:34px;margin:0 auto}
+  .task.is-prio{box-shadow:inset 2px 0 0 var(--prio)}
+  .deck-card{grid-template-columns:20px minmax(0,1fr) 100px 100px 42px;gap:12px;
+    padding:12px;border-radius:10px}
+  .cswipe{border-radius:10px}
+  /* the narrow column drops the middle columns rather than crushing them */
+  .pane.is-side .task,.pane.is-side .deck-card{
+    grid-template-columns:20px minmax(0,1fr) 38px;gap:10px}
+  .pane.is-side .t-disc,.pane.is-side .t-flags,.pane.is-side .grip,
+  .pane.is-side .wip{display:none}
+  .pane.is-side .d-sec{grid-column:2/-1}
+  .pane.is-side .deck-card{padding:10px 11px}
+
+  /* ---- fridge takes both columns ---- */
+  #pane-fridge.is-active{display:grid;grid-template-columns:minmax(0,1fr) 330px;
+    column-gap:26px;align-items:start}
   #pane-fridge.is-active>.sec:first-child,#pane-fridge.is-active>.fridge-mast{grid-column:1/-1}
   #pane-fridge.is-active>.fridge-mast{display:flex}
   #pane-fridge.is-active>.temp,#pane-fridge.is-active>#ideaList,
   #pane-fridge.is-active>#ideaEmpty{grid-column:1}
   #pane-fridge.is-active>#ideaActions{display:none}
   #pane-fridge.is-active>.fridge-side{display:block;grid-column:2;grid-row:3/8;
-    position:sticky;top:92px}
+    position:sticky;top:16px}
   #pane-fridge.is-active #ideaList{display:grid;grid-template-columns:1fr 1fr;
     column-gap:12px;align-items:start}
-  .rail-fridge b{font-size:13px}
-  #pane-overview>.fridge-btn{display:none}
-  .rail-extra .actions{margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft);
-    display:flex;flex-wrap:wrap;gap:9px}
-  .rail-extra .foot{margin-top:12px;font-size:10.5px;line-height:1.6}
-  .rail-extra .btn{padding:7px 11px;font-size:12px}
+  body.fridge .maintabs,body.fridge .sidetabs{display:none}
+  body.fridge .app{grid-template-rows:0 minmax(0,1fr)}
 
-  /* ---- two panes ---- */
-  .panes{
-    grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft);
-    display:grid;grid-template-columns:minmax(0,1fr) var(--side,430px);
-    grid-template-rows:auto minmax(0,1fr);
-  }
-  .sideswitch{
-    display:flex;align-items:center;gap:10px;grid-column:2;grid-row:1;
-    padding:14px 20px;border-left:1px solid var(--line-soft);
-    border-bottom:1px solid var(--line-soft);background:var(--bg);
-    position:sticky;top:0;z-index:22}
-  .sideswitch span{font-family:var(--mono);font-size:8.5px;font-weight:600;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
-  .sideswitch select{margin-left:auto;padding:6px 9px;border-radius:7px;
-    background:var(--panel);border:1px solid var(--line);color:var(--ink);
-    font-family:var(--body);font-size:12.5px;outline:none}
-  .pane.is-active{grid-column:1;grid-row:1/3}
-  .pane.is-side{display:block;grid-column:2;grid-row:2;
-    border-left:1px solid var(--line-soft);padding:0 20px 70px}
-  .pane.is-side>.sec:first-child,.pane.is-side>.filters:first-child{
-    margin:0 -20px 16px;padding:16px 20px 12px;top:52px}
-  .pane.is-side .ring{--r:210px}
-  .pane.is-side .est-date{font-size:24px}
-  .pane.is-side .thead{display:none}
-
-  .pane{padding:0 clamp(20px,2.4vw,40px) 90px}
-  .pane>.sec:first-child,.pane>.filters:first-child{
-    position:sticky;top:0;z-index:20;background:var(--bg);
-    margin:0 calc(-1*clamp(20px,2.4vw,40px)) 18px;
-    padding:20px clamp(20px,2.4vw,40px) 14px;border-bottom:1px solid var(--line-soft)}
-  .pane>.sec:first-child h2{font-size:18px}
-  .pane>.sec:first-child .note{font-size:12px}
-  .sec{margin:24px 0 10px}
-  .sec h2{font-size:14px}
-
-  /* overview is a stack in the side slot, two columns when it takes the floor */
-  #pane-overview{padding-top:22px;grid-template-columns:minmax(0,330px) minmax(0,1fr);
-    column-gap:clamp(20px,2.2vw,38px);align-items:start}
-  #pane-overview.is-active{display:grid}
-  /* the ring column runs the full height so the right column can stack under
-     the estimate instead of leaving a ring-sized hole in the middle */
-  #pane-overview.is-active>.hero{grid-column:1;grid-row:1/3;align-self:start}
-  #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
-  #pane-overview.is-active>.ov-side{grid-column:2;grid-row:2}
-  #pane-overview.is-active .ov-side>.sec:first-child{margin-top:20px}
-  #pane-overview.is-active .ring{--r:300px}
-
-  /* ---- backlog reads as a table ---- */
-  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;
-    align-items:center;gap:12px;padding:0 14px 9px;
-    border-bottom:1px solid var(--line);margin-bottom:2px;
-    font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--dim)}
-  .thead>span:nth-child(3),.thead>span:nth-child(4){text-align:right}
-  .thead>span:last-child{text-align:center}
-  .group{background:transparent;border:none;border-bottom:1px solid var(--line-soft);
-    border-radius:0;margin:0}
-  .group-head{padding:11px 14px;min-height:40px;border-radius:0}
-  .g-name{font-family:var(--body);font-size:13.5px;font-weight:600;
-    text-transform:none;letter-spacing:0}
-  .group-body{padding:0 0 8px;border-top:none}
-  .swipe{border-radius:0}
-  .task{grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;gap:12px;
-    padding:0 14px;min-height:38px;border-radius:0;background-color:transparent}
-  .task.is-done,.task.is-doing,.task.is-req{background-image:none}
-  .task .t-name{font-size:13.5px}
-  .task .t-disc{font-size:9.5px}
-  .task .t-flags{justify-content:flex-end}
-  .task .t-tier{width:36px;margin:0 auto}
-  .task.is-prio{box-shadow:inset 2px 0 0 var(--prio)}
-  .pane.is-side .task,.pane.is-side .deck-card{
-    grid-template-columns:20px minmax(0,1fr) 40px;gap:10px}
-  .pane.is-side .t-disc{display:none}
-  .pane.is-side .t-flags{display:none}
-  .pane.is-side .d-sec{grid-column:2/-1}
-  .pane.is-side .grip{display:none}
-  .pane.is-side .deck-card{padding:10px 12px}
-  .pane.is-side .wip{display:none}
-
-  .deck-card{grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;gap:12px;
-    padding:12px 14px;border-radius:10px}
-  .cswipe{border-radius:10px}
-
-  /* ---- detail as a drawer, with room to actually write in ---- */
+  /* ---- detail drawer ---- */
   .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.55)}
   .gate--sheet .gate-card{
-    width:min(560px,46vw);max-width:none;height:100%;overflow-y:auto;text-align:left;margin:0;
+    width:min(560px,44vw);max-width:none;height:100%;overflow-y:auto;text-align:left;margin:0;
     background:var(--bg);border-left:1px solid var(--line);padding:26px 30px 48px;
     animation:drawerIn .24s cubic-bezier(.2,.8,.3,1) both}
   @keyframes drawerIn{from{transform:translateX(30px);opacity:.5}to{transform:none;opacity:1}}
@@ -536,22 +526,15 @@ body.admin .tab.admin-only{display:flex}
   .gate--sheet .sheet-field textarea{min-height:190px}
   .gate--sheet .cmt-form textarea{min-height:90px}
 
-  .pane.is-active{animation:paneIn .24s cubic-bezier(.2,.8,.3,1) both}
-  @keyframes paneIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-  /* one width does not fit every view */
-  #pane-overview.is-active{max-width:1220px}
-  #pane-tasks.is-active{max-width:1180px}
-  #pane-deck.is-active,#pane-active.is-active,#pane-done.is-active{max-width:960px}
-  #pane-admin.is-active{max-width:880px}
-  #pane-fridge.is-active{max-width:1240px}
-  .filters{gap:10px;max-width:760px}
-  .tseg{max-width:420px}
-  .search{padding:11px 13px}
+  .pane.is-active{animation:paneIn .22s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes paneIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .filters{gap:10px;max-width:720px}
+  .tseg{max-width:400px}
   .card{padding:18px;border-radius:12px}
 }
-@media (min-width:1600px){ .app{--rail:292px} .panes{--side:500px} }
+@media (min-width:1600px){ .app{--rail:324px} }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){
-  .tab:hover{color:var(--ink);background:var(--panel)}
+  .maintabs .tab:hover,.stab:hover{color:var(--ink);background:var(--panel)}
   .task:hover{background-color:var(--panel)}
   .group-head:hover{background:var(--panel)}
   .deck-card:hover,.ice:hover,.req-card:hover{border-color:var(--line)}
@@ -644,7 +627,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
 /* ===== WIP warning =================================================== */
-.thead,.rail-extra,.sideswitch{display:none}
+.thead,.rail-extra,.sidetabs{display:none}
 .wip{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;margin-bottom:11px;
   border-radius:12px;background:rgba(238,138,46,.10);border:1px solid rgba(238,138,46,.34)}
 .wip i{width:23px;height:23px;flex:none;border-radius:50%;display:grid;place-items:center;
@@ -971,7 +954,7 @@ body.fridge .deck-empty p{color:#cdeef7}
     </button>
   </header>
 
-  <nav class="navseg" role="tablist">
+  <nav class="navseg maintabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="pane-overview">Overview</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-active" id="activeTab">Active<span class="badge" id="activeCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
@@ -1015,7 +998,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.49</div>
+    <div class="splash-tag">Production Tracker · v0.50</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1028,10 +1011,7 @@ body.fridge .deck-empty p{color:#cdeef7}
   </div>
 
   <div class="panes" id="panes" hidden>
-    <div class="sideswitch" id="sideSwitch">
-      <span>Side panel</span>
-      <select id="sideSel" aria-label="Side panel view"></select>
-    </div>
+    <nav class="sidetabs" id="sideSwitch" role="tablist" aria-label="Side panel"></nav>
     <section class="pane is-active" id="pane-overview" role="tabpanel">
       <div class="hero">
         <div class="ring">
@@ -1154,6 +1134,16 @@ body.fridge .deck-empty p{color:#cdeef7}
         <div class="de-mark" style="border-style:solid;border-color:rgba(150,220,235,.35);display:grid;place-items:center;font-size:15px;color:#8fe6f2">&#10052;</div>
         <p>The fridge is empty.</p>
         <span>Park an idea here before it melts.<br>Nothing in here is a promise — that is the point.</span>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-frozen" role="tabpanel">
+      <div class="sec"><h2>Frozen</h2><span class="note" id="frozenNote">on the door</span></div>
+      <div id="frozenList"></div>
+      <div class="deck-empty" id="frozenEmpty" hidden>
+        <div class="de-mark" style="border-style:solid;border-color:rgba(150,220,235,.35)"></div>
+        <p>Nothing frozen.</p>
+        <span>Swipe a note right&nbsp;to&nbsp;left to deep freeze it. Frozen notes stay put.</span>
       </div>
     </section>
 
@@ -1319,7 +1309,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.49";
+const VERSION="v0.50";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -2019,16 +2009,27 @@ function ideas(){
     .sort((a,b)=>(b[1].at||0)-(a[1].at||0));
   const cnt=list.length, locked=list.filter(([,v])=>v.lock).length;
   $("fridgeCount").textContent=cnt;
-  $("ideaEmpty").hidden=cnt>0;
   $("ideaNote").textContent=cnt?`${cnt} in fridge`:"nothing in the fridge";
   // a bit of theatre: the more you park, the colder it reads
   const temp=-4-Math.min(cnt,26);
   $("tempLine").innerHTML=`<span>${temp}°C</span><i></i><span>`+
     (cnt?(locked?`${locked} frozen`:"nothing frozen"):"door open")+`</span>`;
-  const box=$("ideaList"); box.innerHTML="";
-  list.forEach(([id,v],i)=>{ const el=iceCard(id,v);
-    el.querySelector(".ice").style.animationDelay=(i*1.35%9).toFixed(2)+"s";
-    box.appendChild(el); });
+  /* loose ideas live on the shelf, frozen ones are stuck to the door */
+  const loose=list.filter(([,v])=>!v.lock), froz=list.filter(([,v])=>v.lock);
+  const fill=(box,rows)=>{
+    box.innerHTML="";
+    rows.forEach(([id,v],i)=>{ const el=iceCard(id,v);
+      el.querySelector(".ice").style.animationDelay=(i*1.35%9).toFixed(2)+"s";
+      box.appendChild(el); });
+  };
+  fill($("ideaList"),loose);
+  $("ideaEmpty").hidden=loose.length>0;
+  const fb=$("frozenList");
+  if(fb){
+    fill(fb,froz);
+    $("frozenEmpty").hidden=froz.length>0;
+    $("frozenNote").textContent=froz.length?`${froz.length} on the door`:"on the door";
+  }
 }
 
 /* A note opens as its own window rather than unfolding in place — the height
@@ -2301,7 +2302,7 @@ function editDesc(t){
     };
     const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
-    setTimeout(()=>ta.focus(),60);
+    if(DESKTOP()) setTimeout(()=>ta.focus(),60);   // a phone keyboard would scroll the title away
   });
 }
 
@@ -2449,7 +2450,7 @@ function editTask(t){
     };
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,reset,cancel); body.appendChild(row);
-    setTimeout(()=>nameI.focus(),60);
+    if(DESKTOP()) setTimeout(()=>nameI.focus(),60);   // a phone keyboard would scroll the title away
   });
 }
 
@@ -2513,7 +2514,7 @@ function composeTask(){
     };
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
-    setTimeout(()=>nameI.focus(),60);
+    if(DESKTOP()) setTimeout(()=>nameI.focus(),60);   // a phone keyboard would scroll the title away
   });
 }
 
@@ -2553,7 +2554,7 @@ function editIdea(id,v){
     };
     const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
-    setTimeout(()=>ta.focus(),60);
+    if(DESKTOP()) setTimeout(()=>ta.focus(),60);   // a phone keyboard would scroll the title away
   });
 }
 
@@ -2585,7 +2586,7 @@ function composeIdea(){
     const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
     row.classList.add("gate-row--split");
     row.append(save,cancel); body.appendChild(row);
-    setTimeout(()=>ti.focus(),60);
+    if(DESKTOP()) setTimeout(()=>ti.focus(),60);   // a phone keyboard would scroll the title away
   });
 }
 
@@ -2701,8 +2702,13 @@ function applyLens(){
 function openGate(){
   const g=$("gate"); g.hidden=false; g.classList.remove("done");
   document.body.style.overflow="hidden";
-  g.scrollTop=0;                                     // always open at the title
-  const c=g.querySelector(".gate-card"); if(c) c.scrollTop=0;
+  const top=()=>{
+    g.scrollTop=0;
+    const c=g.querySelector(".gate-card"); if(c) c.scrollTop=0;
+  };
+  /* the reset has to land after layout — setting scrollTop on a panel the
+     browser has not measured yet does nothing, and the title stays out of view */
+  top(); requestAnimationFrame(top); setTimeout(top,60);
 }
 var closeGate=function(){
   const g=$("gate"); g.classList.add("done"); document.body.style.overflow="";
@@ -2814,7 +2820,7 @@ function showPane(id){
 function showSide(id){
   sideId=id;
   document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-side",DESKTOP()&&p.id===id&&!p.classList.contains("is-active")));
-  const sel=$("sideSel"); if(sel&&sel.value!==id) sel.value=id;
+  document.querySelectorAll(".stab").forEach(b=>b.setAttribute("aria-selected",b.dataset.pane===id));
   markSide();
 }
 function markSide(){
@@ -2823,7 +2829,25 @@ function markSide(){
 }
 
 const SIDE_VIEWS=[["pane-overview","Overview"],["pane-active","Active"],["pane-deck","Deck"],
-                  ["pane-done","Done"],["pane-tasks","Backlog"],["pane-fridge","The Fridge"]];
+                  ["pane-done","Done"],["pane-tasks","Backlog"],["pane-admin","Admin"]];
+
+/* The side column carries the same views as the main one and picks its own.
+   Built from the live tab list so role gating stays in one place. */
+function buildSideTabs(){
+  const box=$("sideSwitch"); if(!box) return;
+  box.innerHTML="";
+  const allowed=SIDE_VIEWS.filter(([id])=>{
+    if(id==="pane-admin") return isAdmin();
+    return true;
+  });
+  allowed.forEach(([id,label])=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="stab"; b.dataset.pane=id; b.textContent=label;
+    b.setAttribute("aria-selected",sideId===id);
+    b.onclick=()=>showSide(id);
+    box.appendChild(b);
+  });
+}
 
 /* The rail owns the controls on desktop and the Overview owns them on a phone.
    Nodes are moved, never duplicated, so state and listeners survive the switch. */
@@ -2835,27 +2859,32 @@ function applyShell(){
     const target=desk?rail:ov;
     if(el.parentNode!==target) target.appendChild(el);
   });
+  // on desktop the rail is a single sticky column, so its parts live together
+  const bar=document.querySelector(".topbar"), nav=document.querySelector(".navseg");
+  const railHome=desk?bar:nav;
+  if(rail&&rail.parentNode!==railHome) railHome.appendChild(rail);
   if(!desk){
     document.querySelectorAll(".pane.is-side").forEach(p=>p.classList.remove("is-side"));
     markSide();
     return;
   }
-  const sel=$("sideSel");
-  if(sel&&!sel.options.length){
-    SIDE_VIEWS.forEach(([id,label])=>{
-      const o=document.createElement("option"); o.value=id; o.textContent=label; sel.appendChild(o);
-    });
-    sel.onchange=()=>showSide(sel.value);
-  }
+  buildSideTabs();
   const activeId=(document.querySelector(".pane.is-active")||{}).id;
-  if(sideId===activeId) sideId=activeId==="pane-overview"?"pane-deck":"pane-overview";
+  if(mode==="fridge") sideId="pane-frozen";
+  else if(sideId===activeId||sideId==="pane-frozen") sideId=activeId==="pane-overview"?"pane-deck":"pane-overview";
   showSide(sideId);
 }
 
 function setMode(m){
+  const leavingFridge=(mode==="fridge"&&m!=="fridge");
   mode=m; savePrefs(); applyMode();
-  if(m==="fridge"){ showPane("pane-fridge"); primeBtn(); modeBtn(); ideas();
-    scrollTo({top:0,behavior:"instant"}); return; }
+  if(m==="fridge"){
+    showPane("pane-fridge");
+    if(DESKTOP()) showSide("pane-frozen");   // the door holds what is frozen
+    primeBtn(); modeBtn(); ideas();
+    scrollTo({top:0,behavior:"instant"}); return;
+  }
+  if(leavingFridge&&DESKTOP()) showSide("pane-overview");
   if($("pane-fridge").classList.contains("is-active")) showPane("pane-overview");
   tierF.clear(); discF.clear(); q=""; $("search").value="";
   open.clear();
