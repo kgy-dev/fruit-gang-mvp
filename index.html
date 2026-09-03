@@ -354,81 +354,65 @@ body.admin .tab.admin-only{display:flex}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-/* ===== desktop ========================================================
-   A phone layout stretched wide reads as cheap: tiny uppercase labels, fat
-   padding, panels floating in space. This is built for a pointer instead —
-   a quiet sidebar, a sticky page header per view, and dense rows. None of it
-   exists below 1024px, so the phone is untouched. */
+/* ===== desktop =========================================================
+   Not the phone stretched wide. A quiet rail on the left, a sticky page header,
+   list rows that read as table rows, and detail that slides in from the right
+   instead of covering the screen. Everything here is behind 1024px. */
 @media (min-width:1024px){
   html{scroll-behavior:smooth}
-  .app{
-    display:grid;grid-template-columns:238px minmax(0,1fr);
-    max-width:1520px;padding-bottom:0;
-  }
+  .app{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1560px;padding-bottom:0}
 
-  /* ---- sidebar ---- */
+  /* ---- left rail ---- */
   .topbar{
     grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
-    flex-direction:column;align-items:stretch;gap:14px;
-    padding:20px 14px 16px;border-bottom:none;box-shadow:none;background:var(--bg);
+    flex-direction:column;align-items:stretch;gap:13px;
+    padding:18px 13px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
   }
-  .topbar .mark{gap:9px}
-  .mark-txt{font-size:18px}
-  .mark-dot{width:8px;height:8px}
-  .mark-sub{
-    align-self:flex-start;min-width:0;padding:2px 7px;
+  .mark-txt{font-size:17px}
+  .mark-dot{width:7px;height:7px}
+  .mark-sub{align-self:flex-start;min-width:0;padding:2px 7px;font-size:8.5px;
     background:transparent !important;color:var(--hot) !important;
-    border-color:color-mix(in srgb,var(--hot) 40%,transparent) !important;
-  }
-  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.75}
-  .primebtn{order:7;margin:0;width:100%;padding:9px;text-align:center;
-    letter-spacing:.14em;border-radius:8px}
+    border-color:color-mix(in srgb,var(--hot) 38%,transparent) !important}
+  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.7}
+  .primebtn{order:7;margin:0;width:100%;padding:8px;text-align:center;border-radius:7px}
   .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
-    align-items:center;padding:9px 11px;min-width:0;border-radius:8px}
-  .mb-lab{font-size:8.5px}
-  .mb-pct{font-size:12.5px}
+    align-items:center;padding:8px 10px;min-width:0;border-radius:7px}
+  .mb-lab{font-size:8px}
+  .mb-pct{font-size:12px}
 
   .navseg{
-    grid-area:1/1;align-self:start;margin-top:var(--barH,190px);
-    position:sticky;top:var(--barH,190px);
+    grid-area:1/1;align-self:start;margin-top:var(--barH,185px);
+    position:sticky;top:var(--barH,185px);
     display:flex;flex-direction:column;gap:1px;
-    padding:6px 10px 26px;background:var(--bg);border-bottom:none;
+    padding:4px 9px 26px;background:var(--bg);border-bottom:none;
   }
-  .navseg::before{
-    content:"Views";padding:0 8px 8px;
-    font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--dim);
-  }
-  /* sentence case at a readable size — small caps mono is what made it look cheap */
+  .navseg::before{content:"Views";padding:0 8px 7px;
+    font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--dim)}
   .tab,body.crew .tab,body.admin .tab{
-    justify-content:flex-start;gap:10px;padding:0 10px;height:33px;
-    font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:0;
-    text-transform:none;border-radius:7px;color:var(--muted);border:none;background:transparent;
+    justify-content:flex-start;gap:10px;padding:0 10px;height:31px;
+    font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
+    text-transform:none;border-radius:6px;color:var(--muted);border:none;background:transparent;
   }
   .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2)}
   .tab::before{display:none}
   .tab .badge,body.crew .tab .badge,body.admin .tab .badge{
-    margin-left:auto;min-width:19px;height:18px;border-radius:9px;
-    font-family:var(--mono);font-size:10px;padding:0 5px;
-  }
+    margin-left:auto;min-width:18px;height:17px;border-radius:9px;
+    font-family:var(--mono);font-size:9.5px;padding:0 5px}
 
   /* ---- content ---- */
   .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
-  .pane{padding:0 34px 80px}
-
-  /* every view opens with a header that stays put while the list scrolls */
+  .pane{padding:0 30px 80px}
   .pane>.sec:first-child,.pane>.filters:first-child{
     position:sticky;top:0;z-index:20;background:var(--bg);
-    margin:0 -34px 20px;padding:22px 34px 15px;
-    border-bottom:1px solid var(--line-soft);
-  }
-  .pane>.sec:first-child h2{font-size:20px;letter-spacing:.01em}
+    margin:0 -30px 18px;padding:20px 30px 14px;border-bottom:1px solid var(--line-soft)}
+  .pane>.sec:first-child h2{font-size:19px}
   .pane>.sec:first-child .note{font-size:12px}
-  .sec{margin:30px 0 12px}
-  .sec h2{font-size:15px}
+  .sec{margin:28px 0 10px}
+  .sec h2{font-size:14px}
 
-  #pane-overview{max-width:1020px;padding-top:26px;
-    display:grid;grid-template-columns:minmax(0,352px) minmax(0,1fr);
+  #pane-overview{max-width:1040px;padding-top:24px;
+    display:grid;grid-template-columns:minmax(0,344px) minmax(0,1fr);
     column-gap:36px;align-items:start}
   #pane-overview>.hero{grid-column:1;grid-row:1}
   #pane-overview>#estCard{grid-column:1;grid-row:2;margin-top:0 !important}
@@ -436,33 +420,64 @@ body.admin .tab.admin-only{display:flex}
   #pane-overview>.ov-side{grid-column:2;grid-row:1/4}
   #pane-overview>.actions,#pane-overview>.foot{grid-column:1/-1}
   .ov-side>.sec:first-child{margin-top:2px}
-  .ring{--r:300px}
+  .ring{--r:292px}
 
-  #pane-tasks{max-width:1000px}
-  #pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1080px}
+  #pane-tasks{max-width:1120px}
+  #pane-deck,#pane-active,#pane-done,#pane-admin{max-width:1120px}
+  #pane-fridge{max-width:1080px}
 
-  /* denser rows: a pointer does not need 46px targets */
-  .task{padding:5px 12px;min-height:40px;gap:12px}
-  .group{margin-bottom:8px}
-  .group-head{padding:11px 14px;min-height:44px}
-  .g-name{font-size:14px}
-  .deck-card{padding:12px 14px}
-  .card{padding:18px;border-radius:12px}
+  /* ---- lists become tables ---- */
+  .thead{
+    display:grid;grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;
+    align-items:center;gap:12px;padding:0 14px 8px;
+    border-bottom:1px solid var(--line);margin-bottom:6px;
+    font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--dim)}
+  .thead>span:first-child{width:18px}
+  .thead>span:nth-child(3),.thead>span:nth-child(4){text-align:right}
+  .thead>span:last-child{text-align:center}
+  .group{background:transparent;border:none;border-bottom:1px solid var(--line-soft);
+    border-radius:0;margin:0}
+  .group-head{padding:10px 14px;min-height:40px;border-radius:0}
+  .g-name{font-size:13.5px;text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:600}
+  .group-body{padding:0 0 6px;border-top:none}
+  .swipe{border-radius:0}
+  .task{grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;gap:12px;
+    padding:0 14px;min-height:36px;border-radius:0;background-color:transparent}
+  .task.is-done,.task.is-doing,.task.is-req{background-image:none}
+  .task .t-disc{font-size:9.5px}
+  .task .t-flags{justify-content:flex-end}
+  .task .t-tier{width:34px;margin:0 auto}
+  .task.is-prio{box-shadow:inset 2px 0 0 var(--prio)}
+
+  .deck-card{grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;gap:12px;
+    padding:11px 14px;border-radius:10px}
+  .cswipe{border-radius:10px}
+
+  /* ---- detail slides in, it does not take the screen ---- */
+  .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;
+    background:rgba(0,0,0,.52)}
+  .gate--sheet .gate-card{
+    width:452px;max-width:452px;height:100%;overflow-y:auto;text-align:left;
+    background:var(--bg);border-left:1px solid var(--line);
+    padding:26px 26px 44px;
+    animation:drawerIn .24s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes drawerIn{from{transform:translateX(28px);opacity:.5}to{transform:none;opacity:1}}
+  .gate--sheet .gate-q{text-align:left;font-size:19px;text-transform:none;
+    letter-spacing:0;color:var(--ink);margin:0 0 20px}
+  .gate--sheet .gate-row{margin-top:22px}
+  .gate--sheet .gate-row--split .gbtn{padding:12px 10px}
+
+  .pane.is-active{animation:paneIn .24s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes paneIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
   .filters{gap:9px}
   .search{padding:11px 13px}
-
-  .pane.is-active{animation:paneIn .26s cubic-bezier(.2,.8,.3,1) both}
-  @keyframes paneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-  .deck-card,.ice,.req-card{transition:border-color .18s,box-shadow .18s,transform .18s}
-  .gate-card{max-width:430px}
-  .gate--sheet .gate-card{max-width:580px}
-  .read-txt{font-size:15.5px;max-height:52vh}
-  .gate-row--split .gbtn{padding:12px 10px}
+  .card{padding:18px;border-radius:12px}
 }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){
   .tab:hover{color:var(--ink);background:var(--panel)}
-  .task:hover{background-color:var(--panel-2)}
+  .task:hover{background-color:var(--panel)}
+  .group-head:hover{background:var(--panel)}
   .deck-card:hover,.ice:hover,.req-card:hover{border-color:var(--line)}
   .btn:hover,.addbtn:hover,.gbtn:hover{border-color:var(--hot)}
   .chip:hover,.tseg button:hover{color:var(--ink)}
@@ -470,7 +485,7 @@ body.admin .tab.admin-only{display:flex}
 }
 @media (min-width:1024px) and (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .pane.is-active{animation:none}
+  .pane.is-active,.gate--sheet .gate-card{animation:none}
 }
 
 /* wide screens get two columns where the order does not matter */
@@ -549,6 +564,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
 /* ===== WIP warning =================================================== */
+.thead{display:none}
 .wip{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;margin-bottom:11px;
   border-radius:12px;background:rgba(238,138,46,.10);border:1px solid rgba(238,138,46,.34)}
 .wip i{width:23px;height:23px;flex:none;border-radius:50%;display:grid;place-items:center;
@@ -839,7 +855,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B44</div>
+    <div class="splash-tag">Production Tracker · v0.45</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -979,6 +995,9 @@ body.fridge .deck-empty p{color:#cdeef7}
         <input class="search" id="search" type="search" placeholder="Search tasks — Lemon, Animset, Locomotion…" aria-label="Search tasks">
         <div class="tseg" id="tierChips"></div>
         <div class="dwrap" id="discChips"></div>
+      </div>
+      <div class="thead" aria-hidden="true">
+        <span></span><span>Task</span><span>Discipline</span><span>Flags</span><span>Tier</span>
       </div>
       <div id="groups"></div>
       <div id="xhint"></div>
@@ -1120,7 +1139,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const BUILD=44;
+const VERSION="v0.45";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1151,6 +1170,9 @@ const isAdmin =()=>role==="admin";
 /* Team may move work along, but finishing or reopening needs a sign-off. */
 const needsReq=(from,to)=>role==="team"&&(to===2||from===2);
 const hasReq  =id=>has(reqMap,id);
+/* A requested completion should feel finished to the person who asked: it
+   leaves their Active list and waits in Done until an admin rules on it. */
+const pendingDone=id=>hasReq(id)&&reqMap[id].to===2;
 const open=new Set();
 const $=id=>document.getElementById(id);
 const has=(m,id)=>Object.prototype.hasOwnProperty.call(m,id);
@@ -1168,14 +1190,14 @@ const rankOf=id=>(id in rankMap)?rankMap[id]:1e6;
 const ordered=l=>l.slice().sort((a,b)=>rankOf(a.id)-rankOf(b.id));
 /* Prime narrows both queues to whoever is holding the phone. */
 const mine=l=>l.filter(inScope);
-const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id))));
+const doingList=()=>mine(ordered(TASKS.filter(t=>isDoing(t.id)&&!pendingDone(t.id))));
 /* Deck = flagged but not started. The moment it starts it belongs to Active,
    so a task is never sitting in two queues at once. */
 const deckList=()=>mine(ordered(TASKS.filter(t=>isPrio(t.id)&&stateOf(t.id)===0)));
 /* Overview follows the lens: pick a person and the ring is theirs. */
 const scope=()=>TASKS.filter(inScope);
-const doneListQ=()=>mine(TASKS.filter(t=>isDone(t.id)))
-  .sort((a,b)=>(doneMap[b.id]||0)-(doneMap[a.id]||0));   // newest first
+const doneListQ=()=>mine(TASKS.filter(t=>isDone(t.id)||pendingDone(t.id)))
+  .sort((a,b)=>(doneMap[b.id]||reqMap[b.id]?.at||0)-(doneMap[a.id]||reqMap[a.id]?.at||0));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== storage adapter: firebase | claude | device ===== */
@@ -1608,34 +1630,13 @@ function bindSwipe(wrap,row,t){
   row.querySelector(".sbox").addEventListener("click",e=>{
     e.stopPropagation();
     if(lock==="x"){ lock=null; return; }
-    if(!canEdit()) return;
-    advance(t);
+    askMove(t,nextDest(t));
   });
   row.addEventListener("click",()=>{
     if(lock==="x"){ lock=null; return; }
     if(openWrap===wrap){ closeOpen(); return; }
     openTask(t);
   });
-}
-/* todo -> in progress -> done -> todo */
-async function advance(t,settleEl){
-  if(!canEdit()) return;
-  const from=stateOf(t.id), to=(from+1)%3;
-
-  if(needsReq(from,to)){                    // team: ask instead of doing
-    if(hasReq(t.id)){ delete reqMap[t.id]; }
-    else { reqMap[t.id]={to,from,at:Date.now()}; }
-    repaint(t.id); adminPane(); summary();
-    await pushKey(DB_REQ,t.id,reqMap[t.id]||null);
-    return;
-  }
-
-  await commit(t.id,to);
-  repaint(t.id); refreshHead(t.si); summary();
-
-  // let the green tick read for a beat before the card leaves its queue
-  if(settleEl) setTimeout(()=>{ deck(); active(); donePane(); },460);
-  else { deck(); active(); donePane(); }
 }
 function repaint(id){
   document.querySelectorAll(`.task[data-id="${id}"],.deck-card[data-id="${id}"]`)
@@ -1659,7 +1660,7 @@ function card(t,kind){
   bindCard(wrap,c,t);
   c.querySelector(".sbox").addEventListener("click",e=>{
     e.stopPropagation();
-    advance(t,c);
+    askMove(t,nextDest(t));
   });
   return wrap;
 }
@@ -1712,7 +1713,6 @@ async function saveOrder(kind,visible){
   await pushRanks(merged);
 }
 
-
 /* One gesture handler per card: hold to drag it up or down, swipe sideways to
    send it back. Vertical moves the wrapper, horizontal moves the card inside it. */
 const CARD_THRESH=72;
@@ -1720,11 +1720,14 @@ function bindCard(wrap,card,t){
   let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false;
 
   const inDeck=()=>wrap.parentNode&&wrap.parentNode.id==="deckList";
+  const backDest=()=>inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog");
+  const fwdDest =()=>inDeck()?"active":"done";
   const label=()=>{
-    // a deck card can only fall back to the backlog; an active one may drop to
-    // the deck first if it was flagged
-    const txt=inDeck()?"BACK TO BACKLOG":(isPrio(t.id)?"BACK TO DECK":"BACK TO BACKLOG");
-    wrap.querySelectorAll(".cswipe-bg em").forEach(e=>e.textContent=txt);
+    const back={backlog:"BACK TO BACKLOG",deck:"BACK TO DECK"}[backDest()];
+    const fwd ={active:"ACTIVATE",done:"COMPLETE"}[fwdDest()];
+    const em=wrap.querySelectorAll(".cswipe-bg em");
+    if(em[0]) em[0].textContent=back;   // revealed by a rightward pull
+    if(em[1]) em[1].textContent=fwd;    // revealed by a leftward pull
   };
   const settle=()=>{ card.style.transform="translateX(0px)"; wrap.classList.remove("armed","drag"); };
 
@@ -1743,8 +1746,8 @@ function bindCard(wrap,card,t){
     if(dragging){ await stopDrag(); return; }
     if(lock!=="x"){ settle(); return; }
     if(Math.abs(dx)>=CARD_THRESH){
-      settle();
-      await moveTo(t, inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog"));
+      const d=dx; settle();
+      askMove(t, d>0 ? backDest() : fwdDest());
     }else settle();
   };
 
@@ -1852,6 +1855,11 @@ function readIdea(id,v){
       };
       row.appendChild(lockBtn);
     }
+    if(!v.lock&&canEdit()){
+      const ed=gbtn("Edit","",false);
+      ed.onclick=()=>{ closeGate(); setTimeout(()=>editIdea(id,v),380); };
+      row.appendChild(ed);
+    }
     if(!v.lock&&DESKTOP()){            // a mouse cannot swipe; a finger can, so this is desktop only
       const rm=gbtn("Unfreeze","",false);
       rm.onclick=()=>{
@@ -1955,6 +1963,27 @@ const STATE_NAME=["Not started","In progress","Done"];
 const DESTS=[["backlog","Backlog"],["deck","Deck"],["active","Active"],["done","Done"]];
 const destOf=t=>isDone(t.id)?"done":(stateOf(t.id)===1?"active":(isPrio(t.id)?"deck":"backlog"));
 
+const MOVE_COPY={
+  backlog:["Send to backlog?", t=>`“${t.name}” goes back to the backlog and loses its deck flag.`,"Send back"],
+  deck:   ["Put on the deck?", t=>`“${t.name}” joins the deck as the next thing up.`,"Put on deck"],
+  active: ["Start this task?", t=>`“${t.name}” moves into Active.`,"Start it"],
+  done:   ["Task finished?",   t=>`“${t.name}” gets marked complete.`,"Mark done"]
+};
+const nextDest=t=>{const d=destOf(t);return d==="active"?"done":d==="done"?"backlog":"active";};
+
+/* Nothing changes state without a question first — a mis-swipe used to cost a
+   round trip through the approvals queue. */
+function askMove(t,dest){
+  if(!canEdit()||destOf(t)===dest) return;
+  const [title,msg,yes]=MOVE_COPY[dest];
+  const to=dest==="active"?1:dest==="done"?2:0;
+  const ask=needsReq(stateOf(t.id),to);
+  confirmSheet(ask?"Ask an admin?":title,
+    msg(t)+(ask?" An admin has to approve it.":""),
+    ask?"Send request":yes,
+    ()=>moveTo(t,dest));
+}
+
 /* Deck, Active and Backlog are not three flags — they are one position.
    Moving a task sets both its state and its deck flag in a single step. */
 async function moveTo(t,dest){
@@ -1970,22 +1999,6 @@ async function moveTo(t,dest){
   if(isPrio(t.id)!==wantPrio&&dest!=="done"){
     if(wantPrio) prioMap[t.id]=Date.now(); else delete prioMap[t.id];
     await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
-  }
-  await commit(t.id,to);
-  repaint(t.id); refreshHead(t.si); summary(); deck(); active(); donePane(); adminPane();
-}
-
-/* Jump straight to a state instead of cycling. Completing or reopening still
-   goes through approval for the team role — the route changes, not the rule. */
-async function setTo(t,to){
-  if(!canEdit()) return;
-  const from=stateOf(t.id);
-  if(from===to&&!hasReq(t.id)) return;
-  if(needsReq(from,to)){
-    reqMap[t.id]={to,from,at:Date.now()};
-    repaint(t.id); summary(); deck(); active(); donePane(); adminPane();
-    await pushKey(DB_REQ,t.id,reqMap[t.id]);
-    return;
   }
   await commit(t.id,to);
   repaint(t.id); refreshHead(t.si); summary(); deck(); active(); donePane(); adminPane();
@@ -2017,7 +2030,7 @@ function openTask(t){
         const b=document.createElement("button"); b.type="button";
         b.textContent=label;
         b.setAttribute("aria-pressed",k===here);
-        b.onclick=async()=>{ closeGate(); await moveTo(t,k); };
+        b.onclick=()=>{ closeGate(); setTimeout(()=>askMove(t,k),380); };
         pr.appendChild(b);
       });
       body.appendChild(f);
@@ -2192,6 +2205,32 @@ function confirmSheet(title,msg,yesLabel,onYes){
   });
 }
 
+/* Frozen notes are settled; anything still loose can be rewritten in place. */
+function editIdea(id,v){
+  if(!canEdit()||v.lock) return;
+  openSheet("Edit note",body=>{
+    const tf=document.createElement("div"); tf.className="sheet-field";
+    tf.innerHTML=`<label>Title</label><input type="text" autocomplete="off">`;
+    const ti=tf.querySelector("input"); ti.value=v.title||""; body.appendChild(tf);
+
+    const f=document.createElement("div"); f.className="sheet-field";
+    f.innerHTML=`<label>The idea</label><textarea></textarea>`;
+    const ta=f.querySelector("textarea"); ta.value=v.text||""; body.appendChild(f);
+
+    const row=document.createElement("div"); row.className="gate-row gate-row--split";
+    const save=gbtn("Save","",true);
+    save.onclick=async()=>{
+      const text=ta.value.trim(); if(!text){ ta.focus(); return; }
+      const nv={...v,title:ti.value.trim(),text,edited:Date.now()};
+      ideaMap[id]=nv; closeGate(); ideas();
+      await pushKey(DB_IDEAS,id,nv);
+    };
+    const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
+    row.append(save,cancel); body.appendChild(row);
+    setTimeout(()=>ta.focus(),60);
+  });
+}
+
 function composeIdea(){
   openSheet("Park an idea",body=>{
     const tf=document.createElement("div"); tf.className="sheet-field";
@@ -2231,14 +2270,15 @@ function donePane(){
     const w=whoOf(t.id), ts=doneMap[t.id];
     const when=(typeof ts==="number"&&ts>0)
       ? new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : "";
-    const c=document.createElement("div"); c.className="deck-card is-done";
+    const c=document.createElement("div"); c.className="deck-card"; c.dataset.id=t.id;
     c.innerHTML=`<button class="sbox" type="button" aria-label="reopen"></button>
       <span class="t-name">${t.name}</span>
       <span class="t-disc" style="color:${DISC[t.disc].c}">${DISC[t.disc].name}</span>
-      <span class="t-flags">${w?`<span class="t-who who-${w}">${w}</span>`:""}</span>
+      ${flagsHTML(t.id)}
       <span class="t-tier tp${t.tier}">T${t.tier}</span>
       <span class="d-sec">${SEC_NAMES[t.si]}${when?" · "+when:""}</span>`;
-    c.querySelector(".sbox").addEventListener("click",e=>{ e.stopPropagation(); moveTo(t,"backlog"); });
+    paintRow(c,t.id);          // carries is-done / is-req, so REQ shows here too
+    c.querySelector(".sbox").addEventListener("click",e=>{ e.stopPropagation(); askMove(t,"backlog"); });
     c.addEventListener("click",()=>openTask(t));
     box.appendChild(c);
   });
@@ -2507,7 +2547,7 @@ document.addEventListener("visibilitychange",async()=>{
   applyRole(); applyLens();
   fitBar(); requestAnimationFrame(fitBar);
   if(DESKTOP()) addEventListener("load",fitBar);   // the sidebar header is tall; remeasure once fonts land
-  $("buildTag").textContent=`build ${BUILD} · ${backend}${navigator.standalone?" · standalone":""}`;
+  $("buildTag").textContent=`${VERSION} · ${backend}${navigator.standalone?" · standalone":""}`;
 
   // hold the splash long enough to read, never longer than needed
   const held=Math.max(0,900-(Date.now()-t0));
