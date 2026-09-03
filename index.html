@@ -177,12 +177,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .cswipe .deck-card{margin-bottom:0;transition:transform .22s cubic-bezier(.2,.8,.3,1)}
 .cswipe.drag .deck-card{transition:none}
 .cswipe-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;pointer-events:none;opacity:0;transition:opacity .16s}
+  padding:0 16px;pointer-events:none;opacity:0;transition:opacity .08s}
 .cswipe.drag .cswipe-bg,.iceswipe.drag .cswipe-bg{opacity:1}
 .cswipe-bg em{font-style:normal;font-family:var(--mono);font-size:8px;font-weight:700;
-  letter-spacing:.07em;color:var(--dim);transition:color .18s;white-space:nowrap}
-.cswipe.armed{background:rgba(255,255,255,.07)}
-.cswipe.armed .cswipe-bg em{color:var(--ink)}
+  letter-spacing:.07em;color:var(--muted);transition:color .18s;white-space:nowrap}
+.cswipe.armed{background:color-mix(in srgb,var(--hot) 12%,transparent)}
+.cswipe.armed .cswipe-bg em{color:var(--hot)}
 .cswipe.dragging{opacity:.96;box-shadow:0 12px 30px rgba(0,0,0,.55);z-index:6;transition:none}
 .cswipe.dragging .deck-card{border-color:var(--hot)}
 
@@ -611,11 +611,18 @@ body.admin .tab.admin-only{display:flex}
   body.fridge .app{grid-template-rows:0 minmax(0,1fr)}
 
   /* ---- detail drawer ---- */
-  .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.55)}
-  .gate--sheet .gate-card{
-    width:min(560px,44vw);max-width:none;height:100%;overflow-y:auto;text-align:left;margin:0;
-    background:var(--bg);border-left:1px solid var(--line);padding:26px 30px 48px;
+  body .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.55)}
+  /* body-prefixed so it outranks the phone card rule that sits later in the sheet */
+  body .gate--sheet .gate-card{
+    width:min(680px,52vw);max-width:none;height:100%;max-height:none;overflow-y:auto;text-align:left;margin:0;
+    background:var(--bg);border:none;border-left:1px solid var(--line);border-radius:0;
+    padding:26px 34px 48px;box-shadow:-24px 0 60px rgba(0,0,0,.35);
     animation:drawerIn .24s cubic-bezier(.2,.8,.3,1) both}
+  .gate.done.gate--sheet .gate-card{transform:translateX(24px);opacity:0}
+  body .gate--confirm .gate-card{width:min(440px,40vw);height:auto;margin:auto;border:1px solid var(--line);
+    border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);transform:none;
+    animation:popIn .28s cubic-bezier(.2,.8,.3,1) both}
+  body .gate--confirm{justify-content:center;align-items:center;padding:24px}
   @keyframes drawerIn{from{transform:translateX(30px);opacity:.5}to{transform:none;opacity:1}}
   .gate--sheet .gate-q{text-align:left;font-size:20px;text-transform:none;
     letter-spacing:0;color:var(--ink);margin:0 0 20px;font-weight:700}
@@ -759,7 +766,13 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
 .gate-card{margin:auto}
 [hidden]{display:none !important}   /* author display must not beat the attribute */
 .gate.done{opacity:0;pointer-events:none;transition:opacity .22s}
-.gate-card{width:100%;max-width:340px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
+.gate-card{width:100%;max-width:340px;text-align:center;
+  animation:popIn .28s cubic-bezier(.2,.8,.3,1) both}
+@keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.975)}to{opacity:1;transform:none}}
+/* closing: the card settles back and fades with the scrim, in the same beat */
+.gate.done .gate-card{opacity:0;transform:translateY(8px) scale(.98);transition:opacity .2s,transform .2s;animation:none}
+#gateBody{transition:opacity .14s,transform .14s}
+#gateBody.swap{opacity:0;transform:translateY(5px)}
 .gate-mark{font-family:var(--stencil);font-size:clamp(30px,10vw,40px);line-height:1;color:var(--ink)}
 .gate-mark em{font-style:normal;color:var(--hot)}
 .gate-sub{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.24em;
@@ -1062,18 +1075,18 @@ body.fridge .deck-empty p{color:#cdeef7}
   background:var(--bg);border:1px solid var(--line);border-radius:18px;
   padding:16px 18px 18px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
 /* a yes/no question is short; on a phone it belongs under the thumb, not at the top */
-.gate--confirm{align-items:flex-end;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
-.gate--confirm .gate-card{margin:auto auto 0;max-height:none;
-  animation:sheetUp .28s cubic-bezier(.2,.8,.3,1) both}
+/* a question sits in the middle of the screen — neither pinned to the top nor
+   dropped to the bottom */
+.gate--confirm .gate-card{margin:auto;max-height:none;max-width:360px}
 .gate--confirm .gate-q{position:static;border-bottom:none;padding-bottom:0;margin-bottom:10px}
 .gate--confirm #gateBody{overflow:visible}
-@keyframes sheetUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 /* the heading is pinned and the body scrolls under it, so the title of whatever
    you opened is always the first thing you see */
 .gate--sheet .gate-q{position:sticky;top:0;z-index:2;flex:none;background:var(--bg);
   margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line-soft)}
 .gate--sheet #gateBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
-  scrollbar-width:thin;padding-right:2px}
+  scrollbar-width:none;-ms-overflow-style:none}
+.gate--sheet #gateBody::-webkit-scrollbar{display:none}
 .gate--sheet .gate-q{margin:0 0 18px}
 </style>
 
@@ -1136,7 +1149,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.58</div>
+    <div class="splash-tag">Production Tracker · v0.59</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1468,7 +1481,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.58";
+const VERSION="v0.59";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -2200,7 +2213,11 @@ function bindCard(wrap,card,t){
       else return;
     }
     e.preventDefault();
-    dx=Math.max(-140,Math.min(140,ax));
+    /* start from zero at the moment the lock engages (no 10px jump), then ease
+       into a soft stop past the threshold so the card never slams the edge */
+    const raw=ax-Math.sign(ax)*10, a=Math.abs(raw);
+    const eased=a<=96?a:96+(a-96)*0.32;
+    dx=Math.sign(raw)*Math.min(140,eased);
     card.style.transform=`translateX(${dx}px)`;
     wrap.classList.toggle("armed",Math.abs(dx)>=CARD_THRESH);
   },{passive:false});
@@ -2284,18 +2301,15 @@ function readIdea(id,v){
     }
     if(!v.lock&&canEdit()){
       const ed=gbtn("Edit","",false);
-      ed.onclick=()=>{ closeGate(); setTimeout(()=>editIdea(id,v),380); };
+      ed.onclick=()=>editIdea(id,v);
       row.appendChild(ed);
     }
     if(!v.lock&&DESKTOP()){            // a mouse cannot swipe; a finger can, so this is desktop only
       const rm=gbtn("Unfreeze","",false);
-      rm.onclick=()=>{
-        closeGate();
-        setTimeout(()=>confirmSheet("Unfreeze this?",
+      rm.onclick=()=>confirmSheet("Unfreeze this?",
           `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
           "Unfreeze",
-          async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); }),380);
-      };
+          async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
       row.appendChild(rm);
     }
     const close=gbtn("Close","",true); close.onclick=closeGate;
@@ -2476,7 +2490,7 @@ function openTask(t){
     if(isAdmin()){
       const eb=document.createElement("button"); eb.type="button"; eb.className="blk-act";
       eb.textContent=dv?"Edit":"Add";
-      eb.onclick=()=>{ closeGate(); setTimeout(()=>editDesc(t),380); };
+      eb.onclick=()=>editDesc(t);
       dWrap.querySelector(".blk-head").appendChild(eb);
     }
     body.appendChild(dWrap);
@@ -2490,7 +2504,7 @@ function openTask(t){
         const b=document.createElement("button"); b.type="button";
         b.textContent=label;
         b.setAttribute("aria-pressed",k===here);
-        b.onclick=()=>{ closeGate(); setTimeout(()=>askMove(t,k),380); };
+        b.onclick=()=>askMove(t,k);
         pr.appendChild(b);
       });
       body.appendChild(f);
@@ -2513,7 +2527,7 @@ function openTask(t){
     row.appendChild(close);                       // row-reverse: first child sits right
     if(isAdmin()){
       const ed=gbtn("Edit","",false);
-      ed.onclick=()=>{ closeGate(); setTimeout(()=>editTask(t),380); };
+      ed.onclick=()=>editTask(t);
       row.appendChild(ed);
     }
     body.appendChild(row);
@@ -2671,15 +2685,14 @@ function editTask(t){
     };
     const reset=gbtn(t.custom?"Delete task":"Reset to original","",false);
     reset.onclick=()=>{
-      closeGate();
-      setTimeout(()=>confirmSheet(t.custom?"Delete this task?":"Reset this task?",
+      confirmSheet(t.custom?"Delete this task?":"Reset this task?",
         t.custom ? `“${t.name}” disappears for everyone, and its progress goes with it.`
                  : `“${t.name}” goes back to the name, tier, discipline and section it shipped with.`,
         t.custom?"Delete":"Reset", async()=>{
           if(t.custom){ delete customMap[t.id]; await pushKey(DB_CUSTOM,t.id,null); }
           else { delete editMap[t.id]; await pushKey(DB_EDITS,t.id,null); }
           rebuildData(); applyMode(); buildTicks(); all_();
-        }),380);
+        });
     };
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,reset,cancel); body.appendChild(row);
@@ -2753,6 +2766,7 @@ function composeTask(){
 
 function confirmSheet(title,msg,yesLabel,onYes){
   $("gate").classList.add("gate--confirm");
+  openSheet._confirm=true;
   openSheet(title,body=>{
     const p=document.createElement("p");
     p.style.cssText="margin:0 0 18px;font-size:14px;line-height:1.55;color:var(--muted);text-align:left";
@@ -2764,6 +2778,7 @@ function confirmSheet(title,msg,yesLabel,onYes){
     const no=gbtn("Keep it","",false); no.className="gbtn gbtn-ghost"; no.onclick=closeGate;
     row.append(yes,no); body.appendChild(row);
   });
+  openSheet._confirm=false;
 }
 
 /* Frozen notes are settled; anything still loose can be rewritten in place. */
@@ -2975,11 +2990,22 @@ const gbtn=(label,sub,primary)=>{
   return b;
 };
 
+/* If a sheet is already up, the next one replaces its contents with a short
+   crossfade. Closing and reopening the whole layer was the flicker. */
 function openSheet(title,build){
-  $("gate").classList.add("gate--sheet");
-  $("gateQ").textContent=title;
-  const body=$("gateBody"); body.innerHTML="";
-  build(body);
+  const g=$("gate"), body=$("gateBody");
+  const already=!g.hidden&&!g.classList.contains("done");
+  g.classList.add("gate--sheet");
+  if(!openSheet._confirm) g.classList.remove("gate--confirm");   // a normal sheet is not a question
+  if(already){
+    body.classList.add("swap");
+    setTimeout(()=>{
+      $("gateQ").textContent=title; body.innerHTML=""; build(body);
+      body.scrollTop=0; body.classList.remove("swap");
+    },140);
+    return;
+  }
+  $("gateQ").textContent=title; body.innerHTML=""; build(body);
   openGate();
 }
 const _closeGate=closeGate;
@@ -3061,7 +3087,7 @@ function pickLens(){
   openGate();
 }
 
-let sideId="pane-overview";
+let sideId="pane-tasks";
 
 /* One element cannot sit in two columns, so when a view is asked for on the
    side it already occupies, the two columns trade places. Nothing is ever
@@ -3137,7 +3163,7 @@ function applyShell(){
   buildSideTabs();
   const activeId=(document.querySelector(".pane.is-active")||{}).id;
   if(mode==="fridge") sideId="pane-frozen";
-  else if(sideId===activeId||sideId==="pane-frozen") sideId=activeId==="pane-overview"?"pane-deck":"pane-overview";
+  else if(sideId===activeId||sideId==="pane-frozen") sideId=activeId==="pane-tasks"?"pane-overview":"pane-tasks";
   showSide(sideId);
 }
 
@@ -3151,7 +3177,7 @@ function setMode(m){
     primeBtn(); modeBtn(); ideas();
     scrollTo({top:0,behavior:"instant"}); return;
   }
-  if(leavingFridge&&DESKTOP()) showSide("pane-overview");
+  if(leavingFridge&&DESKTOP()) showSide("pane-tasks");
   if($("pane-fridge").classList.contains("is-active")) showPane("pane-overview");
   tierF.clear(); discF.clear(); q=""; $("search").value="";
   open.clear();
@@ -3234,7 +3260,7 @@ document.addEventListener("visibilitychange",async()=>{
     $("fsTitle").value=""; ta.value="";
   };
   applyRole(); applyLens();
-  if(DESKTOP()&&mode!=="fridge") showPane("pane-active");   // desktop opens on the work — unless the fridge is open
+  if(DESKTOP()&&mode!=="fridge") showPane("pane-overview");  // desktop opens on the overview, backlog beside it
   fitBar(); requestAnimationFrame(fitBar);
   applyShell(); requestAnimationFrame(applyShell);
   if(DESKTOP()) addEventListener("load",fitBar);   // the sidebar header is tall; remeasure once fonts land
