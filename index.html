@@ -384,14 +384,16 @@ body.admin .tab.admin-only{display:flex}
     background:transparent !important;color:var(--hot) !important;
     border-color:color-mix(in srgb,var(--hot) 40%,transparent) !important}
   /* lens and mode sit shoulder to shoulder, and both are properly tappable */
-  .primebtn{order:3;grid-column:1;margin:0;width:auto;min-height:46px;padding:0 10px;
-    display:flex;align-items:center;justify-content:center;border-radius:9px;
+  /* base .primebtn lives after this block and sets margin-left:auto, which in a
+     grid cell shrinks the button to its label and shoves it right — outrank it */
+  .app .primebtn{order:3;grid-column:1;margin:0;width:auto;justify-self:stretch;min-height:46px;
+    padding:0 10px;display:flex;align-items:center;justify-content:center;border-radius:9px;
     font-size:10px;letter-spacing:.14em}
-  .modebtn{order:4;grid-column:2;margin:0;width:auto;min-height:46px;
+  .app .modebtn{order:4;grid-column:2;margin:0;width:auto;justify-self:stretch;min-height:46px;
     flex-direction:row;justify-content:space-between;align-items:center;
     padding:0 12px;border-radius:9px}
   .mb-lab{font-size:8.5px} .mb-pct{font-size:13px}
-  .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
+  .app .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
   /* the default that hides these sits later in the sheet, and a media query adds
      no specificity — so each of them is qualified to win on its own merit */
   .app .rail-extra{order:6;grid-column:1/-1;display:block;padding:0;margin-top:6px}
@@ -402,14 +404,17 @@ body.admin .tab.admin-only{display:flex}
   .rr-track{fill:none;stroke:var(--line);stroke-width:6}
   .rr-prog{fill:none;stroke:url(#hg);stroke-width:6;stroke-linecap:round;
     transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.3,1)}
-  .rr-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:2px}
-  .rr-mid b{font-family:var(--dsp);font-weight:800;font-size:46px;letter-spacing:-.02em;color:var(--ink)}
-  .rr-mid i{font-style:normal;font-family:var(--mono);font-size:15px;color:var(--muted);
-    align-self:flex-start;margin-top:12px}
+  .rr-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .rr-mid::before{content:"complete";font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+  .rr-mid b{font-family:var(--dsp);font-weight:800;font-size:44px;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+  .rr-mid b::after{content:"%";font-family:var(--mono);font-weight:600;font-size:14px;
+    letter-spacing:0;color:var(--muted);margin-left:2px;vertical-align:top}
+  .rr-mid i{display:none}
   .rr-sub{margin-top:10px;text-align:center;font-family:var(--mono);font-size:10px;
     letter-spacing:.06em;color:var(--dim)}
-  .rail-fridge{margin-top:18px;padding:13px 13px}
-  .rail-fridge b{font-size:13.5px}
+  .app .rail-fridge{margin-top:18px;padding:13px 13px;width:100%}
+  .app .rail-fridge b{font-size:13.5px}
   #pane-overview>.fridge-btn{display:none}
   .rail-extra .actions{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);
     display:flex;flex-wrap:wrap;gap:9px}
@@ -501,17 +506,27 @@ body.admin .tab.admin-only{display:flex}
   .pane.is-side .deck-card{padding:10px 11px}
 
   /* ---- fridge takes both columns ---- */
+  /* explicit rows: the shelf row is the only flexible one, so the tall composer
+     spanning the right column no longer pads out the header and temperature rows */
   #pane-fridge.is-active{display:grid;grid-template-columns:minmax(0,1fr) 330px;
-    column-gap:26px;align-items:start}
+    grid-template-rows:auto auto auto minmax(0,1fr) auto;
+    column-gap:26px;row-gap:0;align-items:start}
   #pane-fridge.is-active>.sec:first-child,#pane-fridge.is-active>.fridge-mast{grid-column:1/-1}
   #pane-fridge.is-active>.fridge-mast{display:flex}
   #pane-fridge.is-active>.temp,#pane-fridge.is-active>#ideaList,
   #pane-fridge.is-active>#ideaEmpty{grid-column:1}
   #pane-fridge.is-active>#ideaActions{display:none}
-  #pane-fridge.is-active>.fridge-side{display:block;grid-column:2;grid-row:3/8;
-    position:sticky;top:16px}
+  #pane-fridge.is-active>.sec:first-child{grid-row:1}
+  #pane-fridge.is-active>.fridge-mast{grid-row:2;margin:0 0 10px}
+  #pane-fridge.is-active>.temp{grid-row:3;margin:0 0 12px}
+  #pane-fridge.is-active>#ideaList{grid-row:4}
+  #pane-fridge.is-active>#ideaEmpty{grid-row:5}
+  #pane-fridge.is-active>.fridge-side{display:block;grid-column:2;grid-row:3/6;
+    align-self:start;position:sticky;top:16px}
   #pane-fridge.is-active #ideaList{display:grid;grid-template-columns:1fr 1fr;
     column-gap:12px;align-items:start}
+  /* the door pane shows the frozen ones, so the shelf hides its copies */
+  #pane-fridge.is-active #ideaList .iceswipe:has(.ice.locked){display:none}
   body.fridge .maintabs,body.fridge .sidetabs{display:none}
   body.fridge .app{grid-template-rows:0 minmax(0,1fr)}
 
@@ -650,8 +665,11 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
 /* ===== role gate ===================================================== */
 /* centring a flex child taller than its container clips the top and puts it out
    of reach; margin:auto centres when it fits and falls back to the top when not */
+/* In standalone mode content runs under the status bar, so the top padding has
+   to clear it — otherwise the first line of every sheet is hidden behind the clock */
 .gate{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center;
-  padding:26px;background:var(--bg);overflow-y:auto}
+  padding:calc(22px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom));
+  background:var(--bg);overflow-y:auto}
 .gate-card{margin:auto}
 .gate--sheet .gate-card{margin:0 auto auto}   /* tall sheets open at the title, never centred out of reach */
 [hidden]{display:none !important}   /* author display must not beat the attribute */
@@ -942,6 +960,13 @@ body.fridge .deck-empty p{color:#cdeef7}
 .gate--sheet .gate-mark,.gate--sheet .gate-sub{display:none}
 .gate--sheet .gate-card{max-width:400px;max-height:calc(100vh - 46px);
   display:flex;flex-direction:column}
+/* a yes/no question is short; on a phone it belongs under the thumb, not at the top */
+.gate--confirm{align-items:flex-end;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.gate--confirm .gate-card{margin:auto auto 0;max-height:none;
+  animation:sheetUp .28s cubic-bezier(.2,.8,.3,1) both}
+.gate--confirm .gate-q{position:static;border-bottom:none;padding-bottom:0;margin-bottom:10px}
+.gate--confirm #gateBody{overflow:visible}
+@keyframes sheetUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 /* the heading is pinned and the body scrolls under it, so the title of whatever
    you opened is always the first thing you see */
 .gate--sheet .gate-q{position:sticky;top:0;z-index:2;flex:none;background:var(--bg);
@@ -1006,7 +1031,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.50</div>
+    <div class="splash-tag">Production Tracker · v0.53</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1317,7 +1342,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.50";
+const VERSION="v0.53";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1790,7 +1815,7 @@ function bindSwipe(wrap,row,t){
     if(!live) return;
     const ax=e.clientX-x0, ay=e.clientY-y0;
     if(lock===null){
-      if(Math.abs(ax)>9&&Math.abs(ax)>Math.abs(ay)+3) lock="x";
+      if(Math.abs(ax)>9&&Math.abs(ax)>Math.abs(ay)+3){ lock="x"; try{ row.setPointerCapture(e.pointerId); }catch(_){} }
       else if(Math.abs(ay)>9){ live=false; wrap.classList.remove("drag"); return; }
       else return;
     }
@@ -1980,7 +2005,11 @@ function bindCard(wrap,card,t){
     }
     const ax=e.clientX-x0, ay=e.clientY-y0;
     if(lock===null){
-      if(Math.abs(ax)>10&&Math.abs(ax)>Math.abs(ay)+3){ lock="x"; clearTimeout(timer); moved=true; wrap.classList.add("drag"); }
+      if(Math.abs(ax)>10&&Math.abs(ax)>Math.abs(ay)+3){
+        lock="x"; clearTimeout(timer); moved=true; wrap.classList.add("drag");
+        // a mouse released outside the card would otherwise leave it shifted
+        try{ card.setPointerCapture(e.pointerId); }catch(_){}
+      }
       else if(Math.abs(ay)>8){ clearTimeout(timer); return; }
       else return;
     }
@@ -1992,6 +2021,7 @@ function bindCard(wrap,card,t){
 
   card.addEventListener("pointerup",finish);
   card.addEventListener("pointercancel",finish);
+  card.addEventListener("lostpointercapture",()=>{ if(lock==="x"&&!dragging) settle(); });
   card.addEventListener("click",()=>{ if(moved){ moved=false; return; } openTask(t); });
 }
 
@@ -2022,16 +2052,18 @@ function ideas(){
   const temp=-4-Math.min(cnt,26);
   $("tempLine").innerHTML=`<span>${temp}°C</span><i></i><span>`+
     (cnt?(locked?`${locked} frozen`:"nothing frozen"):"door open")+`</span>`;
-  /* loose ideas live on the shelf, frozen ones are stuck to the door */
-  const loose=list.filter(([,v])=>!v.lock), froz=list.filter(([,v])=>v.lock);
+  /* The phone has one list and sees everything. Desktop also renders the frozen
+     ones into their own pane and hides them from the shelf with CSS — the data
+     is never split, only the presentation. */
+  const froz=list.filter(([,v])=>v.lock);
   const fill=(box,rows)=>{
     box.innerHTML="";
     rows.forEach(([id,v],i)=>{ const el=iceCard(id,v);
       el.querySelector(".ice").style.animationDelay=(i*1.35%9).toFixed(2)+"s";
       box.appendChild(el); });
   };
-  fill($("ideaList"),loose);
-  $("ideaEmpty").hidden=loose.length>0;
+  fill($("ideaList"),list);
+  $("ideaEmpty").hidden=list.length>0;
   const fb=$("frozenList");
   if(fb){
     fill(fb,froz);
@@ -2527,6 +2559,7 @@ function composeTask(){
 }
 
 function confirmSheet(title,msg,yesLabel,onYes){
+  $("gate").classList.add("gate--confirm");
   openSheet(title,body=>{
     const p=document.createElement("p");
     p.style.cssText="margin:0 0 18px;font-size:14px;line-height:1.55;color:var(--muted);text-align:left";
@@ -2737,7 +2770,7 @@ function openSheet(title,build){
   openGate();
 }
 const _closeGate=closeGate;
-closeGate=function(){ $("gate").classList.remove("gate--sheet"); _closeGate(); };
+closeGate=function(){ $("gate").classList.remove("gate--sheet","gate--confirm"); _closeGate(); };
 
 function askRole(){
   $("gateQ").textContent="How are you joining?";
