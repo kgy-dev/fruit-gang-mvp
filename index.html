@@ -361,6 +361,9 @@ body.admin .tab.admin-only{display:flex}
    centred it, which parked the sidebar in the middle of a wide monitor with
    dead space on both sides. Nothing here exists below 1024px. */
 @media (min-width:1024px){
+  /* overflow-x:hidden turns the page into a scroll container and sticky stops
+     tracking the viewport; clip does the same job without that side effect */
+  html,body{overflow-x:clip}
   html{scroll-behavior:smooth}
   .app{
     display:grid;grid-template-columns:var(--rail,244px) minmax(0,1fr);
@@ -416,9 +419,12 @@ body.admin .tab.admin-only{display:flex}
   .sec h2{font-size:14px}
 
   /* overview uses the width instead of stacking in a column */
+  /* display must stay tied to .is-active — an unqualified display here beat
+     .pane{display:none} and left Overview stacked under every other view */
   #pane-overview{max-width:1180px;padding-top:26px;
-    display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
+    grid-template-columns:minmax(0,340px) minmax(0,1fr);
     column-gap:clamp(24px,2.6vw,44px);align-items:start}
+  #pane-overview.is-active{display:grid}
   #pane-overview>.hero{grid-column:1;grid-row:1}
   #pane-overview>#estCard{grid-column:2;grid-row:1;margin-top:0 !important;align-self:start}
   #pane-overview>.fridge-btn{grid-column:1;grid-row:2;margin-top:16px}
@@ -472,8 +478,10 @@ body.admin .tab.admin-only{display:flex}
 
   .pane.is-active{animation:paneIn .24s cubic-bezier(.2,.8,.3,1) both}
   @keyframes paneIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-  .filters{gap:10px}
+  .filters{gap:10px;max-width:780px}
   .search{padding:11px 13px}
+  .tseg{max-width:420px}
+  .linkbtn:hover{}
   .card{padding:20px;border-radius:12px}
 }
 @media (min-width:1500px){ .app{--rail:264px} .pane{max-width:1340px} #pane-overview{max-width:1340px} }
@@ -482,7 +490,7 @@ body.admin .tab.admin-only{display:flex}
   .task:hover{background-color:var(--panel)}
   .group-head:hover{background:var(--panel)}
   .deck-card:hover,.ice:hover,.req-card:hover{border-color:var(--line)}
-  .btn:hover,.addbtn:hover,.gbtn:hover,.linkbtn:hover{border-color:var(--hot)}
+  .btn:hover,.addbtn:hover,.gbtn:hover,.blk-act:hover{border-color:var(--hot)}
   .chip:hover,.tseg button:hover{color:var(--ink)}
   .fridge-btn:hover{background:rgba(95,216,232,.2)}
   .cmt-del:hover{color:var(--prio);border-color:var(--prio)}
@@ -543,7 +551,10 @@ body.admin .tab.admin-only{display:flex}
 
 /* ===== swipe actions ================================================= */
 .swipe{position:relative;overflow:hidden;border-radius:11px;transition:background-color .2s}
-.sw-bg{position:absolute;inset:0;display:flex;align-items:center;pointer-events:none}
+.sw-bg{position:absolute;inset:0;display:flex;align-items:center;pointer-events:none;
+  opacity:0;transition:opacity .16s}
+/* the actions belong to the gesture; a transparent row must not reveal them */
+.swipe.drag .sw-bg,.swipe.open-l .sw-left{opacity:1}
 .sw-left{justify-content:flex-start;padding-left:11px;gap:6px}
 .swipe.open-l .sw-left{pointer-events:auto}
 .sw-right{justify-content:flex-end;padding-right:16px}
@@ -587,8 +598,11 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   background:var(--panel-2);border:1px solid var(--line)}
 
 /* ===== role gate ===================================================== */
-.gate{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+/* centring a flex child taller than its container clips the top and puts it out
+   of reach; margin:auto centres when it fits and falls back to the top when not */
+.gate{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center;
   padding:26px;background:var(--bg);overflow-y:auto}
+.gate-card{margin:auto}
 [hidden]{display:none !important}   /* author display must not beat the attribute */
 .gate.done{opacity:0;pointer-events:none;transition:opacity .35s}
 .gate-card{width:100%;max-width:340px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
@@ -797,10 +811,33 @@ body.fridge .deck-empty p{color:#cdeef7}
 .desc-body{margin:0;font-size:14.5px;line-height:1.55;color:var(--ink);
   white-space:pre-wrap;overflow-wrap:anywhere}
 .desc-body.is-empty{color:var(--dim);font-style:italic}
-.linkbtn{margin-top:9px;padding:0;background:none;color:var(--hot);
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  text-decoration:underline;text-underline-offset:3px}
-.cmt-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft)}
+.swtch{display:inline-flex;align-items:center;gap:8px;padding:0;background:none;border:none}
+.swtch i{width:34px;height:19px;border-radius:11px;background:#33312f;position:relative;
+  transition:background-color .18s}
+.swtch i::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;
+  border-radius:50%;background:#8a8580;transition:transform .18s,background-color .18s}
+.swtch[aria-pressed="true"] i{background:color-mix(in srgb,var(--done) 40%,transparent)}
+.swtch[aria-pressed="true"] i::after{transform:translateX(15px);background:var(--done)}
+.swtch em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim);min-width:22px;text-align:left}
+.swtch[aria-pressed="true"] em{color:var(--done)}
+.swtch:disabled{opacity:.5}
+
+.blk{margin-top:20px;padding-top:15px;border-top:1px solid var(--line-soft)}
+.blk-head{display:flex;align-items:center;gap:10px;width:100%;padding:0 0 10px;
+  background:none;border:none;text-align:left}
+.blk-head h3{margin:0;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.blk-ct{font-family:var(--mono);font-size:9.5px;color:var(--muted);min-width:12px}
+.blk-caret{margin-left:auto;width:7px;height:7px;border-right:1.6px solid var(--dim);
+  border-bottom:1.6px solid var(--dim);transform:rotate(45deg);transition:transform .22s}
+.blk.open .blk-caret{transform:rotate(-135deg)}
+.blk-act{margin-left:auto;padding:3px 9px;border-radius:6px;background:var(--panel);
+  border:1px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.08em;text-transform:uppercase}
+.blk-body{display:none}
+.blk.open .blk-body{display:block}
+.cmt-wrap{margin-top:20px}
 .cmt-list{display:flex;flex-direction:column;gap:10px}
 .cmt{padding:11px 12px;border-radius:11px;background:var(--panel);border:1px solid var(--line-soft)}
 .cmt-head{display:flex;align-items:center;gap:9px;margin-bottom:5px}
@@ -883,7 +920,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.46</div>
+    <div class="splash-tag">Production Tracker · v0.47</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1169,7 +1206,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.46";
+const VERSION="v0.47";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -2060,41 +2097,40 @@ function openTask(t){
     line("Owner",w||"unassigned",w?`var(--${w.toLowerCase()})`:"");
     line("Scope",inMvp(t)?"MVP":"Alpha");
 
+    /* priority sits with the other facts, as a switch rather than a field */
+    const pRow=document.createElement("div"); pRow.className="tl-row";
+    pRow.innerHTML=`<span>Priority</span>`;
+    const sw=document.createElement("button");
+    sw.type="button"; sw.className="swtch"; sw.setAttribute("aria-pressed",isPrio(t.id));
+    sw.innerHTML=`<i></i><em>${isPrio(t.id)?"on":"off"}</em>`;
+    sw.disabled=!canEdit();
+    sw.onclick=async()=>{
+      if(!canEdit()) return;
+      const on=!isPrio(t.id);
+      if(on) prioMap[t.id]=Date.now(); else delete prioMap[t.id];
+      sw.setAttribute("aria-pressed",on); sw.querySelector("em").textContent=on?"on":"off";
+      repaint(t.id); summary(); deck(); active();
+      await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
+    };
+    pRow.appendChild(sw); body.appendChild(pRow);
+
     /* description */
-    const dWrap=document.createElement("div"); dWrap.className="sheet-field"; dWrap.style.marginTop="18px";
-    dWrap.innerHTML=`<label>Description</label>`;
-    const dTxt=document.createElement("p"); dTxt.className="desc-body";
     const dv=(descMap[t.id]||"").trim();
+    const dWrap=document.createElement("section"); dWrap.className="blk";
+    dWrap.innerHTML=`<div class="blk-head"><h3>Description</h3></div>`;
+    const dTxt=document.createElement("p"); dTxt.className="desc-body";
     dTxt.textContent=dv||"No description yet.";
     if(!dv) dTxt.classList.add("is-empty");
     dWrap.appendChild(dTxt);
     if(isAdmin()){
-      const eb=document.createElement("button"); eb.type="button"; eb.className="linkbtn";
-      eb.textContent=dv?"Edit description":"Add a description";
+      const eb=document.createElement("button"); eb.type="button"; eb.className="blk-act";
+      eb.textContent=dv?"Edit":"Add";
       eb.onclick=()=>{ closeGate(); setTimeout(()=>editDesc(t),380); };
-      dWrap.appendChild(eb);
+      dWrap.querySelector(".blk-head").appendChild(eb);
     }
     body.appendChild(dWrap);
 
     if(canEdit()){
-      /* priority is its own switch — a task can be flagged wherever it sits */
-      const pf=document.createElement("div"); pf.className="sheet-field"; pf.style.marginTop="16px";
-      pf.innerHTML=`<label>Priority</label><div class="pickrow"></div>`;
-      const pr2=pf.querySelector(".pickrow");
-      [["on",true],["off",false]].forEach(([lbl,val])=>{
-        const b=document.createElement("button"); b.type="button"; b.textContent=lbl;
-        b.setAttribute("aria-pressed",isPrio(t.id)===val);
-        b.onclick=async()=>{
-          if(isPrio(t.id)===val) return;
-          if(val) prioMap[t.id]=Date.now(); else delete prioMap[t.id];
-          pf.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b));
-          repaint(t.id); summary(); deck(); active();
-          await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
-        };
-        pr2.appendChild(b);
-      });
-      body.appendChild(pf);
-
       const f=document.createElement("div"); f.className="sheet-field";
       f.style.marginTop="16px";
       f.innerHTML=`<label>${isAdmin()?"Move to":"Ask to move"}</label><div class="pickrow"></div>`;
@@ -2161,12 +2197,18 @@ const ago=ts=>{
 /* Comments belong to whoever wrote them: an author can take their own back,
    and an admin can take any of them back. Nobody edits somebody else's words. */
 function commentBlock(t){
-  const wrap=document.createElement("div"); wrap.className="sheet-field cmt-wrap";
   const list=Object.entries(noteMap[t.id]||{})
     .filter(([,c])=>c&&c.text)
     .sort((a,b)=>(a[1].at||0)-(b[1].at||0));
-  wrap.innerHTML=`<label>Comments${list.length?` · ${list.length}`:""}</label><div class="cmt-list"></div>`;
+  const wrap=document.createElement("section"); wrap.className="blk cmt-wrap";
+  /* folded away by default — a long thread should never bury the task itself */
+  wrap.innerHTML=`<button class="blk-head blk-toggle" type="button" aria-expanded="false">
+      <h3>Comments</h3><span class="blk-ct">${list.length||""}</span><i class="blk-caret"></i>
+    </button><div class="blk-body"><div class="cmt-list"></div></div>`;
   const box=wrap.querySelector(".cmt-list");
+  const tog=wrap.querySelector(".blk-toggle");
+  tog.onclick=()=>{ const o=wrap.classList.toggle("open"); tog.setAttribute("aria-expanded",o); };
+  if(list.length) { wrap.classList.add("open"); tog.setAttribute("aria-expanded","true"); }
 
   if(!list.length){
     const e=document.createElement("p"); e.className="desc-body is-empty";
@@ -2205,7 +2247,7 @@ function commentBlock(t){
       const fresh=commentBlock(t); wrap.replaceWith(fresh);
       await pushKey(DB_NOTES+"/"+t.id,cid,c);
     };
-    wrap.appendChild(form);
+    wrap.querySelector(".blk-body").appendChild(form);
   }
   return wrap;
 }
@@ -2530,7 +2572,12 @@ function applyLens(){
 }
 
 /* ---------- gate: every screen is rebuilt from scratch, so no stale state ---------- */
-function openGate(){ const g=$("gate"); g.hidden=false; g.classList.remove("done"); document.body.style.overflow="hidden"; }
+function openGate(){
+  const g=$("gate"); g.hidden=false; g.classList.remove("done");
+  document.body.style.overflow="hidden";
+  g.scrollTop=0;                                     // always open at the title
+  const c=g.querySelector(".gate-card"); if(c) c.scrollTop=0;
+}
 var closeGate=function(){
   const g=$("gate"); g.classList.add("done"); document.body.style.overflow="";
   setTimeout(()=>{ g.hidden=true; g.classList.remove("done"); },360);
