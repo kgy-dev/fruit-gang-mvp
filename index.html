@@ -25,7 +25,7 @@
   --t0:#4ec96a; --t1:#e9bf35; --t2:#f28fb8; --t3:#e2543f;
   --done:#4ec96a;   /* a state, not a tier — it must not drift when tiers do */
   --doing:#3f8ee0; --prio:#ff3b30;
-  --kgy:#3fae3f; --rfn:#4a9df5;
+  --kgy:#4fc95a; --rfn:#4a9df5;
 
   /* disciplines stay deliberately muted so tier reads first */
   --c-system:#6b8fc4; --c-asset:#c4a06b; --c-animset:#6bb8b5;
@@ -45,15 +45,17 @@ html,body{margin:0;padding:0;overflow-x:hidden;touch-action:pan-x pan-y;-webkit-
    so the T3 badge still separates from the red panels. */
 /* Neutral graphite surfaces with a clear step between them; red is reserved for
    accents. Tinting every surface flattened the contrast and read as cheap. */
+/* MVP: charcoal with a true red — the old orange-leaning coral read as warm
+   rather than urgent, and the near-black background flattened the panels */
 body.mvp{
-  --bg:#0b0b0b; --panel:#191818; --panel-2:#242222;
-  --line:#343130; --line-soft:#252323;
-  --ink:#f7f4f2; --muted:#928d8a; --dim:#5f5b59;
-  --fig-empty:#5e5a58;
-  --hot:#ff4a33; --hot-2:#ff8f3d;
+  --bg:#111113; --panel:#1a1a1d; --panel-2:#242428;
+  --line:#33333a; --line-soft:#26262b;
+  --ink:#f5f2ef; --muted:#9a9498; --dim:#67626a;
+  --fig-empty:#625d61;
+  --hot:#e8433a; --hot-2:#ff7b6a;
   --t0:#5fe884; --t1:#ffd23f; --t2:#ff9ec6; --t3:#ff6f52; --done:#5fe884;
 }
-body.mvp .topbar{background:linear-gradient(180deg,#171211 0%,var(--bg) 72%);border-bottom-color:#2b2827}
+body.mvp .topbar{background:linear-gradient(180deg,#1c1416 0%,var(--bg) 72%);border-bottom-color:#2f2a2c}
 body.mvp .navseg{background:var(--bg)}
 body.mvp .mark-sub{color:#ff7358;border-color:#5a2a22;background:rgba(255,74,51,.09)}
 body.mvp .mark-dot{background:var(--hot);box-shadow:0 0 13px rgba(255,74,51,.6)}
@@ -386,14 +388,23 @@ body.admin .tab.admin-only{display:flex}
   /* lens and mode sit shoulder to shoulder, and both are properly tappable */
   /* base .primebtn lives after this block and sets margin-left:auto, which in a
      grid cell shrinks the button to its label and shoves it right — outrank it */
-  .app .primebtn{order:3;grid-column:1;margin:0;width:auto;justify-self:stretch;min-height:48px;
-    padding:0 10px;display:flex;align-items:center;justify-content:center;border-radius:10px;
-    font-size:12.5px;font-weight:700;letter-spacing:.16em}
-  .app .modebtn{order:4;grid-column:2;margin:0;width:auto;justify-self:stretch;min-height:48px;
-    flex-direction:row;justify-content:space-between;align-items:center;gap:8px;
-    padding:0 13px;border-radius:10px}
-  .app .mb-lab{font-size:10.5px;font-weight:700;letter-spacing:.14em}
-  .app .mb-pct{font-size:17px;font-weight:700}
+  /* two matching controls: a small caption above, the value below, the accent
+     colour doing the talking — no more mismatched label sizes */
+  .app .primebtn,.app .modebtn{
+    margin:0;width:auto;justify-self:stretch;min-height:56px;padding:9px 12px 8px;
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;
+    border-radius:11px;background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line);text-align:left}
+  .app .primebtn{order:3;grid-column:1;font-size:15px;font-weight:700;letter-spacing:.04em;
+    color:var(--ink);font-family:var(--dsp)}
+  .app .primebtn::before{content:"Lens";font-family:var(--mono);font-size:8.5px;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  body.prime .app .primebtn{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 55%,transparent)}
+  .app .modebtn{order:4;grid-column:2;position:relative}
+  .app .modebtn::before{content:"Switch to";font-family:var(--mono);font-size:8.5px;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .app .mb-lab{font-family:var(--dsp);font-size:15px;font-weight:700;letter-spacing:.04em}
+  .app .mb-pct{position:absolute;right:12px;bottom:9px;font-size:15px;font-weight:700}
   .app .mark-sub{font-size:10px;padding:3px 9px}
   .app .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
   /* the default that hides these sits later in the sheet, and a media query adds
@@ -450,8 +461,9 @@ body.admin .tab.admin-only{display:flex}
     font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
     text-transform:none;color:var(--muted);white-space:nowrap}
   .maintabs .tab[aria-selected="true"],.stab[aria-selected="true"]{
-    color:var(--ink);background:var(--panel-2);font-weight:600;
+    color:var(--hot);background:color-mix(in srgb,var(--hot) 12%,transparent);font-weight:600;
     box-shadow:inset 0 -2px 0 var(--hot)}
+  .maintabs .tab[aria-selected="true"] .badge{background:var(--hot);color:#111}
   .maintabs .tab:disabled,.stab:disabled{opacity:.35;cursor:not-allowed;background:transparent}
   .maintabs .tab .badge{background:var(--panel-2)}
   .maintabs .tab::before{display:none}
@@ -472,14 +484,32 @@ body.admin .tab.admin-only{display:flex}
   .sec h2{font-size:14px}
 
   /* overview: ring column runs full height so nothing leaves a hole */
-  #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);
-    grid-template-rows:auto minmax(0,1fr);column-gap:28px;align-items:start}
-  #pane-overview.is-active>.sec{grid-column:1/-1}
-  #pane-overview.is-active>.hero{grid-column:1;grid-row:1/3;align-self:start}
-  #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
-  #pane-overview.is-active>.ov-side{grid-column:2;grid-row:2}
-  #pane-overview.is-active .ov-side>.sec:first-child{margin-top:18px}
-  #pane-overview.is-active .ring{--r:290px}
+  /* two columns that each read top to bottom: progress on the left (ring, stacked
+     bar, tier), planning on the right (estimate, discipline). The estimate card
+     stretches to the ring's height so both columns start level. */
+  #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);
+    grid-template-rows:auto auto auto;column-gap:28px;align-items:start}
+  #pane-overview.is-active>.hero{grid-column:1;grid-row:1;flex-direction:column;align-items:center;gap:18px}
+  #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important;align-self:stretch;
+    display:flex;flex-direction:column;justify-content:space-between}
+  #pane-overview.is-active>.ov-side{display:contents}
+  #pane-overview.is-active .ov-side>:nth-child(1){grid-column:1;grid-row:2}
+  #pane-overview.is-active .ov-side>:nth-child(2){grid-column:1;grid-row:3}
+  #pane-overview.is-active .ov-side>:nth-child(3){grid-column:2;grid-row:2}
+  #pane-overview.is-active .ov-side>:nth-child(4){grid-column:2;grid-row:3}
+  #pane-overview.is-active .ov-side>.sec{margin-top:22px}
+  #pane-overview.is-active .ring{--r:270px}
+  #pane-overview.is-active .arc-prog,#pane-overview.is-active .arc-track{stroke-width:6}
+  #pane-overview.is-active .stack{display:block;width:100%;max-width:340px}
+  .stack-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--panel-2)}
+  .stack-bar i{display:block;height:100%;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+  .st-done{background:var(--done)} .st-doing{background:var(--doing)} .st-req{background:#ffb03a}
+  .st-left{background:var(--line)}
+  .stack-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:9px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--muted)}
+  .stack-key span{display:inline-flex;align-items:center;gap:6px}
+  .stack-key b{width:8px;height:8px;border-radius:2px}
+  .stack-key em{font-style:normal;color:var(--ink);font-weight:700}
   .pane.is-side .ring{--r:200px}
   .pane.is-side .est-date{font-size:22px}
 
@@ -541,6 +571,14 @@ body.admin .tab.admin-only{display:flex}
   /* the door pane shows the frozen ones, so the shelf hides its copies */
   #pane-fridge.is-active #ideaList .iceswipe:has(.ice.locked){display:none}
   body.fridge .maintabs,body.fridge .sidetabs{display:none}
+  #pane-fridge.is-active>.escape-btn{display:none}     /* the rail carries it on desktop */
+  body.fridge .app .modebtn{grid-column:1/-1;flex-direction:row;justify-content:center;
+    align-items:center;gap:9px;padding:0 12px;color:var(--hot);
+    border-color:color-mix(in srgb,var(--hot) 55%,transparent)}
+  body.fridge .app .modebtn .mb-lab,body.fridge .app .modebtn .mb-pct{display:none}
+  body.fridge .app .modebtn::before{content:"\2744";font-size:14px}
+  body.fridge .app .modebtn::after{content:"Escape from the fridge";
+    font-family:var(--dsp);font-weight:700;font-size:13.5px;letter-spacing:.04em;text-transform:uppercase}
   body.fridge .app{grid-template-rows:0 minmax(0,1fr)}
 
   /* ---- detail drawer ---- */
@@ -657,7 +695,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
 /* ===== WIP warning =================================================== */
-.thead,.rail-extra,.sidetabs{display:none}
+.thead,.rail-extra,.sidetabs,.stack{display:none}
 .wip{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;margin-bottom:11px;
   border-radius:12px;background:rgba(238,138,46,.10);border:1px solid rgba(238,138,46,.34)}
 .wip i{width:23px;height:23px;flex:none;border-radius:50%;display:grid;place-items:center;
@@ -739,12 +777,13 @@ body.prime .splash,body.prime .gate{background:var(--bg)}
 body.prime .primebtn{border-color:var(--hot);color:var(--hot);background:var(--panel-2)}
 body.prime .splash-mark em,body.prime .gate-mark em{color:var(--hot)}
 
+/* KGY: the same contrast recipe as RFN — a brighter accent on a cooler base */
 body.lens-KGY{
-  --bg:#090c0a; --panel:#161b17; --panel-2:#202722;
-  --line:#2f3a32; --line-soft:#212925;
-  --ink:#f2f7f3; --muted:#8e9c92; --dim:#5d6a61;
+  --bg:#090c0a; --panel:#141b16; --panel-2:#1d2720;
+  --line:#2c3a30; --line-soft:#1f2923;
+  --ink:#f3f8f4; --muted:#93a297; --dim:#5f6d63;
   --fig-empty:#5b6a60;
-  --hot:#3fae3f; --hot-2:#8ee06a;
+  --hot:#4fc95a; --hot-2:#a6f07c;
 }
 body.lens-KGY .topbar{background:linear-gradient(180deg,#121c15 0%,var(--bg) 72%);border-bottom-color:#28322b}
 body.lens-KGY .mark-sub{color:#63d06e;border-color:#2c6236;background:rgba(63,174,63,.13)}
@@ -770,8 +809,9 @@ body.lens-RFN .hero::before{background:radial-gradient(circle,rgba(74,157,245,.1
    can never be mistaken for one another at a glance ==================== */
 .mark-sub{background:var(--hot) !important;border-color:var(--hot) !important;color:#0d0b08 !important}
 .topbar{box-shadow:inset 0 3px 0 var(--hot)}
-body.mvp{--panel:#1a1717; --panel-2:#262322; --line:#37322f}
-:root{--panel:#15161a; --panel-2:#1e2026; --line:#2e3038}
+
+/* Alpha: the amber earns a little more presence — warmer panels, firmer lines */
+:root{--panel:#17161a; --panel-2:#211f25; --line:#332f36; --line-soft:#272429}
 
 /* ===== fridge: the app goes cold ==================================== */
 body.fridge{
@@ -883,11 +923,19 @@ body.fridge .frost{opacity:1}
 .ice.locked::after{animation-duration:5.5s}
 .ice-title{text-shadow:0 1px 0 rgba(0,0,0,.4),0 0 18px rgba(150,220,235,.18)}
 
+.escape-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  margin:0 0 14px;padding:13px 14px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(95,216,232,.16),rgba(95,216,232,.06));
+  border:1px solid rgba(95,216,232,.5);color:var(--hot);
+  font-family:var(--dsp);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.escape-btn i{font-style:normal;font-size:15px}
 .fridge-mast{display:none;align-items:baseline;gap:12px;margin:2px 0 14px}
 .fm-line{font-family:var(--stencil);font-size:30px;letter-spacing:.02em;color:var(--ink)}
 .fm-line em{font-style:normal;color:var(--hot)}
 .fm-word{font-family:var(--stencil);font-size:30px;letter-spacing:.06em;
-  color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--hot) 70%,transparent)}
+  background:linear-gradient(180deg,#f4feff 0%,#bfeefc 45%,#6fd2ea 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 10px rgba(140,225,245,.45)) drop-shadow(0 2px 0 rgba(20,60,80,.6))}
 .fridge-side{display:none;padding:18px;border-radius:14px;
   background:linear-gradient(150deg,rgba(190,240,250,.07),rgba(120,200,220,.03)),var(--panel);
   border:1px solid var(--line-soft)}
@@ -1044,7 +1092,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.54</div>
+    <div class="splash-tag">Production Tracker · v0.55</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1076,6 +1124,15 @@ body.fridge .deck-empty p{color:#cdeef7}
             <div class="eyebrow">Complete</div>
             <div class="figure"><span class="fig-num" id="num">0</span><span class="fig-pct">%</span></div>
             <div class="ring-sub" id="sub">0 / 128 tasks</div>
+          </div>
+        </div>
+        <div class="stack" id="stackBar" aria-hidden="true">
+          <div class="stack-bar"><i class="st-done"></i><i class="st-doing"></i><i class="st-req"></i></div>
+          <div class="stack-key">
+            <span><b class="st-done"></b>done <em id="stDone">0</em></span>
+            <span><b class="st-doing"></b>in progress <em id="stDoing">0</em></span>
+            <span><b class="st-req"></b>awaiting <em id="stReq">0</em></span>
+            <span><b class="st-left"></b>left <em id="stLeft">0</em></span>
           </div>
         </div>
       </div>
@@ -1157,6 +1214,9 @@ body.fridge .deck-empty p{color:#cdeef7}
     <section class="pane" id="pane-fridge" role="tabpanel">
       <div class="sec"><h2>The Fridge</h2>
         <span class="note" id="ideaNote">nothing in the fridge</span></div>
+      <button class="escape-btn" id="fridgeEscape" type="button">
+        <i>&#10052;</i><span>Escape from the fridge</span>
+      </button>
       <div class="fridge-mast" aria-hidden="true">
         <span class="fm-line">FRUIT <em>GANG</em></span>
         <span class="fm-word">FRIDGE</span>
@@ -1355,7 +1415,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.54";
+const VERSION="v0.55";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1631,6 +1691,17 @@ function tween(to){
 }
 function hero(){
   const S=scope(), p=pct(S), n=S.filter(t=>isDone(t.id)).length;
+  // the stacked bar under the ring: proportions by task count, not by weight
+  const sb=$("stackBar");
+  if(sb){
+    const g=S.filter(t=>isDoing(t.id)&&!pendingDone(t.id)).length,
+          r=S.filter(t=>pendingDone(t.id)).length, tot=S.length||1;
+    sb.querySelector(".st-done").style.width=(n/tot*100)+"%";
+    sb.querySelector(".st-doing").style.width=(g/tot*100)+"%";
+    sb.querySelector(".st-req").style.width=(r/tot*100)+"%";
+    $("stDone").textContent=n; $("stDoing").textContent=g; $("stReq").textContent=r;
+    $("stLeft").textContent=Math.max(0,S.length-n-g-r);
+  }
   tween(p);
   $("sub").textContent=`${n} / ${S.length} tasks`;
   $("arc").style.strokeDashoffset=(2*Math.PI*137)*(1-p/100);
@@ -2729,6 +2800,7 @@ function crossHint(){
   };
 }
 const MODES=["mvp","alpha","fridge"];
+let prevMode="mvp";   // where "escape" takes you back to
 const nextMode=()=>MODES[(MODES.indexOf(mode)+1)%MODES.length];
 function pctOf(m){
   let l=m==="alpha"?ALL_TASKS:ALL_TASKS.filter(t=>MVP_IDS.has(t.id)||(t.custom&&customMap[t.id]&&customMap[t.id].mvp!==false));
@@ -2949,6 +3021,7 @@ function applyShell(){
 }
 
 function setMode(m){
+  if(m==="fridge"&&mode!=="fridge") prevMode=mode;
   const leavingFridge=(mode==="fridge"&&m!=="fridge");
   mode=m; savePrefs(); applyMode();
   if(m==="fridge"){
@@ -3031,6 +3104,7 @@ document.addEventListener("visibilitychange",async()=>{
     const l=localStorage.getItem(MKEY); if(l==="main"||PEOPLE.includes(l)) lens=l;
   }catch(e){}
   $("railFridge").onclick=()=>setMode("fridge");
+  $("fridgeEscape").onclick=()=>setMode(prevMode||"mvp");
   $("fsSave").onclick=async()=>{
     if(!canEdit()) return;
     const ta=$("fsText"), text=ta.value.trim();
