@@ -465,7 +465,7 @@ body.admin .tab.admin-only{display:flex}
     color:var(--hot);background:color-mix(in srgb,var(--hot) 12%,transparent);font-weight:600;
     box-shadow:inset 0 -2px 0 var(--hot)}
   .maintabs .tab[aria-selected="true"] .badge{background:var(--hot);color:#111}
-  .maintabs .tab:disabled,.stab:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+  .maintabs .tab.is-side-view{box-shadow:inset 0 -2px 0 var(--line)}   /* open on the right */
   .maintabs .tab .badge{background:var(--panel-2)}
   .maintabs .tab::before{display:none}
   .maintabs .tab .badge{margin-left:0;min-width:18px;height:17px;border-radius:9px;
@@ -502,7 +502,7 @@ body.admin .tab.admin-only{display:flex}
   #pane-overview.is-active .ov-side>:nth-child(1){grid-column:1;grid-row:4;margin-top:18px}
   #pane-overview.is-active .ov-side>:nth-child(2){grid-column:1;grid-row:5}
   #pane-overview.is-active>.ov-active{display:block;grid-column:2;grid-row:4/6;margin-top:18px}
-  #pane-overview.is-active>.ov-quote{grid-column:1/-1;grid-row:6}
+  #pane-overview.is-active>.ov-quote{display:block;grid-column:1/-1;grid-row:6}
   #pane-overview.is-active .ring{--r:270px}
   .pane.is-side .ov-active,.pane.is-side .ov-quote{display:block}
   .ov-active>.sec{margin-top:0}
@@ -706,9 +706,9 @@ body.admin .tab.admin-only{display:flex}
 .swipe.armed .sw-right em{color:#fff}
 .who-btn{padding:7px 11px;border-radius:8px;border:1px solid;background:var(--panel-2);
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em}
-.who-btn.on{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.4);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 0 0 2px rgba(255,255,255,.08)}
-.who-btn.on::before{content:"\2713 ";font-size:9px}
+/* pressed: the face takes the person's colour and the label takes the old face
+   colour — the same two tones, swapped */
+.who-btn.on{color:var(--panel-2);text-shadow:none;box-shadow:none}
 .who-btn[data-who="KGY"]{color:var(--kgy);border-color:rgba(63,174,63,.55)}
 .who-btn[data-who="RFN"]{color:var(--rfn);border-color:rgba(74,157,245,.55)}
 .who-btn[data-who="KGY"].on{background:var(--kgy)}
@@ -754,7 +754,6 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
 .gate-card{margin:auto}
-.gate--sheet .gate-card{margin:0 auto auto}   /* tall sheets open at the title, never centred out of reach */
 [hidden]{display:none !important}   /* author display must not beat the attribute */
 .gate.done{opacity:0;pointer-events:none;transition:opacity .22s}
 .gate-card{width:100%;max-width:340px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
@@ -1051,8 +1050,13 @@ body.fridge .deck-empty p{color:#cdeef7}
 .pickrow button[aria-pressed="true"]{color:var(--ink);border-color:var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent)}
 .gate--sheet .gate-mark,.gate--sheet .gate-sub{display:none}
-.gate--sheet .gate-card{max-width:400px;max-height:calc(100vh - 46px);
-  display:flex;flex-direction:column}
+/* A card on a scrim: its own solid surface, so the pinned title no longer reads
+   as a dark stripe on translucent glass. It centres when it fits and scrolls
+   inside when it does not — the title can never leave the screen. */
+.gate--sheet .gate-card{max-width:400px;max-height:calc(100vh - 46px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;margin:auto;
+  background:var(--bg);border:1px solid var(--line);border-radius:18px;
+  padding:16px 18px 18px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
 /* a yes/no question is short; on a phone it belongs under the thumb, not at the top */
 .gate--confirm{align-items:flex-end;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
 .gate--confirm .gate-card{margin:auto auto 0;max-height:none;
@@ -1127,7 +1131,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.56</div>
+    <div class="splash-tag">Production Tracker · v0.57</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1459,7 +1463,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.56";
+const VERSION="v0.57";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -2087,8 +2091,9 @@ function bindCard(wrap,card,t){
   const backDest=()=>inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog");
   const fwdDest =()=>inDeck()?"active":"done";
   const label=()=>{
-    const back={backlog:"BACK TO BACKLOG",deck:"BACK TO DECK"}[backDest()];
-    const fwd ={active:"ACTIVATE",done:"COMPLETE"}[fwdDest()];
+    // short enough to sit inside the 72px reveal; arrows carry the direction
+    const back={backlog:"\u2190 BACKLOG",deck:"\u2190 DECK"}[backDest()];
+    const fwd ={active:"ACTIVATE \u2192",done:"COMPLETE \u2192"}[fwdDest()];
     const em=wrap.querySelectorAll(".cswipe-bg em");
     if(em[0]) em[0].textContent=back;   // revealed by a rightward pull
     if(em[1]) em[1].textContent=fwd;    // revealed by a leftward pull
@@ -3010,31 +3015,34 @@ function pickLens(){
 
 let sideId="pane-overview";
 
+/* One element cannot sit in two columns, so when a view is asked for on the
+   side it already occupies, the two columns trade places. Nothing is ever
+   locked and nothing goes blank. */
 function showPane(id){
+  const was=(document.querySelector(".pane.is-active")||{}).id;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.getAttribute("aria-controls")===id));
   document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-active",p.id===id));
-  // one pane cannot be in two places; bump the side panel out of the way
-  if(DESKTOP()&&sideId===id) showSide(id==="pane-overview"?"pane-deck":"pane-overview");
-  else markSide();
+  if(DESKTOP()&&sideId===id&&was&&was!==id) sideId=was;   // swap
+  applySide();
 }
-
 function showSide(id){
   const activeId=(document.querySelector(".pane.is-active")||{}).id;
-  if(id===activeId) return;                        // that one is on the other screen
-  sideId=id;
-  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-side",DESKTOP()&&p.id===id&&!p.classList.contains("is-active")));
-  document.querySelectorAll(".stab").forEach(b=>b.setAttribute("aria-selected",b.dataset.pane===id));
+  if(id===activeId){                                       // swap
+    const old=sideId; sideId=id;
+    if(old&&old!==id){ showPane(old); return; }
+  }
+  sideId=id; applySide();
+}
+function applySide(){
+  document.querySelectorAll(".pane").forEach(p=>
+    p.classList.toggle("is-side",DESKTOP()&&p.id===sideId&&!p.classList.contains("is-active")));
+  document.querySelectorAll(".stab").forEach(b=>{ b.disabled=false; b.setAttribute("aria-selected",b.dataset.pane===sideId); });
   markSide();
 }
 function markSide(){
-  const activeId=(document.querySelector(".pane.is-active")||{}).id;
   document.querySelectorAll(".maintabs .tab").forEach(t=>{
-    const id=t.getAttribute("aria-controls");
-    t.classList.toggle("is-side-view",DESKTOP()&&id===sideId);
-    t.disabled=DESKTOP()&&id===sideId;            // already open on the right
-  });
-  document.querySelectorAll(".stab").forEach(b=>{
-    b.disabled=b.dataset.pane===activeId;         // already open in the middle
+    t.disabled=false;
+    t.classList.toggle("is-side-view",DESKTOP()&&t.getAttribute("aria-controls")===sideId);
   });
 }
 
