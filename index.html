@@ -355,18 +355,23 @@ body.admin .tab.admin-only{display:flex}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* ===== desktop =========================================================
-   Not the phone stretched wide. A quiet rail on the left, a sticky page header,
-   list rows that read as table rows, and detail that slides in from the right
-   instead of covering the screen. Everything here is behind 1024px. */
+   Built for the screen it runs on: the rail is pinned to the left edge, the
+   content column takes the rest and centres its own measure, and detail slides
+   in from the right. The previous attempt capped the whole app at 1560px and
+   centred it, which parked the sidebar in the middle of a wide monitor with
+   dead space on both sides. Nothing here exists below 1024px. */
 @media (min-width:1024px){
   html{scroll-behavior:smooth}
-  .app{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1560px;padding-bottom:0}
+  .app{
+    display:grid;grid-template-columns:var(--rail,244px) minmax(0,1fr);
+    max-width:none;width:100%;padding-bottom:0;min-height:100vh;
+  }
 
-  /* ---- left rail ---- */
+  /* ---- rail, flush to the edge ---- */
   .topbar{
     grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
-    flex-direction:column;align-items:stretch;gap:13px;
-    padding:18px 13px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
+    flex-direction:column;align-items:stretch;gap:12px;
+    padding:20px 14px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
   }
   .mark-txt{font-size:17px}
   .mark-dot{width:7px;height:7px}
@@ -377,12 +382,11 @@ body.admin .tab.admin-only{display:flex}
   .primebtn{order:7;margin:0;width:100%;padding:8px;text-align:center;border-radius:7px}
   .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
     align-items:center;padding:8px 10px;min-width:0;border-radius:7px}
-  .mb-lab{font-size:8px}
-  .mb-pct{font-size:12px}
+  .mb-lab{font-size:8px} .mb-pct{font-size:12px}
 
   .navseg{
-    grid-area:1/1;align-self:start;margin-top:var(--barH,185px);
-    position:sticky;top:var(--barH,185px);
+    grid-area:1/1;align-self:start;margin-top:var(--barH,182px);
+    position:sticky;top:var(--barH,182px);
     display:flex;flex-direction:column;gap:1px;
     padding:4px 9px 26px;background:var(--bg);border-bottom:none;
   }
@@ -392,96 +396,96 @@ body.admin .tab.admin-only{display:flex}
   .tab,body.crew .tab,body.admin .tab{
     justify-content:flex-start;gap:10px;padding:0 10px;height:31px;
     font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
-    text-transform:none;border-radius:6px;color:var(--muted);border:none;background:transparent;
-  }
+    text-transform:none;border-radius:6px;color:var(--muted);border:none;background:transparent}
   .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2)}
   .tab::before{display:none}
   .tab .badge,body.crew .tab .badge,body.admin .tab .badge{
     margin-left:auto;min-width:18px;height:17px;border-radius:9px;
     font-family:var(--mono);font-size:9.5px;padding:0 5px}
 
-  /* ---- content ---- */
+  /* ---- content column ---- */
   .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
-  .pane{padding:0 30px 80px}
+  .pane{padding:0 clamp(24px,3vw,56px) 90px;max-width:1180px;margin:0 auto}
   .pane>.sec:first-child,.pane>.filters:first-child{
     position:sticky;top:0;z-index:20;background:var(--bg);
-    margin:0 -30px 18px;padding:20px 30px 14px;border-bottom:1px solid var(--line-soft)}
+    margin:0 calc(-1*clamp(24px,3vw,56px)) 20px;
+    padding:22px clamp(24px,3vw,56px) 15px;border-bottom:1px solid var(--line-soft)}
   .pane>.sec:first-child h2{font-size:19px}
   .pane>.sec:first-child .note{font-size:12px}
-  .sec{margin:28px 0 10px}
+  .sec{margin:26px 0 10px}
   .sec h2{font-size:14px}
 
-  #pane-overview{max-width:1040px;padding-top:24px;
-    display:grid;grid-template-columns:minmax(0,344px) minmax(0,1fr);
-    column-gap:36px;align-items:start}
+  /* overview uses the width instead of stacking in a column */
+  #pane-overview{max-width:1180px;padding-top:26px;
+    display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
+    column-gap:clamp(24px,2.6vw,44px);align-items:start}
   #pane-overview>.hero{grid-column:1;grid-row:1}
-  #pane-overview>#estCard{grid-column:1;grid-row:2;margin-top:0 !important}
-  #pane-overview>.fridge-btn{grid-column:1;grid-row:3}
-  #pane-overview>.ov-side{grid-column:2;grid-row:1/4}
+  #pane-overview>#estCard{grid-column:2;grid-row:1;margin-top:0 !important;align-self:start}
+  #pane-overview>.fridge-btn{grid-column:1;grid-row:2;margin-top:16px}
+  #pane-overview>.ov-side{grid-column:2;grid-row:2}
   #pane-overview>.actions,#pane-overview>.foot{grid-column:1/-1}
-  .ov-side>.sec:first-child{margin-top:2px}
-  .ring{--r:292px}
+  .ov-side>.sec:first-child{margin-top:14px}
+  .ring{--r:296px}
+  .est-date{font-size:34px}
+  .est-weeks{font-size:26px}
 
-  #pane-tasks{max-width:1120px}
-  #pane-deck,#pane-active,#pane-done,#pane-admin{max-width:1120px}
-  #pane-fridge{max-width:1080px}
+  #pane-tasks,#pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1180px}
 
-  /* ---- lists become tables ---- */
-  .thead{
-    display:grid;grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;
-    align-items:center;gap:12px;padding:0 14px 8px;
-    border-bottom:1px solid var(--line);margin-bottom:6px;
+  /* ---- backlog reads as a table ---- */
+  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;
+    align-items:center;gap:12px;padding:0 14px 9px;
+    border-bottom:1px solid var(--line);margin-bottom:2px;
     font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
     text-transform:uppercase;color:var(--dim)}
-  .thead>span:first-child{width:18px}
   .thead>span:nth-child(3),.thead>span:nth-child(4){text-align:right}
   .thead>span:last-child{text-align:center}
   .group{background:transparent;border:none;border-bottom:1px solid var(--line-soft);
     border-radius:0;margin:0}
-  .group-head{padding:10px 14px;min-height:40px;border-radius:0}
-  .g-name{font-size:13.5px;text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:600}
-  .group-body{padding:0 0 6px;border-top:none}
+  .group-head{padding:12px 14px;min-height:42px;border-radius:0}
+  .g-name{font-family:var(--body);font-size:13.5px;font-weight:600;
+    text-transform:none;letter-spacing:0}
+  .group-body{padding:0 0 8px;border-top:none}
   .swipe{border-radius:0}
-  .task{grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;gap:12px;
-    padding:0 14px;min-height:36px;border-radius:0;background-color:transparent}
+  .task{grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;gap:12px;
+    padding:0 14px;min-height:38px;border-radius:0;background-color:transparent}
   .task.is-done,.task.is-doing,.task.is-req{background-image:none}
+  .task .t-name{font-size:13.5px}
   .task .t-disc{font-size:9.5px}
   .task .t-flags{justify-content:flex-end}
-  .task .t-tier{width:34px;margin:0 auto}
+  .task .t-tier{width:36px;margin:0 auto}
   .task.is-prio{box-shadow:inset 2px 0 0 var(--prio)}
 
-  .deck-card{grid-template-columns:auto minmax(0,1fr) 96px 96px 44px;gap:12px;
-    padding:11px 14px;border-radius:10px}
+  .deck-card{grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;gap:12px;
+    padding:12px 14px;border-radius:10px}
   .cswipe{border-radius:10px}
 
-  /* ---- detail slides in, it does not take the screen ---- */
-  .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;
-    background:rgba(0,0,0,.52)}
+  /* ---- detail as a drawer ---- */
+  .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.55)}
   .gate--sheet .gate-card{
-    width:452px;max-width:452px;height:100%;overflow-y:auto;text-align:left;
-    background:var(--bg);border-left:1px solid var(--line);
-    padding:26px 26px 44px;
+    width:min(480px,42vw);max-width:none;height:100%;overflow-y:auto;text-align:left;
+    background:var(--bg);border-left:1px solid var(--line);padding:26px 28px 48px;
     animation:drawerIn .24s cubic-bezier(.2,.8,.3,1) both}
-  @keyframes drawerIn{from{transform:translateX(28px);opacity:.5}to{transform:none;opacity:1}}
-  .gate--sheet .gate-q{text-align:left;font-size:19px;text-transform:none;
-    letter-spacing:0;color:var(--ink);margin:0 0 20px}
-  .gate--sheet .gate-row{margin-top:22px}
-  .gate--sheet .gate-row--split .gbtn{padding:12px 10px}
+  @keyframes drawerIn{from{transform:translateX(30px);opacity:.5}to{transform:none;opacity:1}}
+  .gate--sheet .gate-q{text-align:left;font-size:20px;text-transform:none;
+    letter-spacing:0;color:var(--ink);margin:0 0 20px;font-weight:700}
+  .gate--sheet .gate-row{margin-top:24px}
 
   .pane.is-active{animation:paneIn .24s cubic-bezier(.2,.8,.3,1) both}
   @keyframes paneIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-  .filters{gap:9px}
+  .filters{gap:10px}
   .search{padding:11px 13px}
-  .card{padding:18px;border-radius:12px}
+  .card{padding:20px;border-radius:12px}
 }
+@media (min-width:1500px){ .app{--rail:264px} .pane{max-width:1340px} #pane-overview{max-width:1340px} }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){
   .tab:hover{color:var(--ink);background:var(--panel)}
   .task:hover{background-color:var(--panel)}
   .group-head:hover{background:var(--panel)}
   .deck-card:hover,.ice:hover,.req-card:hover{border-color:var(--line)}
-  .btn:hover,.addbtn:hover,.gbtn:hover{border-color:var(--hot)}
+  .btn:hover,.addbtn:hover,.gbtn:hover,.linkbtn:hover{border-color:var(--hot)}
   .chip:hover,.tseg button:hover{color:var(--ink)}
   .fridge-btn:hover{background:rgba(95,216,232,.2)}
+  .cmt-del:hover{color:var(--prio);border-color:var(--prio)}
 }
 @media (min-width:1024px) and (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -790,6 +794,30 @@ body.fridge .deck-empty p{color:#cdeef7}
 .addbtn{padding:9px 13px;border-radius:9px;border:1px solid var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent);
   color:var(--hot);font-family:var(--mono);font-size:12px;font-weight:700}
+.desc-body{margin:0;font-size:14.5px;line-height:1.55;color:var(--ink);
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.desc-body.is-empty{color:var(--dim);font-style:italic}
+.linkbtn{margin-top:9px;padding:0;background:none;color:var(--hot);
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:underline;text-underline-offset:3px}
+.cmt-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft)}
+.cmt-list{display:flex;flex-direction:column;gap:10px}
+.cmt{padding:11px 12px;border-radius:11px;background:var(--panel);border:1px solid var(--line-soft)}
+.cmt-head{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.cmt-head b{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.cmt-head span{font-family:var(--mono);font-size:9px;color:var(--dim)}
+.cmt-del{margin-left:auto;padding:2px 6px;border-radius:5px;background:none;
+  border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.08em;text-transform:uppercase}
+.cmt-txt{margin:0;font-size:14px;line-height:1.5;color:var(--ink);
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.cmt-form{margin-top:11px;display:flex;flex-direction:column;gap:8px}
+.cmt-form textarea{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:11px;
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  font-family:var(--body);font-size:14px;line-height:1.5;outline:none;resize:vertical;min-height:56px}
+.cmt-form textarea:focus{border-color:var(--hot)}
+.cmt-form button{align-self:flex-start}
 .tl-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
   padding:11px 0;border-bottom:1px solid var(--line-soft);text-align:left}
 .tl-row span{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;
@@ -855,7 +883,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.45</div>
+    <div class="splash-tag">Production Tracker · v0.46</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1129,6 +1157,8 @@ const DB_REQ   = "fg-mvp/req";   // team asks, admin approves
 const DB_IDEAS = "fg-mvp/ideas"; // the fridge
 const DB_CUSTOM= "fg-mvp/custom";// tasks added from inside the app
 const DB_EDITS = "fg-mvp/edits"; // admin overrides on any task
+const DB_DESC  = "fg-mvp/desc";  // one description per task, whoever wrote it
+const DB_NOTES = "fg-mvp/notes"; // comments, keyed by task then by comment
 
 /* The layout is plain document flow now — no viewport height to solve.
    We only measure the header so the nav can stick directly beneath it. */
@@ -1139,7 +1169,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.45";
+const VERSION="v0.46";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1153,7 +1183,7 @@ addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
 const SKEY="fg-mvp-v3-shared", PKEY="fg-mvp-v3-prefs";
-let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={}, ideaMap={}, customMap={}, editMap={};
+let doneMap={}, doingMap={}, prioMap={}, assignMap={}, rankMap={}, reqMap={}, ideaMap={}, customMap={}, editMap={}, descMap={}, noteMap={};
 let weighted=true, devs=2, tierF=new Set(), discF=new Set(), q="";
 
 /* device-local, never shared: who is looking and what they may do */
@@ -1166,6 +1196,9 @@ const ROLES={
 };
 let role=null, lens="main";
 const canEdit =()=>role==="admin"||role==="team";
+/* Comments need a name. The lens is the sharper identity when one is picked;
+   otherwise fall back to the role so a note is never signed "undefined". */
+const whoAmI=()=>lens!=="main"?lens:(role||"anon");
 const isAdmin =()=>role==="admin";
 /* Team may move work along, but finishing or reopening needs a sign-off. */
 const needsReq=(from,to)=>role==="team"&&(to===2||from===2);
@@ -1216,7 +1249,8 @@ async function initStore(){
       const db=dbm.getDatabase(a);
       FB={db,...dbm,root:dbm.ref(db,DB_ROOT),done:dbm.ref(db,DB_PATH),doing:dbm.ref(db,DB_DOING),
           prio:dbm.ref(db,DB_PRIO),assign:dbm.ref(db,DB_ASSIGN),rank:dbm.ref(db,DB_RANK),req:dbm.ref(db,DB_REQ),
-          ideas:dbm.ref(db,DB_IDEAS),custom:dbm.ref(db,DB_CUSTOM),edits:dbm.ref(db,DB_EDITS)};
+          ideas:dbm.ref(db,DB_IDEAS),custom:dbm.ref(db,DB_CUSTOM),edits:dbm.ref(db,DB_EDITS),
+          desc:dbm.ref(db,DB_DESC),notes:dbm.ref(db,DB_NOTES)};
       backend="firebase"; return;
     }catch(e){ console.error("Firebase unavailable, falling back:",e); }
   }
@@ -1259,7 +1293,8 @@ async function pull(){
       const s=await FB.get(FB.root); const v=s.exists()?(s.val()||{}):{};
       doneMap=v.done||{}; doingMap=v.doing||{};
       prioMap=v.prio||{}; assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
-      ideaMap=v.ideas||{}; customMap=v.custom||{}; editMap=v.edits||{}; return;
+      ideaMap=v.ideas||{}; customMap=v.custom||{}; editMap=v.edits||{};
+      descMap=v.desc||{}; noteMap=v.notes||{}; return;
     }
     if(backend==="claude"){
       const r=await window.storage.get(SKEY,true);
@@ -1272,25 +1307,29 @@ async function pull(){
         if(d&&typeof d.req==="object") reqMap=d.req;
         if(d&&typeof d.ideas==="object") ideaMap=d.ideas;
         if(d&&typeof d.custom==="object") customMap=d.custom;
-        if(d&&typeof d.edits==="object") editMap=d.edits; }
+        if(d&&typeof d.edits==="object") editMap=d.edits;
+        if(d&&typeof d.desc==="object") descMap=d.desc;
+        if(d&&typeof d.notes==="object") noteMap=d.notes; }
       return;
     }
     const raw=JSON.parse(localStorage.getItem(SKEY)||"{}");
     doneMap=raw.done||raw; doingMap=raw.doing||{};
     prioMap=raw.prio||{}; assignMap=raw.assign||{}; rankMap=raw.rank||{}; reqMap=raw.req||{};
     ideaMap=raw.ideas||{}; customMap=raw.custom||{}; editMap=raw.edits||{};
+    descMap=raw.desc||{}; noteMap=raw.notes||{};
   }catch(e){}
 }
 
 const bundle=()=>({v:7,done:doneMap,doing:doingMap,prio:prioMap,assign:assignMap,rank:rankMap,req:reqMap,
-                   ideas:ideaMap,custom:customMap,edits:editMap,at:Date.now()});
+                   ideas:ideaMap,custom:customMap,edits:editMap,desc:descMap,notes:noteMap,at:Date.now()});
 
 async function pushAll(){
   try{
     if(backend==="firebase"){
       await Promise.all([FB.set(FB.done,doneMap),FB.set(FB.doing,doingMap),FB.set(FB.prio,prioMap),
                          FB.set(FB.assign,assignMap),FB.set(FB.rank,rankMap),FB.set(FB.req,reqMap),
-                         FB.set(FB.ideas,ideaMap),FB.set(FB.custom,customMap),FB.set(FB.edits,editMap)]);
+                         FB.set(FB.ideas,ideaMap),FB.set(FB.custom,customMap),FB.set(FB.edits,editMap),
+                         FB.set(FB.desc,descMap),FB.set(FB.notes,noteMap)]);
     }else if(backend==="claude"){
       await window.storage.set(SKEY,JSON.stringify(bundle()),true);
     }else{
@@ -1805,7 +1844,7 @@ function bindCard(wrap,card,t){
    key-only signature meant the other phone never noticed the change. */
 const kv=m=>Object.keys(m).sort().map(k=>k+":"+(typeof m[k]==="object"?JSON.stringify(m[k]):m[k])).join("|");
 const sig=()=>[doneMap,doingMap,prioMap].map(m=>Object.keys(m).sort().join("|")).join("#")
-  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap)+"#"+kv(ideaMap)+"#"+kv(customMap)+"#"+kv(editMap);
+  +"#"+kv(assignMap)+"#"+kv(reqMap)+"#"+kv(rankMap)+"#"+kv(ideaMap)+"#"+kv(customMap)+"#"+kv(editMap)+"#"+kv(descMap)+"#"+kv(noteMap);
 function refreshHead(si){
   const g=document.querySelector(`#groups section[data-si="${si}"]`); if(!g) return;
   const all=TASKS.filter(t=>t.si===si&&inScope(t)), k=all.filter(t=>isDone(t.id)).length;
@@ -2021,7 +2060,41 @@ function openTask(t){
     line("Owner",w||"unassigned",w?`var(--${w.toLowerCase()})`:"");
     line("Scope",inMvp(t)?"MVP":"Alpha");
 
+    /* description */
+    const dWrap=document.createElement("div"); dWrap.className="sheet-field"; dWrap.style.marginTop="18px";
+    dWrap.innerHTML=`<label>Description</label>`;
+    const dTxt=document.createElement("p"); dTxt.className="desc-body";
+    const dv=(descMap[t.id]||"").trim();
+    dTxt.textContent=dv||"No description yet.";
+    if(!dv) dTxt.classList.add("is-empty");
+    dWrap.appendChild(dTxt);
+    if(isAdmin()){
+      const eb=document.createElement("button"); eb.type="button"; eb.className="linkbtn";
+      eb.textContent=dv?"Edit description":"Add a description";
+      eb.onclick=()=>{ closeGate(); setTimeout(()=>editDesc(t),380); };
+      dWrap.appendChild(eb);
+    }
+    body.appendChild(dWrap);
+
     if(canEdit()){
+      /* priority is its own switch — a task can be flagged wherever it sits */
+      const pf=document.createElement("div"); pf.className="sheet-field"; pf.style.marginTop="16px";
+      pf.innerHTML=`<label>Priority</label><div class="pickrow"></div>`;
+      const pr2=pf.querySelector(".pickrow");
+      [["on",true],["off",false]].forEach(([lbl,val])=>{
+        const b=document.createElement("button"); b.type="button"; b.textContent=lbl;
+        b.setAttribute("aria-pressed",isPrio(t.id)===val);
+        b.onclick=async()=>{
+          if(isPrio(t.id)===val) return;
+          if(val) prioMap[t.id]=Date.now(); else delete prioMap[t.id];
+          pf.querySelectorAll("button").forEach(o=>o.setAttribute("aria-pressed",o===b));
+          repaint(t.id); summary(); deck(); active();
+          await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
+        };
+        pr2.appendChild(b);
+      });
+      body.appendChild(pf);
+
       const f=document.createElement("div"); f.className="sheet-field";
       f.style.marginTop="16px";
       f.innerHTML=`<label>${isAdmin()?"Move to":"Ask to move"}</label><div class="pickrow"></div>`;
@@ -2044,6 +2117,8 @@ function openTask(t){
       }
     }
 
+    body.appendChild(commentBlock(t));
+
     const row=document.createElement("div"); row.className="gate-row";
     if(isAdmin()){
       const ed=gbtn("Edit task","",false);
@@ -2053,6 +2128,86 @@ function openTask(t){
     const close=gbtn("Close","",true); close.onclick=closeGate;
     row.appendChild(close); body.appendChild(row);
   });
+}
+
+function editDesc(t){
+  if(!isAdmin()) return;
+  openSheet("Description",body=>{
+    const f=document.createElement("div"); f.className="sheet-field";
+    f.innerHTML=`<label>What this task actually covers</label><textarea placeholder="Scope, gotchas, what done looks like…"></textarea>`;
+    const ta=f.querySelector("textarea"); ta.value=descMap[t.id]||""; body.appendChild(f);
+    const row=document.createElement("div"); row.className="gate-row gate-row--split";
+    const save=gbtn("Save","",true);
+    save.onclick=async()=>{
+      const v=ta.value.trim();
+      if(v) descMap[t.id]=v; else delete descMap[t.id];
+      closeGate(); await pushKey(DB_DESC,t.id,v||null);
+    };
+    const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
+    row.append(save,cancel); body.appendChild(row);
+    setTimeout(()=>ta.focus(),60);
+  });
+}
+
+const ago=ts=>{
+  const s=(Date.now()-ts)/1000;
+  if(s<60) return "just now";
+  if(s<3600) return Math.floor(s/60)+"m ago";
+  if(s<86400) return Math.floor(s/3600)+"h ago";
+  if(s<604800) return Math.floor(s/86400)+"d ago";
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+};
+
+/* Comments belong to whoever wrote them: an author can take their own back,
+   and an admin can take any of them back. Nobody edits somebody else's words. */
+function commentBlock(t){
+  const wrap=document.createElement("div"); wrap.className="sheet-field cmt-wrap";
+  const list=Object.entries(noteMap[t.id]||{})
+    .filter(([,c])=>c&&c.text)
+    .sort((a,b)=>(a[1].at||0)-(b[1].at||0));
+  wrap.innerHTML=`<label>Comments${list.length?` · ${list.length}`:""}</label><div class="cmt-list"></div>`;
+  const box=wrap.querySelector(".cmt-list");
+
+  if(!list.length){
+    const e=document.createElement("p"); e.className="desc-body is-empty";
+    e.textContent="Nothing said yet."; box.appendChild(e);
+  }
+  list.forEach(([cid,c])=>{
+    const el=document.createElement("div"); el.className="cmt";
+    el.innerHTML=`<div class="cmt-head"><b></b><span>${ago(c.at||Date.now())}</span></div>
+      <p class="cmt-txt"></p>`;
+    el.querySelector("b").textContent=c.by||"anon";
+    el.querySelector(".cmt-txt").textContent=c.text;
+    if(isAdmin()||c.by===whoAmI()){
+      const d=document.createElement("button"); d.type="button"; d.className="cmt-del";
+      d.textContent="Delete"; d.setAttribute("aria-label","delete comment");
+      d.onclick=async()=>{
+        if(noteMap[t.id]) delete noteMap[t.id][cid];
+        el.remove();
+        await pushKey(DB_NOTES+"/"+t.id,cid,null);
+      };
+      el.querySelector(".cmt-head").appendChild(d);
+    }
+    box.appendChild(el);
+  });
+
+  if(canEdit()){
+    const form=document.createElement("div"); form.className="cmt-form";
+    form.innerHTML=`<textarea rows="2" placeholder="Add a comment…"></textarea>
+      <button type="button" class="addbtn">Post</button>`;
+    const ta=form.querySelector("textarea"), btn=form.querySelector("button");
+    btn.onclick=async()=>{
+      const text=ta.value.trim(); if(!text) return;
+      const cid="c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      const c={text,by:whoAmI(),at:Date.now()};
+      noteMap[t.id]=noteMap[t.id]||{}; noteMap[t.id][cid]=c;
+      ta.value="";
+      const fresh=commentBlock(t); wrap.replaceWith(fresh);
+      await pushKey(DB_NOTES+"/"+t.id,cid,c);
+    };
+    wrap.appendChild(form);
+  }
+  return wrap;
 }
 
 function editTask(t){
@@ -2065,6 +2220,8 @@ function editTask(t){
 
     const nameF=mk("Task name",'<input type="text" autocomplete="off">');
     const nameI=nameF.querySelector("input"); nameI.value=t.name;
+    const descF=mk("Description",'<textarea placeholder="Scope, gotchas, what done looks like…"></textarea>');
+    const descI=descF.querySelector("textarea"); descI.value=descMap[t.id]||"";
 
     const tierF=mk("Tier",'<div class="pickrow"></div>');
     TIERS.forEach(k=>{
@@ -2103,6 +2260,9 @@ function editTask(t){
     save.onclick=async()=>{
       const name=nameI.value.trim(); if(!name){ nameI.focus(); return; }
       const sec = sel.value===NEW ? (newSec.value.trim()||SEC_NAMES[t.si]) : sel.value;
+      const dv=descI.value.trim();
+      if(dv) descMap[t.id]=dv; else delete descMap[t.id];
+      pushKey(DB_DESC,t.id,dv||null);
       if(t.custom){
         const c={...customMap[t.id],name,disc,tier,sec,mvp:!alphaOnly};
         customMap[t.id]=c; rebuildData(); applyMode(); closeGate(); buildTicks(); all_();
@@ -2141,6 +2301,8 @@ function composeTask(){
 
     const nameF=mk("Task name",'<input type="text" placeholder="e.g. Fridge Logic" autocomplete="off">');
     const nameI=nameF.querySelector("input");
+    const descF=mk("Description",'<textarea placeholder="Optional — scope, gotchas, what done looks like"></textarea>');
+    const descI=descF.querySelector("textarea");
 
     const tierF=mk("Tier",'<div class="pickrow"></div>');
     TIERS.forEach(k=>{
@@ -2182,8 +2344,10 @@ function composeTask(){
       if(ALL_TASKS.some(t=>t.id===id)) id+="-"+Date.now().toString(36).slice(-4);
       const rec={name,disc,tier,sec,mvp:!scopeAlphaOnly,at:Date.now()};
       customMap[id]=rec;
+      const dv=descI.value.trim(); if(dv) descMap[id]=dv;
       rebuildData(); applyMode(); closeGate(); buildTicks(); all_();
       await pushKey(DB_CUSTOM,id,rec);
+      if(dv) await pushKey(DB_DESC,id,dv);
     };
     const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
     row.append(save,cancel); body.appendChild(row);
@@ -2571,6 +2735,7 @@ document.addEventListener("visibilitychange",async()=>{
       doneMap=v.done||{};   doingMap=v.doing||{}; prioMap=v.prio||{};
       assignMap=v.assign||{}; rankMap=v.rank||{}; reqMap=v.req||{};
       ideaMap=v.ideas||{};  customMap=v.custom||{}; editMap=v.edits||{};
+      descMap=v.desc||{};   noteMap=v.notes||{};
       if(sig()!==before){ rebuildData(); applyMode(); all_(); }
       stamp("live");
     });
