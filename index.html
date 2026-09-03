@@ -354,94 +354,123 @@ body.admin .tab.admin-only{display:flex}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-/* ===== desktop: a real sidebar, one pane at a time ====================
-   The old rule stacked every pane in one column, which turned a wide screen
-   into a very long page. Here the nav moves to the left and the content gets
-   the room instead. Same document, same data — only the shell changes. */
-@media (min-width:1024px){
-  .app{
-    display:grid;grid-template-columns:250px minmax(0,1fr);
-    max-width:1480px;padding-bottom:0;
-  }
-  /* Header and nav share one tall cell. Given a row of their own, sticky has no
-     travel — the containing block is exactly the element's height, so it just
-     scrolls away. Stacking them in the same cell gives them the full column. */
-  .topbar{
-    grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
-    flex-direction:column;align-items:stretch;gap:13px;
-    padding:22px 16px 18px;border-bottom:none;
-    box-shadow:inset 3px 0 0 var(--hot);
-  }
-  .topbar .mark{gap:9px}
-  .mark-txt{font-size:19px}
-  .mark-sub{align-self:flex-start;min-width:0;padding:3px 8px}
-  .sync{order:9;margin:0;text-align:left;font-size:9.5px}
-  .primebtn{order:7;margin:0;width:100%;padding:10px;text-align:center;letter-spacing:.16em}
-  .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
-    align-items:center;padding:10px 12px;min-width:0}
-  .mb-lab{font-size:9px}
-  .mb-pct{font-size:13px}
-
-  .navseg{
-    grid-area:1/1;align-self:start;margin-top:var(--barH,168px);
-    position:sticky;top:var(--barH,168px);
-    display:flex;flex-direction:column;gap:4px;
-    padding:14px 12px 26px;background:var(--bg);border-bottom:none;
-  }
-  body.crew .navseg,body.admin .navseg{gap:4px;padding-left:12px;padding-right:12px}
-  .tab,body.crew .tab,body.admin .tab{
-    justify-content:flex-start;gap:9px;padding:11px 13px;
-    font-size:10px;letter-spacing:.12em;border-radius:10px;
-  }
-  .tab .badge{margin-left:auto}
-
-  .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
-  .pane{padding:28px 32px 72px}
-  #pane-overview{max-width:760px}
-  #pane-tasks{max-width:980px}
-  #pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1060px}
-  .ring{--r:320px}
-  .task{padding:9px 12px;min-height:48px}
-  .group-head{padding:15px 16px}
-  body.fridge .navseg{display:none}
-}
-
-/* ===== desktop presentation =====
-   Panes are swapped, not scrolled to, so each one announces itself. All of this
-   lives behind the desktop breakpoint; the phone layout never sees a line of it. */
+/* ===== desktop ========================================================
+   A phone layout stretched wide reads as cheap: tiny uppercase labels, fat
+   padding, panels floating in space. This is built for a pointer instead —
+   a quiet sidebar, a sticky page header per view, and dense rows. None of it
+   exists below 1024px, so the phone is untouched. */
 @media (min-width:1024px){
   html{scroll-behavior:smooth}
-
-  .pane.is-active{animation:paneIn .3s cubic-bezier(.2,.8,.3,1) both}
-  @keyframes paneIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-  /* the sidebar marks where you are with a bar, not just a fill */
-  .tab{position:relative;overflow:visible}
-  .tab[aria-selected="true"]::before{
-    content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
-    width:3px;height:20px;border-radius:0 3px 3px 0;background:var(--hot);
+  .app{
+    display:grid;grid-template-columns:238px minmax(0,1fr);
+    max-width:1520px;padding-bottom:0;
   }
 
-  .sec{margin:32px 0 14px}
-  .sec h2{font-size:19px;letter-spacing:.02em}
-  .pane>.sec:first-child{margin-top:4px}
+  /* ---- sidebar ---- */
+  .topbar{
+    grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
+    flex-direction:column;align-items:stretch;gap:14px;
+    padding:20px 14px 16px;border-bottom:none;box-shadow:none;background:var(--bg);
+  }
+  .topbar .mark{gap:9px}
+  .mark-txt{font-size:18px}
+  .mark-dot{width:8px;height:8px}
+  .mark-sub{
+    align-self:flex-start;min-width:0;padding:2px 7px;
+    background:transparent !important;color:var(--hot) !important;
+    border-color:color-mix(in srgb,var(--hot) 40%,transparent) !important;
+  }
+  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.75}
+  .primebtn{order:7;margin:0;width:100%;padding:9px;text-align:center;
+    letter-spacing:.14em;border-radius:8px}
+  .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
+    align-items:center;padding:9px 11px;min-width:0;border-radius:8px}
+  .mb-lab{font-size:8.5px}
+  .mb-pct{font-size:12.5px}
 
-  .deck-card,.ice,.req-card,.note-card{
-    transition:transform .18s cubic-bezier(.2,.8,.3,1),border-color .2s,box-shadow .2s}
-  .group{transition:border-color .2s}
+  .navseg{
+    grid-area:1/1;align-self:start;margin-top:var(--barH,190px);
+    position:sticky;top:var(--barH,190px);
+    display:flex;flex-direction:column;gap:1px;
+    padding:6px 10px 26px;background:var(--bg);border-bottom:none;
+  }
+  .navseg::before{
+    content:"Views";padding:0 8px 8px;
+    font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--dim);
+  }
+  /* sentence case at a readable size — small caps mono is what made it look cheap */
+  .tab,body.crew .tab,body.admin .tab{
+    justify-content:flex-start;gap:10px;padding:0 10px;height:33px;
+    font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:0;
+    text-transform:none;border-radius:7px;color:var(--muted);border:none;background:transparent;
+  }
+  .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2)}
+  .tab::before{display:none}
+  .tab .badge,body.crew .tab .badge,body.admin .tab .badge{
+    margin-left:auto;min-width:19px;height:18px;border-radius:9px;
+    font-family:var(--mono);font-size:10px;padding:0 5px;
+  }
 
-  /* the reading and compose windows get room to breathe */
-  .gate-card{max-width:420px}
-  .gate--sheet .gate-card{max-width:560px}
+  /* ---- content ---- */
+  .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
+  .pane{padding:0 34px 80px}
+
+  /* every view opens with a header that stays put while the list scrolls */
+  .pane>.sec:first-child,.pane>.filters:first-child{
+    position:sticky;top:0;z-index:20;background:var(--bg);
+    margin:0 -34px 20px;padding:22px 34px 15px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .pane>.sec:first-child h2{font-size:20px;letter-spacing:.01em}
+  .pane>.sec:first-child .note{font-size:12px}
+  .sec{margin:30px 0 12px}
+  .sec h2{font-size:15px}
+
+  #pane-overview{max-width:1020px;padding-top:26px;
+    display:grid;grid-template-columns:minmax(0,352px) minmax(0,1fr);
+    column-gap:36px;align-items:start}
+  #pane-overview>.hero{grid-column:1;grid-row:1}
+  #pane-overview>#estCard{grid-column:1;grid-row:2;margin-top:0 !important}
+  #pane-overview>.fridge-btn{grid-column:1;grid-row:3}
+  #pane-overview>.ov-side{grid-column:2;grid-row:1/4}
+  #pane-overview>.actions,#pane-overview>.foot{grid-column:1/-1}
+  .ov-side>.sec:first-child{margin-top:2px}
+  .ring{--r:300px}
+
+  #pane-tasks{max-width:1000px}
+  #pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1080px}
+
+  /* denser rows: a pointer does not need 46px targets */
+  .task{padding:5px 12px;min-height:40px;gap:12px}
+  .group{margin-bottom:8px}
+  .group-head{padding:11px 14px;min-height:44px}
+  .g-name{font-size:14px}
+  .deck-card{padding:12px 14px}
+  .card{padding:18px;border-radius:12px}
+  .filters{gap:9px}
+  .search{padding:11px 13px}
+
+  .pane.is-active{animation:paneIn .26s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes paneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .deck-card,.ice,.req-card{transition:border-color .18s,box-shadow .18s,transform .18s}
+  .gate-card{max-width:430px}
+  .gate--sheet .gate-card{max-width:580px}
   .read-txt{font-size:15.5px;max-height:52vh}
+  .gate-row--split .gbtn{padding:12px 10px}
 }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){
-  .deck-card:hover,.ice:hover,.req-card:hover{transform:translateY(-1px)}
+  .tab:hover{color:var(--ink);background:var(--panel)}
+  .task:hover{background-color:var(--panel-2)}
+  .deck-card:hover,.ice:hover,.req-card:hover{border-color:var(--line)}
+  .btn:hover,.addbtn:hover,.gbtn:hover{border-color:var(--hot)}
+  .chip:hover,.tseg button:hover{color:var(--ink)}
+  .fridge-btn:hover{background:rgba(95,216,232,.2)}
 }
 @media (min-width:1024px) and (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .pane.is-active{animation:none}
-  .deck-card:hover,.ice:hover,.req-card:hover{transform:none}
 }
 
 /* wide screens get two columns where the order does not matter */
@@ -515,7 +544,7 @@ body.admin .tab.admin-only{display:flex}
 
 /* ===== drag to reorder =============================================== */
 .deck-card{touch-action:pan-y}
-body.dragging-on{user-select:none;-webkit-user-select:none}
+body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:none;touch-action:none}
 .grip{position:absolute;right:11px;bottom:12px;width:14px;height:8px;opacity:.22;pointer-events:none;
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
@@ -572,6 +601,9 @@ body.dragging-on{user-select:none;-webkit-user-select:none}
 .gate-err{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
   text-transform:uppercase;color:var(--prio)}
 .gate-row{display:flex;flex-direction:column;gap:7px;margin-top:11px}
+/* side by side keeps Cancel out of the path to the confirm button */
+.gate-row--split{flex-direction:row-reverse;gap:9px}
+.gate-row--split .gbtn{flex:1;min-height:0;padding:13px 10px}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
 /* visitors read, they do not write */
@@ -720,8 +752,17 @@ body.fridge .frost{opacity:1}
   max-height:46vh;overflow-y:auto}
 .read-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--dim);text-align:left;margin-bottom:4px}
-.ice.locked{border-color:rgba(150,220,235,.46);
-  box-shadow:inset 0 1px 0 rgba(220,250,255,.26),inset 3px 0 0 var(--hot)}
+.ice.locked{
+  background:
+    radial-gradient(84px 54px at 93% 0%,rgba(235,254,255,.30),transparent 70%),
+    radial-gradient(62px 50px at 3% 100%,rgba(185,242,253,.22),transparent 70%),
+    linear-gradient(150deg,rgba(218,249,255,.26),rgba(140,215,238,.11)),
+    linear-gradient(180deg,#16323d,#102832);
+  border-color:rgba(198,243,253,.58);
+  box-shadow:inset 0 1px 0 rgba(240,254,255,.45),inset 3px 0 0 var(--hot),
+             0 0 0 1px rgba(150,220,235,.18),0 5px 22px rgba(0,0,0,.42)}
+.ice.locked .ice-title{color:#f4feff;text-shadow:0 0 14px rgba(170,235,250,.4)}
+.ice.locked .ice-when{color:#9fd4e2}
 .ice.locked::after{animation-duration:5.5s}
 .ice-title{text-shadow:0 1px 0 rgba(0,0,0,.4),0 0 18px rgba(150,220,235,.18)}
 
@@ -775,7 +816,7 @@ body.fridge .deck-empty p{color:#cdeef7}
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-active" id="activeTab">Active<span class="badge" id="activeCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-deck" id="deckTab">Deck<span class="badge" id="deckCount">0</span></button>
     <button class="tab crew-only" role="tab" aria-selected="false" aria-controls="pane-done" id="doneTab">Done<span class="badge" id="doneCount">0</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Tasks</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Backlog</button>
     <button class="tab admin-only" role="tab" aria-selected="false" aria-controls="pane-admin" id="adminTab">Admin<span class="badge" id="reqCount">0</span></button>
   </nav>
 
@@ -798,7 +839,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · B42</div>
+    <div class="splash-tag">Production Tracker · B44</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -833,7 +874,7 @@ body.fridge .deck-empty p{color:#cdeef7}
         </div>
       </div>
 
-      <div class="card" style="margin-top:10px">
+      <div class="card" id="estCard" style="margin-top:10px">
         <div class="est-top">
           <div>
             <div class="est-lab">Estimated</div>
@@ -853,15 +894,17 @@ body.fridge .deck-empty p{color:#cdeef7}
 
       <button class="fridge-btn" id="fridgeBtn" type="button">
         <i>&#10052;</i>
-        <span><b>The Fridge</b><span>ideas on ice</span></span>
+        <span><b>The Fridge</b><span>ideas, kept cold</span></span>
         <em id="fridgeCount">0</em>
       </button>
 
-      <div class="sec"><h2>Tier</h2><span class="note">ceiling per task</span></div>
-      <div class="card"><div class="rows" id="tierRows"></div></div>
+      <div class="ov-side">
+        <div class="sec"><h2>Tier</h2><span class="note">ceiling per task</span></div>
+        <div class="card"><div class="rows" id="tierRows"></div></div>
 
-      <div class="sec"><h2>Discipline</h2></div>
-      <div class="card"><div class="rows" id="discRows"></div></div>
+        <div class="sec"><h2>Discipline</h2></div>
+        <div class="card"><div class="rows" id="discRows"></div></div>
+      </div>
 
       <div class="actions">
         <label class="toggle"><input type="checkbox" id="wToggle"><span>Tier-weighted %</span></label>
@@ -890,7 +933,7 @@ body.fridge .deck-empty p{color:#cdeef7}
       <div class="deck-empty" id="deckEmpty" hidden>
         <div class="de-mark"></div>
         <p>Deck is empty.</p>
-        <span>In <b>Tasks</b>, swipe a row <b>right&nbsp;to&nbsp;left</b> to flag it as priority.
+        <span>In <b>Backlog</b>, swipe a row <b>right&nbsp;to&nbsp;left</b> to flag it as priority.
               Hold and drag here to reorder.</span>
       </div>
     </section>
@@ -907,7 +950,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
     <section class="pane" id="pane-fridge" role="tabpanel">
       <div class="sec"><h2>The Fridge</h2>
-        <span class="note" id="ideaNote">ideas on ice</span></div>
+        <span class="note" id="ideaNote">nothing in the fridge</span></div>
       <div class="temp" id="tempLine"></div>
       <div class="actions" style="margin-bottom:12px">
         <button class="addbtn" id="addIdea" type="button">+ New note</button>
@@ -1077,7 +1120,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const BUILD=42;
+const BUILD=44;
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1676,16 +1719,21 @@ const CARD_THRESH=72;
 function bindCard(wrap,card,t){
   let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false;
 
+  const inDeck=()=>wrap.parentNode&&wrap.parentNode.id==="deckList";
   const label=()=>{
-    const txt=isPrio(t.id)?"BACK TO DECK":"BACK TO TASKS";
+    // a deck card can only fall back to the backlog; an active one may drop to
+    // the deck first if it was flagged
+    const txt=inDeck()?"BACK TO BACKLOG":(isPrio(t.id)?"BACK TO DECK":"BACK TO BACKLOG");
     wrap.querySelectorAll(".cswipe-bg em").forEach(e=>e.textContent=txt);
   };
   const settle=()=>{ card.style.transform="translateX(0px)"; wrap.classList.remove("armed","drag"); };
 
+  const blockScroll=e=>e.preventDefault();
   const stopDrag=async()=>{
     dragging=false;
     wrap.classList.remove("dragging"); wrap.style.transform="";
     document.body.classList.remove("dragging-on");
+    document.removeEventListener("touchmove",blockScroll);
     const kind=wrap.parentNode.id==="deckList"?"deck":"active";
     await saveOrder(kind,[...wrap.parentNode.children].map(c=>c.dataset.id));
   };
@@ -1696,9 +1744,7 @@ function bindCard(wrap,card,t){
     if(lock!=="x"){ settle(); return; }
     if(Math.abs(dx)>=CARD_THRESH){
       settle();
-      await commit(t.id,0);                 // back to untouched
-      repaint(t.id); refreshHead(t.si); summary();
-      setTimeout(()=>{ deck(); active(); donePane(); },300);
+      await moveTo(t, inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog"));
     }else settle();
   };
 
@@ -1711,6 +1757,9 @@ function bindCard(wrap,card,t){
       dragging=true; moved=true;
       wrap.classList.add("dragging");
       document.body.classList.add("dragging-on");
+      // the finger has been still for 340ms, so the browser has not committed to
+      // a scroll yet — this is the moment it can still be refused
+      document.addEventListener("touchmove",blockScroll,{passive:false});
       try{ card.setPointerCapture(e.pointerId); }catch(_){}
       if(navigator.vibrate) navigator.vibrate(12);
     },340);
@@ -1746,7 +1795,7 @@ function bindCard(wrap,card,t){
 
   card.addEventListener("pointerup",finish);
   card.addEventListener("pointercancel",finish);
-  card.addEventListener("click",()=>{ moved=false; });   // body taps do nothing; use the box
+  card.addEventListener("click",()=>{ if(moved){ moved=false; return; } openTask(t); });
 }
 
 /* Values, not just keys: reassigning KGY -> RFN keeps the same key, and the old
@@ -1772,11 +1821,11 @@ function ideas(){
   const cnt=list.length, locked=list.filter(([,v])=>v.lock).length;
   $("fridgeCount").textContent=cnt;
   $("ideaEmpty").hidden=cnt>0;
-  $("ideaNote").textContent=cnt?`${cnt} on ice`:"ideas on ice";
+  $("ideaNote").textContent=cnt?`${cnt} in fridge`:"nothing in the fridge";
   // a bit of theatre: the more you park, the colder it reads
   const temp=-4-Math.min(cnt,26);
   $("tempLine").innerHTML=`<span>${temp}°C</span><i></i><span>`+
-    (cnt?`${cnt} frozen${locked?` · ${locked} sealed`:""}`:"door open")+`</span>`;
+    (cnt?(locked?`${locked} frozen`:"nothing frozen"):"door open")+`</span>`;
   const box=$("ideaList"); box.innerHTML="";
   list.forEach(([id,v],i)=>{ const el=iceCard(id,v);
     el.querySelector(".ice").style.animationDelay=(i*1.35%9).toFixed(2)+"s";
@@ -1791,12 +1840,12 @@ function readIdea(id,v){
       {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
     const p=document.createElement("p"); p.className="read-txt"; p.textContent=v.text||"";
     const meta=document.createElement("div"); meta.className="read-meta";
-    meta.textContent=[v.by||"anon",when,v.lock?"sealed":""].filter(Boolean).join(" · ");
+    meta.textContent=[v.by||"anon",when,v.lock?"frozen":""].filter(Boolean).join(" · ");
     body.append(p,meta);
 
     const row=document.createElement("div"); row.className="gate-row";
     if(isAdmin()){
-      const lockBtn=gbtn(v.lock?"Thaw":"Deep freeze","",false);
+      const lockBtn=gbtn(v.lock?"Defrost":"Deep freeze","",false);
       lockBtn.onclick=async()=>{
         v.lock=!v.lock; ideaMap[id]=v; closeGate(); ideas();
         await pushKey(DB_IDEAS,id,v);
@@ -1822,11 +1871,11 @@ function readIdea(id,v){
 function iceCard(id,v){
   const when=v.at?new Date(v.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
   const wrap=document.createElement("div"); wrap.className="iceswipe"; wrap.dataset.id=id;
-  wrap.innerHTML=`<div class="cswipe-bg act"><em class="act-l">UNFREEZE</em><em class="act-r">${isAdmin()?"DEEP FREEZE":""}</em></div>
+  wrap.innerHTML=`<div class="cswipe-bg act"><em class="act-l">${v.lock?"DEFROST":"UNFREEZE"}</em><em class="act-r">${(isAdmin()&&!v.lock)?"DEEP FREEZE":""}</em></div>
     <div class="ice${v.lock?" locked":""}">
       <div class="ice-head">
         <span class="ice-title"></span>
-        ${v.lock?'<span class="magnet">SEALED</span>':""}
+        ${v.lock?'<span class="magnet">FROZEN</span>':""}
         <span class="ice-when">${when}</span>
       </div>
     </div>`;
@@ -1861,7 +1910,9 @@ function bindIce(wrap,card,id,v){
       else return;
     }
     e.preventDefault();
-    const right=!v.lock, left=isAdmin();          // locked notes refuse to leave
+    /* right pull = defrost when frozen, otherwise remove.
+       left pull = deep freeze, and only on something not already frozen. */
+    const right=v.lock?isAdmin():canEdit(), left=isAdmin()&&!v.lock;
     dx=Math.max(left?-130:0, Math.min(right?130:0, ax));
     card.style.transform=`translateX(${dx}px)`;
     wrap.classList.toggle("armed",Math.abs(dx)>=T);
@@ -1874,13 +1925,19 @@ function bindIce(wrap,card,id,v){
     const d=dx, hor=lock==="x";
     settle();
     if(!hor) return;
-    if(d>=T&&!v.lock){
-      confirmSheet("Unfreeze this?",
-        `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
-        "Unfreeze",
-        async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
-    }else if(d<=-T&&isAdmin()){
-      v.lock=!v.lock; ideaMap[id]=v; ideas();
+    if(d>=T){
+      if(v.lock){                                   // frozen: thaw it, do not delete
+        if(!isAdmin()) return;
+        v.lock=false; ideaMap[id]=v; ideas();
+        await pushKey(DB_IDEAS,id,v);
+      }else{
+        confirmSheet("Unfreeze this?",
+          `“${ideaTitle(v)}” leaves the fridge for good. Nobody gets it back.`,
+          "Unfreeze",
+          async()=>{ delete ideaMap[id]; ideas(); modeBtn(); await pushKey(DB_IDEAS,id,null); });
+      }
+    }else if(d<=-T&&isAdmin()&&!v.lock){            // deep freeze only pulls one way
+      v.lock=true; ideaMap[id]=v; ideas();
       await pushKey(DB_IDEAS,id,v);
     }
   };
@@ -1895,6 +1952,28 @@ function bindIce(wrap,card,id,v){
 }
 
 const STATE_NAME=["Not started","In progress","Done"];
+const DESTS=[["backlog","Backlog"],["deck","Deck"],["active","Active"],["done","Done"]];
+const destOf=t=>isDone(t.id)?"done":(stateOf(t.id)===1?"active":(isPrio(t.id)?"deck":"backlog"));
+
+/* Deck, Active and Backlog are not three flags — they are one position.
+   Moving a task sets both its state and its deck flag in a single step. */
+async function moveTo(t,dest){
+  if(!canEdit()||destOf(t)===dest) return;
+  const to = dest==="active"?1 : dest==="done"?2 : 0;
+  if(needsReq(stateOf(t.id),to)){
+    reqMap[t.id]={to,from:stateOf(t.id),at:Date.now()};
+    repaint(t.id); summary(); deck(); active(); donePane(); adminPane();
+    await pushKey(DB_REQ,t.id,reqMap[t.id]);
+    return;
+  }
+  const wantPrio=(dest==="deck");
+  if(isPrio(t.id)!==wantPrio&&dest!=="done"){
+    if(wantPrio) prioMap[t.id]=Date.now(); else delete prioMap[t.id];
+    await pushKey(DB_PRIO,t.id,prioMap[t.id]||null);
+  }
+  await commit(t.id,to);
+  repaint(t.id); refreshHead(t.si); summary(); deck(); active(); donePane(); adminPane();
+}
 
 /* Jump straight to a state instead of cycling. Completing or reopening still
    goes through approval for the team role — the route changes, not the rule. */
@@ -1925,20 +2004,20 @@ function openTask(t){
     line("Tier",`T${t.tier} · ${TIER[t.tier].when}`,`var(--t${t.tier})`);
     line("Discipline",DISC[t.disc].name,DISC[t.disc].c);
     line("State",hasReq(t.id)?"Awaiting approval":STATE_NAME[stateOf(t.id)]);
+    line("Sits in",DESTS.find(d=>d[0]===destOf(t))[1]);
     line("Owner",w||"unassigned",w?`var(--${w.toLowerCase()})`:"");
-    line("On the deck",isPrio(t.id)?"yes":"no");
     line("Scope",inMvp(t)?"MVP":"Alpha");
 
     if(canEdit()){
       const f=document.createElement("div"); f.className="sheet-field";
       f.style.marginTop="16px";
-      f.innerHTML=`<label>${isAdmin()?"Set state":"Ask for a change"}</label><div class="pickrow"></div>`;
-      const pr=f.querySelector(".pickrow");
-      [0,1,2].forEach(s=>{
+      f.innerHTML=`<label>${isAdmin()?"Move to":"Ask to move"}</label><div class="pickrow"></div>`;
+      const pr=f.querySelector(".pickrow"), here=destOf(t);
+      DESTS.forEach(([k,label])=>{
         const b=document.createElement("button"); b.type="button";
-        b.textContent=STATE_NAME[s];
-        b.setAttribute("aria-pressed",s===stateOf(t.id));
-        b.onclick=async()=>{ closeGate(); await setTo(t,s); };
+        b.textContent=label;
+        b.setAttribute("aria-pressed",k===here);
+        b.onclick=async()=>{ closeGate(); await moveTo(t,k); };
         pr.appendChild(b);
       });
       body.appendChild(f);
@@ -2124,7 +2203,7 @@ function composeIdea(){
     const ta=f.querySelector("textarea");
     body.appendChild(f);
     const row=document.createElement("div"); row.className="gate-row";
-    const save=gbtn("Put on ice","",true);
+    const save=gbtn("Put on fridge","",true);
     save.onclick=async()=>{
       const text=ta.value.trim(); if(!text){ ta.focus(); return; }
       const id="i"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -2132,7 +2211,8 @@ function composeIdea(){
       ideaMap[id]=v; closeGate(); ideas(); modeBtn();
       await pushKey(DB_IDEAS,id,v);
     };
-    const cancel=gbtn("Cancel","",false); cancel.className="gbtn gbtn-ghost"; cancel.onclick=closeGate;
+    const cancel=gbtn("Cancel","",false); cancel.onclick=closeGate;
+    row.classList.add("gate-row--split");
     row.append(save,cancel); body.appendChild(row);
     setTimeout(()=>ti.focus(),60);
   });
@@ -2158,7 +2238,7 @@ function donePane(){
       <span class="t-flags">${w?`<span class="t-who who-${w}">${w}</span>`:""}</span>
       <span class="t-tier tp${t.tier}">T${t.tier}</span>
       <span class="d-sec">${SEC_NAMES[t.si]}${when?" · "+when:""}</span>`;
-    c.querySelector(".sbox").addEventListener("click",e=>{ e.stopPropagation(); setTo(t,0); });
+    c.querySelector(".sbox").addEventListener("click",e=>{ e.stopPropagation(); moveTo(t,"backlog"); });
     c.addEventListener("click",()=>openTask(t));
     box.appendChild(c);
   });
