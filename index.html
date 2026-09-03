@@ -179,8 +179,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .cswipe-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
   padding:0 16px;pointer-events:none;opacity:0;transition:opacity .16s}
 .cswipe.drag .cswipe-bg,.iceswipe.drag .cswipe-bg{opacity:1}
-.cswipe-bg em{font-style:normal;font-family:var(--mono);font-size:8.5px;font-weight:700;
-  letter-spacing:.13em;color:var(--dim);transition:color .18s}
+.cswipe-bg em{font-style:normal;font-family:var(--mono);font-size:8px;font-weight:700;
+  letter-spacing:.07em;color:var(--dim);transition:color .18s;white-space:nowrap}
 .cswipe.armed{background:rgba(255,255,255,.07)}
 .cswipe.armed .cswipe-bg em{color:var(--ink)}
 .cswipe.dragging{opacity:.96;box-shadow:0 12px 30px rgba(0,0,0,.55);z-index:6;transition:none}
@@ -491,8 +491,11 @@ body.admin .tab.admin-only{display:flex}
   /* Laid out to the sketch: progress block top-left, estimate top-right with
      disciplines directly beneath it, tiers under the progress block, the active
      list beside them, and the quote across the bottom. */
+  /* align-content:start — the pane is stretched to the viewport by the app grid,
+     and the default (stretch) was padding every row with the leftover height */
   #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);
-    grid-template-rows:auto auto auto auto auto auto;column-gap:28px;align-items:start}
+    grid-template-rows:auto auto auto auto auto auto;column-gap:28px;
+    align-items:start;align-content:start}
   #pane-overview.is-active>.hero{grid-column:1;grid-row:1/4;align-self:start;
     flex-direction:column;align-items:center;gap:18px;padding:6px 0 10px}
   #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
@@ -578,8 +581,8 @@ body.admin .tab.admin-only{display:flex}
   /* explicit rows: the shelf row is the only flexible one, so the tall composer
      spanning the right column no longer pads out the header and temperature rows */
   #pane-fridge.is-active{display:grid;grid-template-columns:minmax(0,1fr) 330px;
-    grid-template-rows:auto auto auto minmax(0,1fr) auto;
-    column-gap:26px;row-gap:0;align-items:start}
+    grid-template-rows:auto auto auto auto auto;
+    column-gap:26px;row-gap:0;align-items:start;align-content:start}
   #pane-fridge.is-active>.sec:first-child,#pane-fridge.is-active>.fridge-mast{grid-column:1/-1}
   #pane-fridge.is-active>.fridge-mast{display:flex}
   #pane-fridge.is-active>.temp,#pane-fridge.is-active>#ideaList,
@@ -1054,6 +1057,7 @@ body.fridge .deck-empty p{color:#cdeef7}
    as a dark stripe on translucent glass. It centres when it fits and scrolls
    inside when it does not — the title can never leave the screen. */
 .gate--sheet .gate-card{max-width:400px;max-height:calc(100vh - 46px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height:calc(100dvh - 46px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display:flex;flex-direction:column;margin:auto;
   background:var(--bg);border:1px solid var(--line);border-radius:18px;
   padding:16px 18px 18px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
@@ -1068,7 +1072,8 @@ body.fridge .deck-empty p{color:#cdeef7}
    you opened is always the first thing you see */
 .gate--sheet .gate-q{position:sticky;top:0;z-index:2;flex:none;background:var(--bg);
   margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line-soft)}
-.gate--sheet #gateBody{flex:1;min-height:0;overflow-y:auto}
+.gate--sheet #gateBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;padding-right:2px}
 .gate--sheet .gate-q{margin:0 0 18px}
 </style>
 
@@ -1131,7 +1136,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.57</div>
+    <div class="splash-tag">Production Tracker · v0.58</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1463,7 +1468,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.57";
+const VERSION="v0.58";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1935,14 +1940,24 @@ function bindSwipe(wrap,row,t){
     });
   });
 
+  let onBox=false, tapAt=0;
   row.addEventListener("pointerdown",e=>{
-    if(!canEdit()) return;
+    onBox=!!e.target.closest(".sbox");
+    if(onBox) return;                       // the box has its own click handler
+    if(!canEdit()){ live=false; return; }
     if(openWrap&&openWrap!==wrap) closeOpen();
     live=true; lock=null; dx=0;
     x0=e.clientX; y0=e.clientY;
     base=openWrap===wrap?OPEN_L:0;
     wrap.classList.add("drag");
   });
+  /* A tap is decided here, on the pointer itself. iOS cancels a touch that
+     drifts a couple of pixels and then never fires click — which is exactly
+     why "tap the task" was failing on the phone and passing with a mouse. */
+  const tap=()=>{
+    if(openWrap===wrap){ closeOpen(); return; }
+    tapAt=Date.now(); openTask(t);
+  };
   row.addEventListener("pointermove",e=>{
     if(!live) return;
     const ax=e.clientX-x0, ay=e.clientY-y0;
@@ -1957,10 +1972,15 @@ function bindSwipe(wrap,row,t){
     wrap.classList.toggle("armed",dx<=-THRESH&&!isDone(t.id));
   },{passive:false});
 
-  const finish=async()=>{
+  const finish=async(e)=>{
     if(!live) return;
     live=false; wrap.classList.remove("drag","armed");
-    if(lock!=="x"){ row.style.transform="translateX(0px)"; lock=null; return; }
+    if(lock!=="x"){
+      row.style.transform="translateX(0px)"; lock=null;
+      const moved=Math.hypot(e.clientX-x0,e.clientY-y0);
+      if(e.type==="pointerup"&&moved<9) tap();
+      return;
+    }
     if(dx<=-THRESH){                       // left swipe -> toggle priority
       row.style.transform="translateX(0px)";
       if(isDone(t.id)) return;             // a finished task has no place on the deck
@@ -1983,9 +2003,11 @@ function bindSwipe(wrap,row,t){
     if(lock==="x"){ lock=null; return; }
     askMove(t,nextDest(t));
   });
+  // visitors have no pointerdown path; give them the plain click. Everyone
+  // else already opened on pointerup, so a trailing click must not open twice.
   row.addEventListener("click",()=>{
-    if(lock==="x"){ lock=null; return; }
-    if(openWrap===wrap){ closeOpen(); return; }
+    if(onBox) return;
+    if(canEdit()){ if(Date.now()-tapAt<600) return; if(lock==="x"){ lock=null; return; } return; }
     openTask(t);
   });
 }
@@ -2085,15 +2107,14 @@ async function saveOrder(kind,visible){
    send it back. Vertical moves the wrapper, horizontal moves the card inside it. */
 const CARD_THRESH=72;
 function bindCard(wrap,card,t){
-  let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false,live=false,pid=null;
+  let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false,live=false,pid=null,tapAt=0;
 
   const inDeck=()=>wrap.parentNode&&wrap.parentNode.id==="deckList";
   const backDest=()=>inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog");
   const fwdDest =()=>inDeck()?"active":"done";
   const label=()=>{
-    // short enough to sit inside the 72px reveal; arrows carry the direction
-    const back={backlog:"\u2190 BACKLOG",deck:"\u2190 DECK"}[backDest()];
-    const fwd ={active:"ACTIVATE \u2192",done:"COMPLETE \u2192"}[fwdDest()];
+    const back={backlog:"BACK TO BACKLOG",deck:"BACK TO DECK"}[backDest()];
+    const fwd ={active:"ACTIVATE",done:"COMPLETE"}[fwdDest()];
     const em=wrap.querySelectorAll(".cswipe-bg em");
     if(em[0]) em[0].textContent=back;   // revealed by a rightward pull
     if(em[1]) em[1].textContent=fwd;    // revealed by a leftward pull
@@ -2110,21 +2131,29 @@ function bindCard(wrap,card,t){
     await saveOrder(kind,[...wrap.parentNode.children].map(c=>c.dataset.id));
   };
 
-  const finish=async()=>{
+  const finish=async(e)=>{
     clearTimeout(timer);
     if(!live) return;
     live=false;
     try{ card.releasePointerCapture&&card.releasePointerCapture(pid); }catch(_){}
     if(dragging){ await stopDrag(); return; }
-    if(lock!=="x"){ settle(); lock=null; return; }
+    if(lock!=="x"){
+      settle(); lock=null;
+      const dist=Math.hypot(e.clientX-x0,e.clientY-y0);
+      if(e.type==="pointerup"&&dist<9&&!moved){ tapAt=Date.now(); openTask(t); }
+      moved=false;
+      return;
+    }
     if(Math.abs(dx)>=CARD_THRESH){
       const d=dx; settle();
       askMove(t, d>0 ? backDest() : fwdDest());
     }else settle();
+    setTimeout(()=>{ moved=false; },80);   // never leave the next tap swallowed
   };
 
   card.addEventListener("pointerdown",e=>{
-    if(!canEdit()||e.target.closest(".sbox")) return;
+    if(e.target.closest(".sbox")) return;
+    if(!canEdit()){ live=false; return; }
     live=true; pid=e.pointerId;
     x0=e.clientX; y0=e.clientY; dx=0; lock=null; moved=false;
     label();
@@ -2179,7 +2208,11 @@ function bindCard(wrap,card,t){
   card.addEventListener("pointerup",finish);
   card.addEventListener("pointercancel",finish);
   card.addEventListener("lostpointercapture",()=>{ if(lock==="x"&&!dragging) settle(); });
-  card.addEventListener("click",()=>{ if(moved){ moved=false; return; } openTask(t); });
+  card.addEventListener("click",e=>{
+    if(e.target.closest(".sbox")) return;
+    if(canEdit()){ return; }             // opened on pointerup already
+    openTask(t);                          // visitors: plain click
+  });
 }
 
 /* Values, not just keys: reassigning KGY -> RFN keeps the same key, and the old
@@ -2901,12 +2934,26 @@ function applyLens(){
 }
 
 /* ---------- gate: every screen is rebuilt from scratch, so no stale state ---------- */
-let gateTimer=null;
+/* iOS ignores overflow:hidden on the body — the only lock that holds is pinning
+   the body in place and restoring the scroll offset on release */
+let gateTimer=null, lockY=0, locked=false;
+function lockPage(){
+  if(locked) return; locked=true; lockY=window.scrollY;
+  const b=document.body.style;
+  b.position="fixed"; b.top=(-lockY)+"px"; b.left="0"; b.right="0"; b.width="100%";
+}
+function unlockPage(){
+  if(!locked) return; locked=false;
+  const b=document.body.style;
+  b.position=""; b.top=""; b.left=""; b.right=""; b.width="";
+  window.scrollTo({top:lockY,behavior:"instant"});
+}
 function openGate(){
   /* a close scheduled 360ms ago would otherwise hide the sheet we are opening
      now — that was the "tap it five times" bug and the vanishing confirmations */
   clearTimeout(gateTimer); gateTimer=null;
   const g=$("gate"); g.hidden=false; g.classList.remove("done");
+  lockPage();
   const top=()=>{
     g.scrollTop=0;
     const c=g.querySelector(".gate-card"); if(c) c.scrollTop=0;
@@ -2917,6 +2964,7 @@ function openGate(){
 }
 var closeGate=function(){
   const g=$("gate"); g.classList.add("done");
+  unlockPage();
   clearTimeout(gateTimer);
   gateTimer=setTimeout(()=>{ g.hidden=true; g.classList.remove("done"); gateTimer=null; },300);
 };
