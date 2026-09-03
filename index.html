@@ -355,90 +355,130 @@ body.admin .tab.admin-only{display:flex}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* ===== desktop =========================================================
-   Built for the screen it runs on: the rail is pinned to the left edge, the
-   content column takes the rest and centres its own measure, and detail slides
-   in from the right. The previous attempt capped the whole app at 1560px and
-   centred it, which parked the sidebar in the middle of a wide monitor with
-   dead space on both sides. Nothing here exists below 1024px. */
+   Three columns, not a stretched phone. A rail that carries identity, the
+   headline ring and every switch; a primary pane you drive with the nav; and a
+   second pane you can point at any other view. Below 1024px none of this
+   exists and the phone layout runs exactly as before. */
 @media (min-width:1024px){
-  /* overflow-x:hidden turns the page into a scroll container and sticky stops
-     tracking the viewport; clip does the same job without that side effect */
   html,body{overflow-x:clip}
   html{scroll-behavior:smooth}
   .app{
-    display:grid;grid-template-columns:var(--rail,244px) minmax(0,1fr);
+    display:grid;grid-template-columns:var(--rail,268px) minmax(0,1fr);
     max-width:none;width:100%;padding-bottom:0;min-height:100vh;
   }
 
-  /* ---- rail, flush to the edge ---- */
+  /* ---- rail ---- */
   .topbar{
     grid-area:1/1;align-self:start;position:sticky;top:0;z-index:31;
-    flex-direction:column;align-items:stretch;gap:12px;
-    padding:20px 14px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
+    flex-direction:column;align-items:stretch;gap:11px;
+    padding:20px 16px 14px;border-bottom:none;box-shadow:none;background:var(--bg);
   }
   .mark-txt{font-size:17px}
   .mark-dot{width:7px;height:7px}
   .mark-sub{align-self:flex-start;min-width:0;padding:2px 7px;font-size:8.5px;
     background:transparent !important;color:var(--hot) !important;
     border-color:color-mix(in srgb,var(--hot) 38%,transparent) !important}
-  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.7}
+  .sync{order:9;margin:0;text-align:left;font-size:9px;opacity:.65}
   .primebtn{order:7;margin:0;width:100%;padding:8px;text-align:center;border-radius:7px}
   .modebtn{order:8;margin:0;width:100%;flex-direction:row;justify-content:space-between;
-    align-items:center;padding:8px 10px;min-width:0;border-radius:7px}
+    align-items:center;padding:8px 11px;min-width:0;border-radius:7px}
   .mb-lab{font-size:8px} .mb-pct{font-size:12px}
 
   .navseg{
-    grid-area:1/1;align-self:start;margin-top:var(--barH,182px);
-    position:sticky;top:var(--barH,182px);
+    grid-area:1/1;align-self:start;margin-top:var(--barH,178px);
+    position:sticky;top:var(--barH,178px);
     display:flex;flex-direction:column;gap:1px;
-    padding:4px 9px 26px;background:var(--bg);border-bottom:none;
+    padding:10px 12px 0;background:var(--bg);border-bottom:none;
+    border-top:1px solid var(--line-soft);margin-left:12px;margin-right:12px;
   }
-  .navseg::before{content:"Views";padding:0 8px 7px;
-    font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--dim)}
+  .navseg::before{display:none}   /* the faint label read as a stray artefact */
   .tab,body.crew .tab,body.admin .tab{
-    justify-content:flex-start;gap:10px;padding:0 10px;height:31px;
-    font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
-    text-transform:none;border-radius:6px;color:var(--muted);border:none;background:transparent}
-  .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2)}
-  .tab::before{display:none}
+    justify-content:flex-start;gap:10px;padding:0 10px;height:32px;
+    font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:0;
+    text-transform:none;border-radius:7px;color:var(--muted);border:none;background:transparent}
+  .tab[aria-selected="true"]{color:var(--ink);background:var(--panel-2);font-weight:600}
+  .tab[aria-selected="true"]::before{
+    display:block;content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:3px;height:17px;border-radius:0 3px 3px 0;background:var(--hot)}
+  .tab.is-side-view{color:var(--ink);background:color-mix(in srgb,var(--panel-2) 60%,transparent)}
   .tab .badge,body.crew .tab .badge,body.admin .tab .badge{
     margin-left:auto;min-width:18px;height:17px;border-radius:9px;
     font-family:var(--mono);font-size:9.5px;padding:0 5px}
 
-  /* ---- content column ---- */
-  .panes{grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft)}
-  .pane{padding:0 clamp(24px,3vw,56px) 90px;max-width:1180px;margin:0 auto}
+  /* ---- rail: ring, fridge, controls, footer ---- */
+  .rail-extra{
+    display:block;grid-area:1/1;align-self:start;
+    margin-top:var(--railY,540px);padding:0 14px 26px;
+  }
+  .rail-ring{position:relative;width:132px;margin:0 auto}
+  .rail-ring svg{width:100%;height:auto;display:block}
+  .rr-track{fill:none;stroke:var(--line);stroke-width:6}
+  .rr-prog{fill:none;stroke:url(#hg);stroke-width:6;stroke-linecap:round;
+    transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.3,1)}
+  .rr-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px}
+  .rr-mid b{font-family:var(--dsp);font-weight:800;font-size:33px;letter-spacing:-.02em;color:var(--ink)}
+  .rr-mid i{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);align-self:flex-start;margin-top:9px}
+  .rr-sub{margin-top:9px;text-align:center;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.06em;color:var(--dim)}
+  .rail-fridge{margin-top:16px;padding:11px 12px}
+  .rail-fridge b{font-size:13px}
+  #pane-overview>.fridge-btn{display:none}
+  .rail-extra .actions{margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft);
+    display:flex;flex-wrap:wrap;gap:9px}
+  .rail-extra .foot{margin-top:12px;font-size:10.5px;line-height:1.6}
+  .rail-extra .btn{padding:7px 11px;font-size:12px}
+
+  /* ---- two panes ---- */
+  .panes{
+    grid-area:1/2;min-height:100vh;border-left:1px solid var(--line-soft);
+    display:grid;grid-template-columns:minmax(0,1fr) var(--side,430px);
+    grid-template-rows:auto minmax(0,1fr);
+  }
+  .sideswitch{
+    display:flex;align-items:center;gap:10px;grid-column:2;grid-row:1;
+    padding:14px 20px;border-left:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line-soft);background:var(--bg);
+    position:sticky;top:0;z-index:22}
+  .sideswitch span{font-family:var(--mono);font-size:8.5px;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .sideswitch select{margin-left:auto;padding:6px 9px;border-radius:7px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--body);font-size:12.5px;outline:none}
+  .pane.is-active{grid-column:1;grid-row:1/3}
+  .pane.is-side{display:block;grid-column:2;grid-row:2;
+    border-left:1px solid var(--line-soft);padding:0 20px 70px}
+  .pane.is-side>.sec:first-child,.pane.is-side>.filters:first-child{
+    margin:0 -20px 16px;padding:16px 20px 12px;top:52px}
+  .pane.is-side .ring{--r:210px}
+  .pane.is-side .est-date{font-size:24px}
+  .pane.is-side .thead{display:none}
+
+  .pane{padding:0 clamp(20px,2.4vw,40px) 90px}
   .pane>.sec:first-child,.pane>.filters:first-child{
     position:sticky;top:0;z-index:20;background:var(--bg);
-    margin:0 calc(-1*clamp(24px,3vw,56px)) 20px;
-    padding:22px clamp(24px,3vw,56px) 15px;border-bottom:1px solid var(--line-soft)}
-  .pane>.sec:first-child h2{font-size:19px}
+    margin:0 calc(-1*clamp(20px,2.4vw,40px)) 18px;
+    padding:20px clamp(20px,2.4vw,40px) 14px;border-bottom:1px solid var(--line-soft)}
+  .pane>.sec:first-child h2{font-size:18px}
   .pane>.sec:first-child .note{font-size:12px}
-  .sec{margin:26px 0 10px}
+  .sec{margin:24px 0 10px}
   .sec h2{font-size:14px}
 
-  /* overview uses the width instead of stacking in a column */
-  /* display must stay tied to .is-active — an unqualified display here beat
-     .pane{display:none} and left Overview stacked under every other view */
-  #pane-overview{max-width:1180px;padding-top:26px;
-    grid-template-columns:minmax(0,340px) minmax(0,1fr);
-    column-gap:clamp(24px,2.6vw,44px);align-items:start}
+  /* overview is a stack in the side slot, two columns when it takes the floor */
+  #pane-overview{padding-top:22px;grid-template-columns:minmax(0,330px) minmax(0,1fr);
+    column-gap:clamp(20px,2.2vw,38px);align-items:start}
   #pane-overview.is-active{display:grid}
-  #pane-overview>.hero{grid-column:1;grid-row:1}
-  #pane-overview>#estCard{grid-column:2;grid-row:1;margin-top:0 !important;align-self:start}
-  #pane-overview>.fridge-btn{grid-column:1;grid-row:2;margin-top:16px}
-  #pane-overview>.ov-side{grid-column:2;grid-row:2}
-  #pane-overview>.actions,#pane-overview>.foot{grid-column:1/-1}
-  .ov-side>.sec:first-child{margin-top:14px}
-  .ring{--r:296px}
-  .est-date{font-size:34px}
-  .est-weeks{font-size:26px}
-
-  #pane-tasks,#pane-deck,#pane-active,#pane-done,#pane-admin,#pane-fridge{max-width:1180px}
+  #pane-overview.is-active>.hero{grid-column:1;grid-row:1}
+  #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
+  #pane-overview.is-active>.ov-side{grid-column:1/-1;grid-row:2}
+  #pane-overview.is-active .ov-side{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
+  #pane-overview.is-active .ov-side>:nth-child(1){grid-column:1;grid-row:1}
+  #pane-overview.is-active .ov-side>:nth-child(2){grid-column:1;grid-row:2}
+  #pane-overview.is-active .ov-side>:nth-child(3){grid-column:2;grid-row:1}
+  #pane-overview.is-active .ov-side>:nth-child(4){grid-column:2;grid-row:2}
+  #pane-overview.is-active .ring{--r:280px}
 
   /* ---- backlog reads as a table ---- */
-  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;
+  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;
     align-items:center;gap:12px;padding:0 14px 9px;
     border-bottom:1px solid var(--line);margin-bottom:2px;
     font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
@@ -447,12 +487,12 @@ body.admin .tab.admin-only{display:flex}
   .thead>span:last-child{text-align:center}
   .group{background:transparent;border:none;border-bottom:1px solid var(--line-soft);
     border-radius:0;margin:0}
-  .group-head{padding:12px 14px;min-height:42px;border-radius:0}
+  .group-head{padding:11px 14px;min-height:40px;border-radius:0}
   .g-name{font-family:var(--body);font-size:13.5px;font-weight:600;
     text-transform:none;letter-spacing:0}
   .group-body{padding:0 0 8px;border-top:none}
   .swipe{border-radius:0}
-  .task{grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;gap:12px;
+  .task{grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;gap:12px;
     padding:0 14px;min-height:38px;border-radius:0;background-color:transparent}
   .task.is-done,.task.is-doing,.task.is-req{background-image:none}
   .task .t-name{font-size:13.5px}
@@ -460,31 +500,34 @@ body.admin .tab.admin-only{display:flex}
   .task .t-flags{justify-content:flex-end}
   .task .t-tier{width:36px;margin:0 auto}
   .task.is-prio{box-shadow:inset 2px 0 0 var(--prio)}
+  .pane.is-side .task,.pane.is-side .deck-card{grid-template-columns:20px minmax(0,1fr) 44px}
+  .pane.is-side .t-disc,.pane.is-side .t-flags{display:none}
 
-  .deck-card{grid-template-columns:20px minmax(0,1fr) 108px 108px 46px;gap:12px;
+  .deck-card{grid-template-columns:20px minmax(0,1fr) 104px 104px 44px;gap:12px;
     padding:12px 14px;border-radius:10px}
   .cswipe{border-radius:10px}
 
-  /* ---- detail as a drawer ---- */
+  /* ---- detail as a drawer, with room to actually write in ---- */
   .gate--sheet{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.55)}
   .gate--sheet .gate-card{
-    width:min(480px,42vw);max-width:none;height:100%;overflow-y:auto;text-align:left;
-    background:var(--bg);border-left:1px solid var(--line);padding:26px 28px 48px;
+    width:min(560px,46vw);max-width:none;height:100%;overflow-y:auto;text-align:left;margin:0;
+    background:var(--bg);border-left:1px solid var(--line);padding:26px 30px 48px;
     animation:drawerIn .24s cubic-bezier(.2,.8,.3,1) both}
   @keyframes drawerIn{from{transform:translateX(30px);opacity:.5}to{transform:none;opacity:1}}
   .gate--sheet .gate-q{text-align:left;font-size:20px;text-transform:none;
     letter-spacing:0;color:var(--ink);margin:0 0 20px;font-weight:700}
   .gate--sheet .gate-row{margin-top:24px}
+  .gate--sheet .sheet-field textarea{min-height:190px}
+  .gate--sheet .cmt-form textarea{min-height:90px}
 
   .pane.is-active{animation:paneIn .24s cubic-bezier(.2,.8,.3,1) both}
   @keyframes paneIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-  .filters{gap:10px;max-width:780px}
-  .search{padding:11px 13px}
+  .filters{gap:10px;max-width:760px}
   .tseg{max-width:420px}
-  .linkbtn:hover{}
-  .card{padding:20px;border-radius:12px}
+  .search{padding:11px 13px}
+  .card{padding:18px;border-radius:12px}
 }
-@media (min-width:1500px){ .app{--rail:264px} .pane{max-width:1340px} #pane-overview{max-width:1340px} }
+@media (min-width:1600px){ .app{--rail:292px} .panes{--side:500px} }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){
   .tab:hover{color:var(--ink);background:var(--panel)}
   .task:hover{background-color:var(--panel)}
@@ -579,7 +622,7 @@ body.dragging-on{user-select:none;-webkit-user-select:none;overscroll-behavior:n
   background:repeating-linear-gradient(180deg,currentColor 0 1.5px,transparent 1.5px 4px)}
 
 /* ===== WIP warning =================================================== */
-.thead{display:none}
+.thead,.rail-extra,.sideswitch{display:none}
 .wip{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;margin-bottom:11px;
   border-radius:12px;background:rgba(238,138,46,.10);border:1px solid rgba(238,138,46,.34)}
 .wip i{width:23px;height:23px;flex:none;border-radius:50%;display:grid;place-items:center;
@@ -899,6 +942,22 @@ body.fridge .deck-empty p{color:#cdeef7}
     <button class="tab crew-only" role="tab" aria-selected="false" aria-controls="pane-done" id="doneTab">Done<span class="badge" id="doneCount">0</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="pane-tasks">Backlog</button>
     <button class="tab admin-only" role="tab" aria-selected="false" aria-controls="pane-admin" id="adminTab">Admin<span class="badge" id="reqCount">0</span></button>
+    <div class="rail-extra" id="railExtra">
+      <div class="rail-ring" id="railRing">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="rr-track" cx="60" cy="60" r="52"/>
+          <circle class="rr-prog" id="rrArc" cx="60" cy="60" r="52"
+                  transform="rotate(-90 60 60)" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="rr-mid"><b id="rrPct">0</b><i>%</i></div>
+      </div>
+      <div class="rr-sub" id="rrSub">0 / 0 tasks</div>
+      <button class="fridge-btn rail-fridge" id="railFridge" type="button">
+        <i>&#10052;</i>
+        <span><b>The Fridge</b><span>ideas, kept cold</span></span>
+        <em id="railFridgeCt">0</em>
+      </button>
+    </div>
   </nav>
 
   <script>
@@ -920,7 +979,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.47</div>
+    <div class="splash-tag">Production Tracker · v0.48</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -933,6 +992,10 @@ body.fridge .deck-empty p{color:#cdeef7}
   </div>
 
   <div class="panes" id="panes" hidden>
+    <div class="sideswitch" id="sideSwitch">
+      <span>Side panel</span>
+      <select id="sideSel" aria-label="Side panel view"></select>
+    </div>
     <section class="pane is-active" id="pane-overview" role="tabpanel">
       <div class="hero">
         <div class="ring">
@@ -1206,7 +1269,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.47";
+const VERSION="v0.48";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1215,7 +1278,7 @@ function fitBar(){
   // sticks to its full height; on mobile it is the bar across the top
   document.documentElement.style.setProperty("--barH",h+"px");
 }
-addEventListener("resize",fitBar);
+addEventListener("resize",()=>{fitBar();applyShell();});
 addEventListener("orientationchange",()=>setTimeout(fitBar,150));
 
 /* ===== state ===== */
@@ -1485,6 +1548,13 @@ function hero(){
   tween(p);
   $("sub").textContent=`${n} / ${S.length} tasks`;
   $("arc").style.strokeDashoffset=(2*Math.PI*137)*(1-p/100);
+  // the rail keeps the same number in view no matter which pane is open
+  const rp=$("rrPct"), ra=$("rrArc"), rs=$("rrSub");
+  if(rp) rp.textContent=Math.round(p);
+  if(ra) ra.style.strokeDashoffset=(2*Math.PI*52)*(1-p/100);
+  if(rs) rs.textContent=`${n} / ${S.length} tasks`;
+  const rf=$("railFridgeCt");
+  if(rf) rf.textContent=Object.keys(ideaMap).filter(k=>ideaMap[k]&&ideaMap[k].text).length;
 }
 function buildTicks(){
   TICKS=scope(); TICK_SIG=TICKS.map(t=>t.id).join("|");
@@ -2640,6 +2710,7 @@ function setRole(r){
 }
 function applyRole(){
   document.body.classList.toggle("ro",!canEdit());
+  setTimeout(applyShell,0);   // the nav changes height with the role
   document.body.classList.toggle("crew",canEdit());
   document.body.classList.toggle("admin",isAdmin());
   const cur=document.querySelector('.tab[aria-selected="true"]');
@@ -2674,9 +2745,59 @@ function pickLens(){
   openGate();
 }
 
+let sideId="pane-overview";
+
 function showPane(id){
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.getAttribute("aria-controls")===id));
   document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-active",p.id===id));
+  // one pane cannot be in two places; bump the side panel out of the way
+  if(DESKTOP()&&sideId===id) showSide(id==="pane-overview"?"pane-deck":"pane-overview");
+  else markSide();
+}
+
+function showSide(id){
+  sideId=id;
+  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-side",DESKTOP()&&p.id===id&&!p.classList.contains("is-active")));
+  const sel=$("sideSel"); if(sel&&sel.value!==id) sel.value=id;
+  markSide();
+}
+function markSide(){
+  document.querySelectorAll(".tab").forEach(t=>
+    t.classList.toggle("is-side-view",DESKTOP()&&t.getAttribute("aria-controls")===sideId));
+}
+
+const SIDE_VIEWS=[["pane-overview","Overview"],["pane-active","Active"],["pane-deck","Deck"],
+                  ["pane-done","Done"],["pane-tasks","Backlog"],["pane-fridge","The Fridge"]];
+
+/* The rail owns the controls on desktop and the Overview owns them on a phone.
+   Nodes are moved, never duplicated, so state and listeners survive the switch. */
+function applyShell(){
+  const desk=DESKTOP(), ov=$("pane-overview"), rail=$("railExtra");
+  const acts=document.querySelector(".actions"), foot=document.querySelector(".foot");
+  [acts,foot].forEach(el=>{
+    if(!el) return;
+    const target=desk?rail:ov;
+    if(el.parentNode!==target) target.appendChild(el);
+  });
+  if(!desk){
+    document.querySelectorAll(".pane.is-side").forEach(p=>p.classList.remove("is-side"));
+    markSide();
+    return;
+  }
+  const sel=$("sideSel");
+  if(sel&&!sel.options.length){
+    SIDE_VIEWS.forEach(([id,label])=>{
+      const o=document.createElement("option"); o.value=id; o.textContent=label; sel.appendChild(o);
+    });
+    sel.onchange=()=>showSide(sel.value);
+  }
+  const activeId=(document.querySelector(".pane.is-active")||{}).id;
+  if(sideId===activeId) sideId=activeId==="pane-overview"?"pane-deck":"pane-overview";
+  showSide(sideId);
+  // the rail block sits under the nav, whose height depends on the role
+  const nav=document.querySelector(".navseg");
+  if(nav) document.documentElement.style.setProperty("--railY",
+    Math.round(nav.getBoundingClientRect().bottom+window.scrollY)+"px");
 }
 
 function setMode(m){
@@ -2755,8 +2876,11 @@ document.addEventListener("visibilitychange",async()=>{
     const r=localStorage.getItem(RKEY); if(ROLES[r]) role=r;
     const l=localStorage.getItem(MKEY); if(l==="main"||PEOPLE.includes(l)) lens=l;
   }catch(e){}
+  $("railFridge").onclick=()=>setMode("fridge");
   applyRole(); applyLens();
+  if(DESKTOP()) showPane("pane-active");     // desktop opens on the work, not the report
   fitBar(); requestAnimationFrame(fitBar);
+  applyShell(); requestAnimationFrame(applyShell);
   if(DESKTOP()) addEventListener("load",fitBar);   // the sidebar header is tall; remeasure once fonts land
   $("buildTag").textContent=`${VERSION} · ${backend}${navigator.standalone?" · standalone":""}`;
 
