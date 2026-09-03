@@ -392,8 +392,10 @@ body.admin .tab.admin-only{display:flex}
     padding:0 12px;border-radius:9px}
   .mb-lab{font-size:8.5px} .mb-pct{font-size:13px}
   .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
-  .rail-extra{order:6;grid-column:1/-1;display:block;padding:0;margin-top:6px}
-  .navseg{display:none}                 /* the tabs belong above the panes now */
+  /* the default that hides these sits later in the sheet, and a media query adds
+     no specificity — so each of them is qualified to win on its own merit */
+  .app .rail-extra{order:6;grid-column:1/-1;display:block;padding:0;margin-top:6px}
+
 
   .rail-ring{position:relative;width:100%;max-width:190px;margin:6px auto 0}
   .rail-ring svg{width:100%;height:auto;display:block}
@@ -415,18 +417,18 @@ body.admin .tab.admin-only{display:flex}
   .rail-extra .btn{padding:8px 12px;font-size:12px}
 
   /* ---- tab strips, one per pane ---- */
-  .navseg,.sidetabs{background:var(--bg)}
-  .maintabs{
+  .app .navseg{background:var(--bg)}
+  .app .maintabs{
     grid-column:2;grid-row:1;display:flex;gap:4px;align-items:center;
     padding:14px 18px 12px;border-bottom:1px solid var(--line-soft);
     position:sticky;top:0;z-index:24;overflow-x:auto;scrollbar-width:none}
-  .maintabs::-webkit-scrollbar{display:none}
-  .sidetabs{
+  .app .maintabs::-webkit-scrollbar{display:none}
+  .app .sidetabs{
     grid-column:3;grid-row:1;display:flex;gap:4px;align-items:center;
     padding:14px 16px 12px;border-left:1px solid var(--line-soft);
     border-bottom:1px solid var(--line-soft);
     position:sticky;top:0;z-index:24;overflow-x:auto;scrollbar-width:none}
-  .sidetabs::-webkit-scrollbar{display:none}
+  .app .sidetabs::-webkit-scrollbar{display:none}
   .maintabs .tab,body.crew .maintabs .tab,body.admin .maintabs .tab,.stab{
     flex:none;justify-content:center;gap:7px;padding:0 13px;height:32px;border:none;
     display:inline-flex;align-items:center;border-radius:8px;background:transparent;
@@ -455,16 +457,16 @@ body.admin .tab.admin-only{display:flex}
   #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);
     column-gap:28px;align-items:start}
   #pane-overview.is-active>.sec{grid-column:1/-1}
-  #pane-overview.is-active>.hero{grid-column:1;grid-row:2/4;align-self:start}
-  #pane-overview.is-active>#estCard{grid-column:2;grid-row:2;margin-top:0 !important}
-  #pane-overview.is-active>.ov-side{grid-column:2;grid-row:3}
+  #pane-overview.is-active>.hero{grid-column:1;grid-row:1/3;align-self:start}
+  #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
+  #pane-overview.is-active>.ov-side{grid-column:2;grid-row:2}
   #pane-overview.is-active .ov-side>.sec:first-child{margin-top:18px}
   #pane-overview.is-active .ring{--r:290px}
   .pane.is-side .ring{--r:200px}
   .pane.is-side .est-date{font-size:22px}
 
   /* ---- backlog reads as a table in the main column ---- */
-  .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 100px 100px 42px;
+  .app .thead{display:grid;grid-template-columns:20px minmax(0,1fr) 100px 100px 42px;
     align-items:center;gap:12px;padding:0 12px 9px;
     border-bottom:1px solid var(--line);margin-bottom:2px;
     font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
@@ -938,7 +940,13 @@ body.fridge .deck-empty p{color:#cdeef7}
 .pickrow button[aria-pressed="true"]{color:var(--ink);border-color:var(--hot);
   background:color-mix(in srgb,var(--hot) 14%,transparent)}
 .gate--sheet .gate-mark,.gate--sheet .gate-sub{display:none}
-.gate--sheet .gate-card{max-width:400px}
+.gate--sheet .gate-card{max-width:400px;max-height:calc(100vh - 46px);
+  display:flex;flex-direction:column}
+/* the heading is pinned and the body scrolls under it, so the title of whatever
+   you opened is always the first thing you see */
+.gate--sheet .gate-q{position:sticky;top:0;z-index:2;flex:none;background:var(--bg);
+  margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line-soft)}
+.gate--sheet #gateBody{flex:1;min-height:0;overflow-y:auto}
 .gate--sheet .gate-q{margin:0 0 18px}
 </style>
 
@@ -2966,7 +2974,7 @@ document.addEventListener("visibilitychange",async()=>{
     $("fsTitle").value=""; ta.value="";
   };
   applyRole(); applyLens();
-  if(DESKTOP()) showPane("pane-active");     // desktop opens on the work, not the report
+  if(DESKTOP()&&mode!=="fridge") showPane("pane-active");   // desktop opens on the work — unless the fridge is open
   fitBar(); requestAnimationFrame(fitBar);
   applyShell(); requestAnimationFrame(applyShell);
   if(DESKTOP()) addEventListener("load",fitBar);   // the sidebar header is tall; remeasure once fonts land
