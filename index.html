@@ -386,13 +386,15 @@ body.admin .tab.admin-only{display:flex}
   /* lens and mode sit shoulder to shoulder, and both are properly tappable */
   /* base .primebtn lives after this block and sets margin-left:auto, which in a
      grid cell shrinks the button to its label and shoves it right — outrank it */
-  .app .primebtn{order:3;grid-column:1;margin:0;width:auto;justify-self:stretch;min-height:46px;
-    padding:0 10px;display:flex;align-items:center;justify-content:center;border-radius:9px;
-    font-size:10px;letter-spacing:.14em}
-  .app .modebtn{order:4;grid-column:2;margin:0;width:auto;justify-self:stretch;min-height:46px;
-    flex-direction:row;justify-content:space-between;align-items:center;
-    padding:0 12px;border-radius:9px}
-  .mb-lab{font-size:8.5px} .mb-pct{font-size:13px}
+  .app .primebtn{order:3;grid-column:1;margin:0;width:auto;justify-self:stretch;min-height:48px;
+    padding:0 10px;display:flex;align-items:center;justify-content:center;border-radius:10px;
+    font-size:12.5px;font-weight:700;letter-spacing:.16em}
+  .app .modebtn{order:4;grid-column:2;margin:0;width:auto;justify-self:stretch;min-height:48px;
+    flex-direction:row;justify-content:space-between;align-items:center;gap:8px;
+    padding:0 13px;border-radius:10px}
+  .app .mb-lab{font-size:10.5px;font-weight:700;letter-spacing:.14em}
+  .app .mb-pct{font-size:17px;font-weight:700}
+  .app .mark-sub{font-size:10px;padding:3px 9px}
   .app .sync{order:5;grid-column:1/-1;margin:0;text-align:left;font-size:9.5px;opacity:.7}
   /* the default that hides these sits later in the sheet, and a media query adds
      no specificity — so each of them is qualified to win on its own merit */
@@ -419,6 +421,14 @@ body.admin .tab.admin-only{display:flex}
   .rail-extra .actions{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);
     display:flex;flex-wrap:wrap;gap:9px}
   .rail-extra .foot{margin-top:12px;font-size:10.5px;line-height:1.65}
+  /* who you are, readable at a glance */
+  .rail-extra .rc{display:inline-block;padding:3px 9px;border-radius:6px;margin-right:2px;
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .rail-extra .rc-admin{background:color-mix(in srgb,var(--hot) 18%,transparent);color:var(--hot);
+    border:1px solid color-mix(in srgb,var(--hot) 45%,transparent)}
+  .rail-extra .rc-team{background:rgba(63,142,224,.16);color:var(--doing);border:1px solid rgba(63,142,224,.45)}
+  .rail-extra .rc-visitor{background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+  .rail-extra .rolebtn{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em}
   .rail-extra .btn{padding:8px 12px;font-size:12px}
 
   /* ---- tab strips, one per pane ---- */
@@ -440,7 +450,10 @@ body.admin .tab.admin-only{display:flex}
     font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:0;
     text-transform:none;color:var(--muted);white-space:nowrap}
   .maintabs .tab[aria-selected="true"],.stab[aria-selected="true"]{
-    color:var(--ink);background:var(--panel-2);font-weight:600}
+    color:var(--ink);background:var(--panel-2);font-weight:600;
+    box-shadow:inset 0 -2px 0 var(--hot)}
+  .maintabs .tab:disabled,.stab:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+  .maintabs .tab .badge{background:var(--panel-2)}
   .maintabs .tab::before{display:none}
   .maintabs .tab .badge{margin-left:0;min-width:18px;height:17px;border-radius:9px;
     font-family:var(--mono);font-size:9.5px;padding:0 5px}
@@ -460,7 +473,7 @@ body.admin .tab.admin-only{display:flex}
 
   /* overview: ring column runs full height so nothing leaves a hole */
   #pane-overview.is-active{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);
-    column-gap:28px;align-items:start}
+    grid-template-rows:auto minmax(0,1fr);column-gap:28px;align-items:start}
   #pane-overview.is-active>.sec{grid-column:1/-1}
   #pane-overview.is-active>.hero{grid-column:1;grid-row:1/3;align-self:start}
   #pane-overview.is-active>#estCard{grid-column:2;grid-row:1;margin-top:0 !important}
@@ -905,7 +918,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 .swtch[aria-pressed="true"] em{color:var(--done)}
 .swtch:disabled{opacity:.5}
 
-.blk{margin-top:20px;padding-top:15px;border-top:1px solid var(--line-soft)}
+.blk{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .blk-head{display:flex;align-items:center;gap:10px;width:100%;padding:0 0 10px;
   background:none;border:none;text-align:left}
 .blk-head h3{margin:0;font-family:var(--mono);font-size:9px;font-weight:600;
@@ -919,7 +932,7 @@ body.fridge .deck-empty p{color:#cdeef7}
   letter-spacing:.08em;text-transform:uppercase}
 .blk-body{display:none}
 .blk.open .blk-body{display:block}
-.cmt-wrap{margin-top:20px}
+.cmt-wrap{margin-top:14px}
 .cmt-list{display:flex;flex-direction:column;gap:10px}
 .cmt{padding:11px 12px;border-radius:11px;background:var(--panel);border:1px solid var(--line-soft)}
 .cmt-head{display:flex;align-items:center;gap:9px;margin-bottom:5px}
@@ -937,8 +950,8 @@ body.fridge .deck-empty p{color:#cdeef7}
   font-family:var(--body);font-size:14px;line-height:1.5;outline:none;resize:vertical;min-height:56px}
 .cmt-form textarea:focus{border-color:var(--hot)}
 .cmt-form button{align-self:flex-start}
-.tl-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
-  padding:11px 0;border-bottom:1px solid var(--line-soft);text-align:left}
+.tl-row{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:8px 0;border-bottom:1px solid var(--line-soft);text-align:left;min-height:34px}
 .tl-row span{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;
   text-transform:uppercase;color:var(--dim);flex:none}
 .tl-row b{font-size:14.5px;font-weight:500;color:var(--ink);text-align:right;overflow-wrap:anywhere}
@@ -1031,7 +1044,7 @@ body.fridge .deck-empty p{color:#cdeef7}
 
   <div id="boot" class="splash">
     <div class="splash-mark">FRUIT <em>GANG</em></div>
-    <div class="splash-tag">Production Tracker · v0.53</div>
+    <div class="splash-tag">Production Tracker · v0.54</div>
     <svg class="splash-ring" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="none" stroke="#242422" stroke-width="3"/>
       <circle class="spin" cx="50" cy="50" r="44" fill="none" stroke="url(#sg)"
@@ -1342,7 +1355,7 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 const DESKTOP=()=>matchMedia("(min-width:1024px)").matches;
 
-const VERSION="v0.53";
+const VERSION="v0.54";
 function fitBar(){
   const tb=document.querySelector(".topbar");
   if(!tb) return;
@@ -1828,7 +1841,7 @@ function bindSwipe(wrap,row,t){
   const finish=async()=>{
     if(!live) return;
     live=false; wrap.classList.remove("drag","armed");
-    if(lock!=="x"){ row.style.transform="translateX(0px)"; return; }
+    if(lock!=="x"){ row.style.transform="translateX(0px)"; lock=null; return; }
     if(dx<=-THRESH){                       // left swipe -> toggle priority
       row.style.transform="translateX(0px)";
       if(isDone(t.id)) return;             // a finished task has no place on the deck
@@ -1936,7 +1949,7 @@ async function saveOrder(kind,visible){
    send it back. Vertical moves the wrapper, horizontal moves the card inside it. */
 const CARD_THRESH=72;
 function bindCard(wrap,card,t){
-  let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false;
+  let timer=null,dragging=false,lock=null,x0=0,y0=0,dx=0,moved=false,live=false,pid=null;
 
   const inDeck=()=>wrap.parentNode&&wrap.parentNode.id==="deckList";
   const backDest=()=>inDeck()?"backlog":(isPrio(t.id)?"deck":"backlog");
@@ -1962,8 +1975,11 @@ function bindCard(wrap,card,t){
 
   const finish=async()=>{
     clearTimeout(timer);
+    if(!live) return;
+    live=false;
+    try{ card.releasePointerCapture&&card.releasePointerCapture(pid); }catch(_){}
     if(dragging){ await stopDrag(); return; }
-    if(lock!=="x"){ settle(); return; }
+    if(lock!=="x"){ settle(); lock=null; return; }
     if(Math.abs(dx)>=CARD_THRESH){
       const d=dx; settle();
       askMove(t, d>0 ? backDest() : fwdDest());
@@ -1972,6 +1988,7 @@ function bindCard(wrap,card,t){
 
   card.addEventListener("pointerdown",e=>{
     if(!canEdit()||e.target.closest(".sbox")) return;
+    live=true; pid=e.pointerId;
     x0=e.clientX; y0=e.clientY; dx=0; lock=null; moved=false;
     label();
     timer=setTimeout(()=>{
@@ -1988,6 +2005,9 @@ function bindCard(wrap,card,t){
   });
 
   card.addEventListener("pointermove",e=>{
+    /* a mouse fires pointermove on plain hover; without a pointerdown there is
+       no origin, ax became the raw cursor x, and the card slid off and stayed */
+    if(!live) return;
     if(dragging){
       e.preventDefault();
       wrap.style.transform=`translateY(${e.clientY-y0}px)`;
@@ -2293,7 +2313,7 @@ function openTask(t){
 
     if(canEdit()){
       const f=document.createElement("div"); f.className="sheet-field";
-      f.style.marginTop="16px";
+      f.style.marginTop="12px";
       f.innerHTML=`<label>${isAdmin()?"Move to":"Ask to move"}</label><div class="pickrow"></div>`;
       const pr=f.querySelector(".pickrow"), here=destOf(t);
       DESTS.forEach(([k,label])=>{
@@ -2316,14 +2336,17 @@ function openTask(t){
 
     body.appendChild(commentBlock(t));
 
-    const row=document.createElement("div"); row.className="gate-row";
+    /* one row, Close on the right where the thumb lands, Edit on the left —
+       so a task with no description and folded comments fits without scrolling */
+    const row=document.createElement("div"); row.className="gate-row gate-row--split";
+    const close=gbtn("Close","",true); close.onclick=closeGate;
+    row.appendChild(close);                       // row-reverse: first child sits right
     if(isAdmin()){
-      const ed=gbtn("Edit task","",false);
+      const ed=gbtn("Edit","",false);
       ed.onclick=()=>{ closeGate(); setTimeout(()=>editTask(t),380); };
       row.appendChild(ed);
     }
-    const close=gbtn("Close","",true); close.onclick=closeGate;
-    row.appendChild(close); body.appendChild(row);
+    body.appendChild(row);
   });
 }
 
@@ -2820,7 +2843,7 @@ function applyRole(){
   if(cur&&getComputedStyle(cur).display==="none") showPane("pane-overview");
   const el=$("roleLine");
   if(el){
-    el.innerHTML=`${role||"visitor"} · <button class="rolebtn" type="button">switch</button>`;
+    el.innerHTML=`<span class="rc rc-${role||"visitor"}">${role||"visitor"}</span> · <button class="rolebtn" type="button">switch</button>`;
     el.querySelector("button").onclick=askRole;
   }
 }
@@ -2859,14 +2882,23 @@ function showPane(id){
 }
 
 function showSide(id){
+  const activeId=(document.querySelector(".pane.is-active")||{}).id;
+  if(id===activeId) return;                        // that one is on the other screen
   sideId=id;
   document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("is-side",DESKTOP()&&p.id===id&&!p.classList.contains("is-active")));
   document.querySelectorAll(".stab").forEach(b=>b.setAttribute("aria-selected",b.dataset.pane===id));
   markSide();
 }
 function markSide(){
-  document.querySelectorAll(".tab").forEach(t=>
-    t.classList.toggle("is-side-view",DESKTOP()&&t.getAttribute("aria-controls")===sideId));
+  const activeId=(document.querySelector(".pane.is-active")||{}).id;
+  document.querySelectorAll(".maintabs .tab").forEach(t=>{
+    const id=t.getAttribute("aria-controls");
+    t.classList.toggle("is-side-view",DESKTOP()&&id===sideId);
+    t.disabled=DESKTOP()&&id===sideId;            // already open on the right
+  });
+  document.querySelectorAll(".stab").forEach(b=>{
+    b.disabled=b.dataset.pane===activeId;         // already open in the middle
+  });
 }
 
 const SIDE_VIEWS=[["pane-overview","Overview"],["pane-active","Active"],["pane-deck","Deck"],
